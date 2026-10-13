@@ -8,6 +8,7 @@ import {
 import { apiPatientService } from "./apiPatientService";
 import { apiAppointmentService } from "@/features/platform/appointments/apiAppointmentService";
 import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
+import { apiInsuranceService } from "@/features/platform/insurance/apiInsuranceService";
 
 /**
  * Patient Service (Connected directly to MongoDB Backend)
@@ -23,14 +24,27 @@ export const patientService = {
       ]);
 
       if (profile) {
+        let insStatus = (profile.insuranceStatus as any) || "Active & Verified";
+        let insProvider = profile.insuranceProvider || "BlueCross Premier PPO";
+
+        try {
+          const insData = await apiInsuranceService.getPatientInsurance(profile.id);
+          if (insData?.patient) {
+            if (insData.patient.insuranceStatus) insStatus = insData.patient.insuranceStatus;
+            if (insData.patient.insuranceProvider) insProvider = insData.patient.insuranceProvider;
+          }
+        } catch {
+          // Keep profile defaults
+        }
+
         return {
           patientName: profile.name,
           mrn: profile.mrn || `MRN-${profile.id.slice(-6).toUpperCase()}`,
           assignedPCP: profile.assignedDoctorName
             ? `${profile.assignedDoctorName} (${profile.department || "Clinical Care"})`
             : "Assigned Staff Physician",
-          insuranceStatus: (profile.insuranceStatus as any) || "Active & Verified",
-          insuranceProvider: profile.insuranceProvider || "MetroHealth Living System",
+          insuranceStatus: insStatus,
+          insuranceProvider: insProvider,
           upcomingAppointmentsCount: liveApts.filter((a) => a.status !== "cancelled").length,
           pendingRequestsCount: liveReqs.filter((r) => r.status !== "Resolved").length,
           recentMessagesCount: 0,
