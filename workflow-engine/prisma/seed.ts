@@ -206,7 +206,7 @@ async function seed() {
   // 4. Seed Exemplar Clinical Call, Task, Note & Timeline for E2E Demonstration
   console.log("📞 Seeding exemplar clinical call and task...");
   const sampleCallId = "c1000000-0000-0000-0000-000000000001";
-  const sampleTaskId = "t1000000-0000-0000-0000-000000000001";
+  const sampleTaskId = "a1000000-0000-0000-0000-000000000001";
 
   await prisma.call.upsert({
     where: { id: sampleCallId },
@@ -251,7 +251,7 @@ async function seed() {
   // Task Note
   await prisma.taskNote.create({
     data: {
-      id: "n1000000-0000-0000-0000-000000000001",
+      id: "b1000000-0000-0000-0000-000000000001",
       taskId: sampleTaskId,
       authorId: "e4000000-0000-0000-0000-000000000003", // Elena Rodriguez
       note: "Left voicemail for patient Eleanor Vance. Escalating to attending surgeon Dr. Chen for fast-track telehealth appointment.",
@@ -263,21 +263,21 @@ async function seed() {
   // Task Timelines
   const timelines = [
     {
-      id: "m1000000-0000-0000-0000-000000000001",
+      id: "f1000000-0000-0000-0000-000000000001",
       taskId: sampleTaskId,
       eventType: "CALL_RECEIVED",
       message: "Inbound telephony call logged from +1 (555) 234-5678",
       metadata: { channel: "SIP_TRUNK", durationSeconds: 142 },
     },
     {
-      id: "m1000000-0000-0000-0000-000000000002",
+      id: "f1000000-0000-0000-0000-000000000002",
       taskId: sampleTaskId,
       eventType: "AI_PROCESSED",
       message: "NLU parser classified intent as POST_OP_COMPLICATION_TRIAGE with URGENT priority",
       metadata: { confidence: 0.982, sentiment: "CRITICAL" },
     },
     {
-      id: "m1000000-0000-0000-0000-000000000003",
+      id: "f1000000-0000-0000-0000-000000000003",
       taskId: sampleTaskId,
       actorId: "e4000000-0000-0000-0000-000000000002", // Dr. Robert Chen
       eventType: "ASSIGNED",
