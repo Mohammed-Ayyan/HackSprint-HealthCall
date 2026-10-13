@@ -177,6 +177,22 @@ export const createTaskNoteSchema = z
     };
   });
 
+export const SLAHealthStatusEnum = z.enum(
+  [
+    "ON_TRACK",
+    "NEAR_BREACH",
+    "BREACHED",
+    "COMPLETED_ON_TIME",
+    "COMPLETED_BREACHED",
+  ],
+  {
+    errorMap: () => ({
+      message:
+        "slaStatus must be one of: ON_TRACK, NEAR_BREACH, BREACHED, COMPLETED_ON_TIME, COMPLETED_BREACHED",
+    }),
+  }
+);
+
 export const listTasksQuerySchema = z
   .object({
     page: z.coerce.number().int().min(1).default(1),
@@ -186,6 +202,7 @@ export const listTasksQuerySchema = z
     status: TaskStatusEnum.optional(),
     priority: TaskPriorityEnum.optional(),
     escalationLevel: EscalationLevelEnum.optional(),
+    slaStatus: SLAHealthStatusEnum.optional(),
     isOverdue: z
       .union([z.boolean(), z.string()])
       .optional()
@@ -200,6 +217,7 @@ export const listTasksQuerySchema = z
     department_id: z.string().optional(),
     assigned_employee_id: z.string().optional(),
     escalation_level: EscalationLevelEnum.optional(),
+    sla_status: SLAHealthStatusEnum.optional(),
     is_overdue: z
       .union([z.boolean(), z.string()])
       .optional()
@@ -218,6 +236,7 @@ export const listTasksQuerySchema = z
     status: data.status,
     priority: data.priority,
     escalationLevel: data.escalationLevel || data.escalation_level,
+    slaStatus: data.slaStatus || data.sla_status,
     isOverdue:
       data.isOverdue !== undefined ? data.isOverdue : data.is_overdue,
   }));

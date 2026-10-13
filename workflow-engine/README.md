@@ -268,6 +268,49 @@ npm run build && npm start
 - **Atomic Concurrency Guarantee**: Decrementing previous employee workload and incrementing new employee workload occurs within an atomic database transaction.
 - **Chronological Notes Ledger**: Appends internal clinical and operational notes linked to author employees and task timelines.
 
+---
 
+## 10. Phase 6: SLA Deadline Tracking Engine
 
+### SLA Window Tiers by Priority
+Dynamic deadline calculation automatically assigns task resolution windows upon creation or priority adjustment:
 
+| Priority | SLA Window | Formula |
+|---|---|---|
+| `URGENT` | **15 minutes** | `createdAt + 15m` |
+| `HIGH` | **2 hours** | `createdAt + 2h` |
+| `MEDIUM` | **4 hours** | `createdAt + 4h` |
+| `LOW` | **24 hours** | `createdAt + 24h` |
+
+### Health Status State Matrix
+
+| Health Status | Condition / Trigger | Task State |
+|---|---|---|
+| `ON_TRACK` | Active task with > 30 minutes remaining before deadline | Active (`PENDING`, `ASSIGNED`, `IN_PROGRESS`) |
+| `NEAR_BREACH` | Active task with 0 to 30 minutes remaining before deadline | Active (`PENDING`, `ASSIGNED`, `IN_PROGRESS`) |
+| `BREACHED` | Active task past its deadline (`referenceTime > deadlineAt`) | Active (`PENDING`, `ASSIGNED`, `IN_PROGRESS`) |
+| `COMPLETED_ON_TIME` | Task completed before or precisely at deadline (`completedAt <= deadlineAt`) | Terminal (`COMPLETED`) |
+| `COMPLETED_BREACHED` | Task completed after deadline (`completedAt > deadlineAt`) | Terminal (`COMPLETED`) |
+
+### SLA Response Payload Structure
+Appended to all `GET /api/v1/tasks` and `GET /api/v1/tasks/:id` responses:
+
+```json
+{
+  "sla": {
+    "createdAt": "2026-10-13T10:00:00.000Z",
+    "assignedAt": "2026-10-13T10:05:00.000Z",
+    "deadlineAt": "2026-10-13T12:00:00.000Z",
+    "completedAt": null,
+    "healthStatus": "ON_TRACK",
+    "remainingMinutes": 60,
+    "elapsedMinutes": 60
+  }
+}
+```
+
+### SLA Query Parameter Filtering
+Filter active or completed tasks by real-time SLA health status:
+- `GET /api/v1/tasks?slaStatus=ON_TRACK`
+- `GET /api/v1/tasks?slaStatus=NEAR_BREACH`
+- `GET /api/v1/tasks?slaStatus=BREACHED`

@@ -11,10 +11,30 @@ export function validateRequest(validators: RequestValidators) {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
       if (validators.params) {
-        req.params = await validators.params.parseAsync(req.params);
+        const parsedParams = await validators.params.parseAsync(req.params);
+        try {
+          req.params = parsedParams;
+        } catch {
+          Object.defineProperty(req, "params", {
+            value: parsedParams,
+            writable: true,
+            configurable: true,
+            enumerable: true,
+          });
+        }
       }
       if (validators.query) {
-        req.query = await validators.query.parseAsync(req.query);
+        const parsedQuery = await validators.query.parseAsync(req.query);
+        try {
+          req.query = parsedQuery;
+        } catch {
+          Object.defineProperty(req, "query", {
+            value: parsedQuery,
+            writable: true,
+            configurable: true,
+            enumerable: true,
+          });
+        }
       }
       if (validators.body) {
         req.body = await validators.body.parseAsync(req.body);

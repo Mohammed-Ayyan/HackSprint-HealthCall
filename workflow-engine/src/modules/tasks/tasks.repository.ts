@@ -9,6 +9,8 @@ import {
 import { prisma as defaultPrisma } from "../../db/client";
 import { CreateTaskDTO, ListTasksQueryDTO } from "./tasks.types";
 
+import { slaService } from "../sla/sla.service";
+
 export interface AssignOrTransferParams {
   taskId: string;
   previousDepartmentId: string;
@@ -31,6 +33,9 @@ export class TaskRepository {
     const hasEmployee = Boolean(data.assignedEmployeeId);
     const initialStatus = hasEmployee ? TaskStatus.ASSIGNED : TaskStatus.PENDING;
     const now = new Date();
+    const deadlineAt =
+      data.deadlineAt ||
+      slaService.calculateDeadline(now, data.priority || Priority.MEDIUM);
 
     return this.db.$transaction(async (tx) => {
       // 1. Create Task
@@ -43,7 +48,7 @@ export class TaskRepository {
           assignedEmployeeId: data.assignedEmployeeId,
           status: initialStatus,
           priority: data.priority,
-          deadlineAt: data.deadlineAt,
+          deadlineAt,
           assignedAt: hasEmployee ? now : null,
         },
       });

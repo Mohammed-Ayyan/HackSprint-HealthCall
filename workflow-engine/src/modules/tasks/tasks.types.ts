@@ -9,6 +9,9 @@ import {
   TaskTimeline,
   Call,
 } from "@prisma/client";
+import { SLAHealthStatus, SLAMetrics } from "../sla/sla.types";
+
+export { SLAHealthStatus, SLAMetrics };
 
 export interface CreateTaskDTO {
   callId: string;
@@ -52,6 +55,7 @@ export interface ListTasksQueryDTO {
   priority?: Priority;
   escalationLevel?: EscalationLevel;
   isOverdue?: boolean;
+  slaStatus?: SLAHealthStatus;
 }
 
 export type TaskWithDetails = Task & {
@@ -60,4 +64,5 @@ export type TaskWithDetails = Task & {
   assignedEmployee: Employee | null;
   notes: TaskNote[];
   timelines: TaskTimeline[];
+  sla?: SLAMetrics;
 };

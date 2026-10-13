@@ -13,7 +13,8 @@ import {
 } from "./tasks.types";
 import { BadRequestError, NotFoundError } from "../../errors/appError";
 import { prisma } from "../../db/client";
-import { Priority, TaskStatus } from "@prisma/client";
+import { Priority } from "@prisma/client";
+import { slaService } from "../sla/sla.service";
 
 export class TaskService {
   private repo: TaskRepository;
@@ -64,7 +65,11 @@ export class TaskService {
       }
     }
 
-    return this.repo.create(data);
+    const task = await this.repo.create(data);
+    return {
+      ...task,
+      sla: slaService.evaluateSLA(task),
+    };
   }
 
   async getTaskById(id: string) {
@@ -72,17 +77,32 @@ export class TaskService {
     if (!task) {
       throw new NotFoundError(`Task with ID '${id}' not found`);
     }
-    return task;
+    return {
+      ...task,
+      sla: slaService.evaluateSLA(task),
+    };
   }
 
   async listTasks(query: ListTasksQueryDTO) {
     const { tasks, total } = await this.repo.findMany(query);
-    const totalPages = Math.ceil(total / query.limit) || 1;
+    let enrichedTasks = tasks.map((t) => ({
+      ...t,
+      sla: slaService.evaluateSLA(t),
+    }));
+
+    if (query.slaStatus) {
+      enrichedTasks = enrichedTasks.filter(
+        (t) => t.sla.healthStatus === query.slaStatus
+      );
+    }
+
+    const effectiveTotal = query.slaStatus ? enrichedTasks.length : total;
+    const totalPages = Math.ceil(effectiveTotal / query.limit) || 1;
 
     return {
-      data: tasks,
+      data: enrichedTasks,
       meta: {
-        total,
+        total: effectiveTotal,
         page: query.page,
         limit: query.limit,
         totalPages,
@@ -105,7 +125,7 @@ export class TaskService {
       reason: update.reason,
     });
 
-    return this.repo.updateStatus(
+    const task = await this.repo.updateStatus(
       id,
       update.status,
       currentTask.status,
@@ -113,6 +133,11 @@ export class TaskService {
       update.reason,
       update.actorId
     );
+
+    return {
+      ...task,
+      sla: slaService.evaluateSLA(task),
+    };
   }
 
   /**
@@ -193,7 +218,7 @@ export class TaskService {
         }`
       : `Task assigned to ${targetEmployeeName}`;
 
-    return this.repo.assignOrTransfer({
+    const updatedTask = await this.repo.assignOrTransfer({
       taskId: id,
       previousDepartmentId: task.departmentId,
       targetDepartmentId: targetDeptId,
@@ -203,6 +228,11 @@ export class TaskService {
       isTransfer: isDepartmentTransfer || (Boolean(task.assignedEmployeeId) && isEmployeeTransfer),
       message,
     });
+
+    return {
+      ...updatedTask,
+      sla: slaService.evaluateSLA(updatedTask),
+    };
   }
 
   async changePriority(id: string, params: ChangePriorityDTO) {
@@ -218,15 +248,23 @@ export class TaskService {
     }
 
     if (task.priority === params.priority) {
-      return task;
+      return {
+        ...task,
+        sla: slaService.evaluateSLA(task),
+      };
     }
 
-    return this.repo.updatePriority(
+    const updatedTask = await this.repo.updatePriority(
       id,
       params.priority,
       task.priority,
       params.actorId
     );
+
+    return {
+      ...updatedTask,
+      sla: slaService.evaluateSLA(updatedTask),
+    };
   }
 
   async addNote(id: string, params: CreateTaskNoteDTO) {
