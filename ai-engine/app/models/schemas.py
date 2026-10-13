@@ -155,7 +155,42 @@ class TranscriptValidationResponse(BaseModel):
 
 
 # ============================================================================
-# Future AI Intelligence Response Schemas (Phase 2+ Extensibility)
+# Phase 2: Audio Transcription Schemas
+# ============================================================================
+
+class TranscriptionSegment(BaseModel):
+    """Single segment of transcribed speech with timestamps."""
+    id: Optional[int] = None
+    start: float = Field(..., description="Start timestamp in seconds.")
+    end: float = Field(..., description="End timestamp in seconds.")
+    text: str = Field(..., description="Recognized speech segment text.")
+
+
+class TranscriptionResponse(BaseModel):
+    """Structured audio transcription result."""
+    success: bool = Field(default=True, description="Indicates whether transcription succeeded.")
+    transcript: str = Field(..., description="Full consolidated transcript text.")
+    language: str = Field(..., description="Detected or specified ISO language code.")
+    language_probability: Optional[float] = Field(
+        default=None,
+        description="Confidence score for language detection (0.0 to 1.0).",
+    )
+    duration_seconds: Optional[float] = Field(
+        default=None,
+        description="Total audio duration in seconds.",
+    )
+    segments: List[TranscriptionSegment] = Field(
+        default_factory=list,
+        description="Timestamped diarized or speech segments.",
+    )
+    processing_time_seconds: float = Field(
+        ...,
+        description="Total server processing latency in seconds.",
+    )
+
+
+# ============================================================================
+# Future AI Intelligence Response Schemas (Phase 3+ Extensibility)
 # ============================================================================
 
 class AISummaryResponse(BaseModel):
