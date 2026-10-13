@@ -13,7 +13,8 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force",
     "start": "tsx src/index.ts",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "verify": "tsx src/scripts/verify-phase1.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
