@@ -4,8 +4,10 @@ import { prisma } from "./db/client";
 import { config } from "./config/env";
 import * as types from "./types";
 import { escalationScheduler } from "./modules/escalation/escalation.scheduler";
+import { auditService } from "./modules/audit/audit.service";
+import { analyticsService } from "./modules/analytics/analytics.service";
 
-export { app, prisma, config, types, escalationScheduler };
+export { app, prisma, config, types, escalationScheduler, auditService, analyticsService };
 
 /**
  * Health check to verify database connectivity.

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { taskService, TaskService } from "./tasks.service";
 import { escalationService } from "../escalation/escalation.service";
+import { auditService } from "../audit/audit.service";
 import {
   CreateTaskDTO,
   UpdateTaskStatusDTO,
@@ -204,6 +205,23 @@ export class TaskController {
         data: result.data,
         grouped: result.grouped,
         meta: result.meta,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getTaskTimeline = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const id = req.params.id as string;
+      const timeline = await auditService.getTimelineForTask(id);
+      res.status(200).json({
+        success: true,
+        data: timeline,
       });
     } catch (error) {
       next(error);

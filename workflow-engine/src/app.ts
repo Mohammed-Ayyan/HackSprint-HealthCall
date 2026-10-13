@@ -3,6 +3,7 @@ import cors from "cors";
 import { callRouter } from "./modules/calls/calls.routes";
 import { routingRouter } from "./modules/routing/routing.routes";
 import { taskRouter } from "./modules/tasks/tasks.routes";
+import { analyticsRouter } from "./modules/analytics/analytics.routes";
 import { errorHandler } from "./middleware/errorHandler";
 import { NotFoundError } from "./errors/appError";
 
@@ -35,6 +36,7 @@ export function createApp(): Application {
   app.use("/api/v1/calls", callRouter);
   app.use("/api/v1/routing", routingRouter);
   app.use("/api/v1/tasks", taskRouter);
+  app.use("/api/v1/analytics", analyticsRouter);
 
   // 404 Handler for undefined routes
   app.use((req: Request, _res: Response, next) => {

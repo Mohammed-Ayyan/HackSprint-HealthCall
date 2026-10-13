@@ -43,6 +43,13 @@ router.get(
   taskController.getTaskById
 );
 
+// GET /api/v1/tasks/:id/timeline - Retrieve full chronological task audit timeline
+router.get(
+  "/:id/timeline",
+  validateRequest({ params: taskIdParamSchema }),
+  taskController.getTaskTimeline
+);
+
 // POST /api/v1/tasks/:id/escalate - Manually trigger task escalation
 router.post(
   "/:id/escalate",
