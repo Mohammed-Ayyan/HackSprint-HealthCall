@@ -106,6 +106,18 @@ export const MOCK_USERS: Record<UserRole, User> = {
   },
 };
 
+export const ANONYMOUS_USER: User = {
+  id: "",
+  name: "Guest",
+  email: "",
+  role: "Patient",
+  department: "",
+  status: "active",
+  avatar: "",
+  phone: "",
+  lastActive: "Never",
+};
+
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
@@ -121,7 +133,7 @@ export const authService = {
   getCurrentUser(): User {
     const stored = getClientSession();
     if (stored) return stored;
-    return MOCK_USERS.Admin;
+    return ANONYMOUS_USER;
   },
 
   getCurrentRole(): UserRole {
@@ -254,6 +266,6 @@ export const authService = {
   switchRole(role: UserRole): User {
     const current = getClientSession();
     if (current) return current;
-    return MOCK_USERS.Admin;
+    return ANONYMOUS_USER;
   },
 };

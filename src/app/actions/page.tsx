@@ -17,7 +17,7 @@ import { SLATrackerCard } from "@/features/workflow/components/SLATrackerCard";
 import { DepartmentRoutingUI } from "@/features/workflow/components/DepartmentRoutingUI";
 import { EscalationBanner } from "@/features/workflow/components/EscalationBanner";
 import { mockTasksService } from "@/features/workflow/mockTasksService";
-import { mockUserService } from "@/features/platform/mockUserService";
+import { apiUserService } from "@/features/platform/users/apiUserService";
 import { ActionItem, DepartmentRoutingRule, TaskStatus } from "@/shared/types/action";
 import { User } from "@/shared/types/user";
 import { Modal } from "@/shared/components/ui/Modal";
@@ -41,7 +41,7 @@ export default function ActionsPage() {
     const [actionList, rules, staffList] = await Promise.all([
       mockTasksService.getTasks(),
       mockTasksService.getRoutingRules(),
-      mockUserService.getUsers(),
+      apiUserService.getUsers(),
     ]);
     setTasks(actionList);
     setRoutingRules(rules);

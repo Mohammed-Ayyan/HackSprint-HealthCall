@@ -161,6 +161,58 @@ async function seed() {
     console.log("Doctor profile already exists: Dr. Rahul");
   }
 
+  // 4. Seed Insurance Claims
+  const InsuranceClaim = require("../models/InsuranceClaim");
+  const existingClaimsCount = await InsuranceClaim.countDocuments();
+  if (existingClaimsCount === 0) {
+    const adminUser = seededUsers[USER_ROLES.ADMIN];
+    await InsuranceClaim.create([
+      {
+        patientId: rahulPatient._id,
+        insuranceProvider: "BlueCross BlueShield",
+        policyNumber: "BCBS-8849-01",
+        claimAmount: 3450.00,
+        claimReason: "Laparoscopic appendectomy pre-authorization & surgical coverage",
+        claimType: "POST_OP_COVERAGE",
+        priority: "HIGH",
+        status: "SUBMITTED",
+        submittedBy: adminUser._id,
+        aiMetadata: {
+          callId: "call-live-001",
+          transcriptSnippet: "I have a scheduled post-op review and need BlueCross pre-auth confirmation.",
+        },
+      },
+      {
+        patientId: rahulPatient._id,
+        insuranceProvider: "BlueCross BlueShield",
+        policyNumber: "BCBS-8849-01",
+        claimAmount: 850.00,
+        claimReason: "Post-op abdominal ultrasound imaging verification",
+        claimType: "DIAGNOSTIC_IMAGING",
+        priority: "MEDIUM",
+        status: "UNDER_REVIEW",
+        submittedBy: adminUser._id,
+        reviewNotes: "Carrier audit in progress with BlueCross claims division.",
+      },
+      {
+        patientId: ananyaPatient._id,
+        insuranceProvider: "Aetna Health",
+        policyNumber: "AET-7731-99",
+        claimAmount: 1950.00,
+        claimReason: "Cardiovascular stress telemetry & clinical clearance",
+        claimType: "PRIOR_AUTHORIZATION",
+        priority: "HIGH",
+        status: "APPROVED",
+        submittedBy: adminUser._id,
+        reviewedBy: seededUsers[USER_ROLES.INSURANCE_EMPLOYEE]._id,
+        reviewNotes: "Prior-authorization electronic token issued.",
+      },
+    ]);
+    console.log("Seeded 3 operational Insurance Claims in MongoDB.");
+  } else {
+    console.log(`Insurance claims already present in database: ${existingClaimsCount}`);
+  }
+
   await mongoose.disconnect();
   console.log("Database seeded successfully!");
 }

@@ -72,7 +72,17 @@ export const apiAuthService = {
   getCurrentUser(): User {
     const stored = getClientSession();
     if (stored) return stored;
-    return MOCK_USERS.Admin;
+    return {
+      id: "",
+      name: "Guest",
+      email: "",
+      role: "Patient",
+      department: "",
+      status: "active",
+      avatar: "",
+      phone: "",
+      lastActive: "Never",
+    };
   },
 
   getCurrentRole(): UserRole {

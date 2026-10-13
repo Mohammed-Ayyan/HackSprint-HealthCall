@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, UserRole } from "@/shared/types/user";
-import { authService, LoginCredentials, AuthResponse, MOCK_USERS } from "./authService";
+import { authService, LoginCredentials, AuthResponse, ANONYMOUS_USER } from "./authService";
 import { getClientSession, saveSession } from "./sessionStore";
 
 interface AuthContextType {
@@ -33,21 +33,25 @@ export function AuthProvider({
   children: React.ReactNode;
   initialUser?: User | null;
 }) {
-  const fallback = initialUser || MOCK_USERS.Admin;
+  const fallback = initialUser || ANONYMOUS_USER;
   const [user, setUser] = useState<User>(fallback);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!initialUser);
   const [loading, setLoading] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Phase 2 -> 3: Client hydration: Resolve active user from sessionStore
+    // Client hydration: Resolve active user from sessionStore
     const clientUser = getClientSession();
     if (clientUser) {
       setUser(clientUser);
       setIsAuthenticated(true);
     } else if (initialUser) {
       saveSession(initialUser);
+      setUser(initialUser);
       setIsAuthenticated(true);
+    } else {
+      setUser(ANONYMOUS_USER);
+      setIsAuthenticated(false);
     }
     setIsHydrated(true);
   }, [initialUser]);
@@ -87,9 +91,7 @@ export function AuthProvider({
     setLoading(true);
     try {
       await authService.logout();
-      // Reset to unauthenticated admin template
-      const defaultUser = MOCK_USERS.Admin;
-      setUser(defaultUser);
+      setUser(ANONYMOUS_USER);
       setIsAuthenticated(false);
     } finally {
       setLoading(false);

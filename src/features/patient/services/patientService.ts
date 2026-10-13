@@ -7,6 +7,8 @@ import {
 } from "../types";
 import { apiPatientService } from "./apiPatientService";
 import { apiAppointmentService } from "@/features/platform/appointments/apiAppointmentService";
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
+import { apiInsuranceService } from "@/features/platform/insurance/apiInsuranceService";
 
 /**
  * Patient Service (Connected directly to MongoDB Backend)
@@ -15,22 +17,36 @@ import { apiAppointmentService } from "@/features/platform/appointments/apiAppoi
 export const patientService = {
   async getOverview(): Promise<PatientOverviewData> {
     try {
-      const [profile, liveApts] = await Promise.all([
+      const [profile, liveApts, liveReqs] = await Promise.all([
         apiPatientService.getMyProfile().catch(() => null),
         apiAppointmentService.getAppointments().catch(() => []),
+        this.getRequests().catch(() => []),
       ]);
 
       if (profile) {
+        let insStatus = (profile.insuranceStatus as any) || "Active & Verified";
+        let insProvider = profile.insuranceProvider || "BlueCross Premier PPO";
+
+        try {
+          const insData = await apiInsuranceService.getPatientInsurance(profile.id);
+          if (insData?.patient) {
+            if (insData.patient.insuranceStatus) insStatus = insData.patient.insuranceStatus;
+            if (insData.patient.insuranceProvider) insProvider = insData.patient.insuranceProvider;
+          }
+        } catch {
+          // Keep profile defaults
+        }
+
         return {
           patientName: profile.name,
           mrn: profile.mrn || `MRN-${profile.id.slice(-6).toUpperCase()}`,
           assignedPCP: profile.assignedDoctorName
             ? `${profile.assignedDoctorName} (${profile.department || "Clinical Care"})`
             : "Assigned Staff Physician",
-          insuranceStatus: (profile.insuranceStatus as any) || "Active & Verified",
-          insuranceProvider: profile.insuranceProvider || "MetroHealth Living System",
+          insuranceStatus: insStatus,
+          insuranceProvider: insProvider,
           upcomingAppointmentsCount: liveApts.filter((a) => a.status !== "cancelled").length,
-          pendingRequestsCount: 0,
+          pendingRequestsCount: liveReqs.filter((r) => r.status !== "Resolved").length,
           recentMessagesCount: 0,
         };
       }
@@ -113,7 +129,32 @@ export const patientService = {
   },
 
   async getRequests(): Promise<PatientRequest[]> {
-    return [];
+    try {
+      const tasks = await apiTaskService.getTasks();
+      return tasks.map((t) => {
+        let cat: PatientRequest["category"] = "Medical Records";
+        if (t.department === "Insurance") cat = "Insurance";
+        else if (t.department === "Reception") cat = "Appointment";
+        else if (t.department === "Billing") cat = "Billing";
+
+        let st: PatientRequest["status"] = "In Progress";
+        if (t.status === "completed") st = "Resolved";
+        else if (t.status === "pending") st = "Under Review";
+
+        return {
+          id: t.id,
+          title: t.task,
+          category: cat,
+          status: st,
+          createdDate: new Date(t.createdAt).toLocaleDateString(),
+          estimatedResolution: t.deadline || "Within 24 hours",
+          department: t.department,
+          lastUpdateNotes: t.description || "Operational request under hospital review",
+        };
+      });
+    } catch {
+      return [];
+    }
   },
 
   async getCommunicationHistory(): Promise<CommunicationRecord[]> {
