@@ -1,26 +1,37 @@
 import { User, UserRole } from "@/shared/types/user";
 import { authService, MOCK_USERS } from "./auth/authService";
+import { apiAuthService } from "./auth/apiAuthService";
 
 export const mockUsersList: User[] = Object.values(MOCK_USERS);
 
 /**
- * Backwards-compatible export mapping to centralized authService
+ * Enterprise Authentication Service
+ * Seamlessly transitions between mock testing and real backend API:
+ * - Use `apiAuthService` for real HTTP endpoints (/api/v1/auth)
+ * - Use `mockAuthService` for offline mock testing
  */
 export const mockAuthService = {
   getCurrentUser(): User {
-    return authService.getCurrentUser();
+    return apiAuthService.getCurrentUser();
   },
 
   getCurrentRole(): UserRole {
-    return authService.getCurrentRole();
+    return apiAuthService.getCurrentRole();
   },
 
   async login(email: string, role: UserRole): Promise<User> {
-    const res = await authService.login({ email, role });
+    const res = await apiAuthService.login({ email, role });
     return res.user;
   },
 
+  async logout(): Promise<void> {
+    await apiAuthService.logout();
+  },
+
   switchRole(role: UserRole): User {
-    return authService.switchRole(role);
+    return apiAuthService.switchRole(role);
   },
 };
+
+export { apiAuthService };
+
