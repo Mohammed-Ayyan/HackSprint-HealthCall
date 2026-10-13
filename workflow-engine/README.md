@@ -170,3 +170,40 @@ npm run dev
 npm run build && npm start
 ```
 
+---
+
+## 7. Phase 3: Automatic Department Routing Engine
+
+### Routing Rules Matrix
+
+| Intent Category | Exemplar Intents | Target Department | Department ID | Default Priority | Target SLA Window |
+|---|---|---|---|---|---|
+| **Appointment** | `appointment`, `appointment_booking`, `reschedule`, `cancellation` | Reception Team | `reception` | `MEDIUM` | 4.0 hours |
+| **Insurance** | `insurance`, `insurance_verification`, `prior_auth`, `claim_inquiry` | Insurance Department | `insurance` | `HIGH` | 2.0 hours |
+| **Complaint / Billing** | `complaint`, `billing`, `billing_dispute`, `feedback` | Customer Support | `customer_support` | `MEDIUM` | 6.0 hours |
+| **Emergency / Critical** | `emergency`, `critical_symptoms`, `triage`, `chest_pain` | Clinical Triage | `clinical_triage` | `URGENT` | 0.25 hours (15 min) |
+| **Fallback** | Unrecognized / empty intents | Reception Team | `reception` | `HIGH` | 2.0 hours |
+
+### Dry-Run Endpoint
+
+- **Method**: `POST /api/v1/routing/evaluate`
+- **Payload**:
+  ```json
+  {
+    "intent": "appointment_booking",
+    "priority": "MEDIUM",
+    "sentiment": "NEUTRAL"
+  }
+  ```
+- **Response (`200 OK`)**:
+  ```json
+  {
+    "matched_intent": "appointment",
+    "department_id": "reception",
+    "department_name": "Reception Team",
+    "default_priority": "MEDIUM",
+    "sla_hours": 4
+  }
+  ```
+
+
