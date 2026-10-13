@@ -14,7 +14,8 @@
     "db:reset": "prisma migrate reset --force",
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
-    "verify": "tsx src/scripts/verify-phase1.ts"
+    "verify": "tsx src/scripts/verify-phase1.ts",
+    "test": "tsx --test tests/**/*.test.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -31,11 +32,18 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "dotenv": "^16.4.7"
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.7",
+    "express": "^5.3.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^20.17.24",
+    "@types/supertest": "^7.2.1",
     "prisma": "^5.22.0",
+    "supertest": "^7.3.1",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   }

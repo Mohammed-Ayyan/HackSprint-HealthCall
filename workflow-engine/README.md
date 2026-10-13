@@ -26,9 +26,24 @@ workflow-engine/
 │   │   └── env.ts                  # Typed environment configuration
 │   ├── db/
 │   │   └── client.ts               # PrismaClient singleton instance
+│   ├── errors/
+│   │   └── appError.ts             # Standardized operational error classes
+│   ├── middleware/
+│   │   ├── errorHandler.ts         # Centralized error handler returning structured JSON
+│   │   └── validateRequest.ts      # Zod validation middleware for body/query/params
+│   ├── modules/
+│   │   └── calls/
+│   │       ├── calls.validation.ts # Zod schemas for Call CRUD
+│   │       ├── calls.repository.ts # Prisma repository data access layer
+│   │       ├── calls.service.ts    # Business logic layer with pagination
+│   │       ├── calls.controller.ts # HTTP controller handlers
+│   │       └── calls.routes.ts     # Express routes under /api/v1/calls
+│   ├── app.ts                      # Express application factory & middleware setup
 │   ├── types/
 │   │   └── index.ts                # Domain types, DTOs & Prisma re-exports
-│   └── index.ts                    # Module entry point & health check
+│   └── index.ts                    # Server entry point with HTTP listener
+├── tests/
+│   └── calls.test.ts               # Automated tests for Call CRUD & validation
 ├── .env.example                    # Environment template
 ├── package.json                    # Scripts & dependencies
 └── tsconfig.json                   # Strict TS compiler configuration
@@ -126,3 +141,32 @@ Running the seed script provisions:
   - `clinical_triage` — Clinical Triage (Manager: Dr. Robert Chen)
 - **Default Employees** across all 3 roles (`STAFF`, `MANAGER`, `ADMINISTRATOR`) in each department.
 - **End-to-End Exemplar Record**: An inbound urgent call, clinical triage task, nurse clinical note, and 3 timeline audit events demonstrating full relational integrity.
+
+---
+
+## 6. Phase 2: Call Management System (CRUD API)
+
+### Endpoints
+
+| Method | Endpoint | Description | Validation |
+|---|---|---|---|
+| `POST` | `/api/v1/calls` | Ingest and create a new Call record | Zod `createCallSchema` |
+| `GET` | `/api/v1/calls` | List calls with pagination and filtering | `page`, `limit`, `patientPhone`, `detectedIntent`, `priority`, `sentiment` |
+| `GET` | `/api/v1/calls/:id` | Retrieve single call with linked tasks | Valid UUID parameter |
+| `PATCH` | `/api/v1/calls/:id` | Update call metadata | Valid UUID, at least 1 updatable field |
+| `DELETE` | `/api/v1/calls/:id` | Delete call (cascades linked tasks) | Valid UUID parameter |
+| `GET` | `/health` | Server health check | None |
+
+### Running the Server & Tests
+
+```bash
+# Run tests
+npm test
+
+# Run development server
+npm run dev
+
+# Run production build
+npm run build && npm start
+```
+
