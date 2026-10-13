@@ -53,12 +53,15 @@ The application now communicates strictly with the live MongoDB database and Exp
   - `DEPARTMENT_MANAGER`: `eleanor.v@metrohealth.eco`
   - `PATIENT`: `rahul.sharma@email.com`
 
+- **Self-Registration Fixed:** Converted public `/auth/signup` from the internal Admin `mockUserService.addUser` to the public `apiAuthService.register()` / `POST /api/v1/auth/register` endpoint with complete error handling. Eliminates the unhandled 403 permission rejection, cleanly saves new users to MongoDB, and logs them in seamlessly.
+
 ---
 
 ## 3. Mock Data Removal Registry
 
 | Module / Component | Removed Mock Items | New Real Source |
 | :--- | :--- | :--- |
+| `src/app/auth/signup/page.tsx` | `mockUserService.addUser` admin-only call | Real public `POST /api/v1/auth/register` via `useAuth().register` |
 | `src/features/platform/auth/authService.ts` | `MOCK_USERS`, dummy tokens (`careops-jwt-*`), fallback catch | Real `POST /api/v1/auth/login`, `GET /api/v1/auth/me` |
 | `src/features/platform/auth/apiAuthService.ts` | Fallback registration and login objects | Real backend endpoints |
 | `src/app/auth/login/page.tsx` | Fake dummy masked password string (`••••••••••••`) | User inputs or role demo autofill targeting real DB credentials |

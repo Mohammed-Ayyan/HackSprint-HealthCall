@@ -3,10 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { HeartHandshake, ArrowRight, ShieldCheck } from "lucide-react";
+import { HeartHandshake, ArrowRight, AlertCircle } from "lucide-react";
 import { UserRole } from "@/shared/types/user";
 import { DepartmentName } from "@/shared/types/action";
-import { mockUserService } from "@/features/platform/mockUserService";
 import { useAuth } from "@/features/platform/auth/authContext";
 import { Button } from "@/shared/components/ui/Button";
 import { Input, Select } from "@/shared/components/ui/Input";
@@ -15,30 +14,36 @@ import { Badge } from "@/shared/components/ui/Badge";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("Doctor");
   const [department, setDepartment] = useState<DepartmentName>("Clinical Team");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    await mockUserService.addUser({
-      name,
-      email,
-      role,
-      department,
-      status: "active",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-    });
-    const res = await login({ email, password, role });
-    if (res.success && res.redirectTo) {
-      router.push(res.redirectTo);
-    } else {
-      router.push("/dashboard");
+    try {
+      const res = await register({
+        name,
+        email,
+        password,
+        role,
+        department,
+      });
+      if (res.success && res.redirectTo) {
+        router.push(res.redirectTo);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to complete registration");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,6 +69,13 @@ export default function SignupPage() {
         </div>
 
         <Card variant="elevated" className="p-6 sm:p-8 bg-white border-[#d8e2d6] shadow-[0_8px_30px_rgba(20,32,25,0.06)] space-y-5">
+          {error && (
+            <div className="flex items-center gap-2 p-3 text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg">
+              <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+              <span>{error}</span>
+            </div>
+          )}
+
           <form onSubmit={handleSignup} className="space-y-4">
             <Input
               label="Full Name & Clinical Credentials"

@@ -186,6 +186,18 @@ export const authService = {
     };
   },
 
+  async register(params: {
+    name: string;
+    email: string;
+    password: string;
+    role: UserRole;
+    department?: string;
+    phone?: string;
+  }): Promise<AuthResponse> {
+    const { apiAuthService } = await import("./apiAuthService");
+    return apiAuthService.register(params);
+  },
+
   async fetchCurrentUser(): Promise<User | null> {
     const token = getClientToken();
     if (!token) return getClientSession();
