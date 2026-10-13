@@ -1,0 +1,41 @@
+{
+  "name": "@careops/workflow-engine",
+  "version": "1.0.0",
+  "description": "Healthcare Workflow Engine - Telephony Intelligence, Departmental Routing & Task Management Backend",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset --force",
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "keywords": [
+    "healthcare",
+    "telephony",
+    "workflow-engine",
+    "prisma",
+    "postgresql",
+    "careops"
+  ],
+  "author": "CareOps AI Team",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.24",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
