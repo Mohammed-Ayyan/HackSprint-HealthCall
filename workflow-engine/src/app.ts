@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import { callRouter } from "./modules/calls/calls.routes";
 import { routingRouter } from "./modules/routing/routing.routes";
+import { taskRouter } from "./modules/tasks/tasks.routes";
 import { errorHandler } from "./middleware/errorHandler";
 import { NotFoundError } from "./errors/appError";
 
@@ -33,6 +34,7 @@ export function createApp(): Application {
   // Mount API modules
   app.use("/api/v1/calls", callRouter);
   app.use("/api/v1/routing", routingRouter);
+  app.use("/api/v1/tasks", taskRouter);
 
   // 404 Handler for undefined routes
   app.use((req: Request, _res: Response, next) => {

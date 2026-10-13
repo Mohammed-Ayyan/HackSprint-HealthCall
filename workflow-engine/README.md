@@ -206,4 +206,51 @@ npm run build && npm start
   }
   ```
 
+---
+
+## 8. Phase 4: Action & Task Management Core
+
+### Task State Machine Transition Rules
+
+```
+       ┌───────────┐
+       │  PENDING  │──────────────┐
+       └─────┬─────┘              │
+             │                    │
+             ▼                    ▼
+       ┌───────────┐         ┌───────────┐
+  ┌───►│ ASSIGNED  │────────►│ CANCELLED │ (Terminal)
+  │    └─────┬─────┘         └───────────┘
+  │          │ (requires          ▲   ▲
+  │          │  assigned employee)│   │
+  │          ▼                    │   │
+  └─── ┌─────────────┐            │   │
+       │ IN_PROGRESS │────────────┘   │
+       └─────┬───────┘ (requires      │
+             │          mandatory     │
+             ▼          reason)       │
+       ┌───────────┐                  │
+       │ COMPLETED │──────────────────┘
+       └───────────┘
+        (Terminal)
+```
+
+| Source Status | Allowed Targets | Requirements / Invariants |
+|---|---|---|
+| `PENDING` | `ASSIGNED`, `CANCELLED` | Cannot skip to `IN_PROGRESS` or `COMPLETED`. |
+| `ASSIGNED` | `IN_PROGRESS`, `CANCELLED`, `PENDING` | `IN_PROGRESS` requires an assigned employee. |
+| `IN_PROGRESS` | `COMPLETED`, `CANCELLED` | `COMPLETED` requires an assigned employee; sets `completedAt`. |
+| `COMPLETED` | *None* | Terminal state. No further transitions permitted. |
+| `CANCELLED` | *None* | Terminal state. Requires a mandatory non-empty cancellation reason. |
+
+### Task Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/tasks` | Create task linked to `callId` and `departmentId` |
+| `GET` | `/api/v1/tasks` | List tasks with filters (`departmentId`, `assignedEmployeeId`, `status`, `priority`, `escalationLevel`, `isOverdue`) and pagination |
+| `GET` | `/api/v1/tasks/:id` | Get full task details including department, assigned staff, notes, and audit timelines |
+| `PATCH` | `/api/v1/tasks/:id/status` | Update task status with state machine governance (`{ status, reason?, actorId? }`) |
+
+
 
