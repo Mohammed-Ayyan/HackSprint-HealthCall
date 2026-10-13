@@ -175,6 +175,8 @@ let directoryStore = [...mockDirectoryPatients];
  * Reception Service (API-Ready Layer)
  * Future replacement point: GET /api/reception/appointments, POST /api/reception/appointments
  */
+import { apiPatientService } from "@/features/platform/patients/apiPatientService";
+
 export const receptionService = {
   async getOverview(): Promise<ReceptionOverviewData> {
     await new Promise((r) => setTimeout(r, 40));
@@ -226,21 +228,60 @@ export const receptionService = {
   },
 
   async getPatientDirectory(): Promise<DirectoryPatient[]> {
-    await new Promise((r) => setTimeout(r, 40));
+    try {
+      const apiPatients = await apiPatientService.getPatients();
+      if (apiPatients && apiPatients.length > 0) {
+        return apiPatients.map((p) => ({
+          id: p.id,
+          mrn: p.mrn,
+          name: p.name,
+          contact: p.phone,
+          email: p.email,
+          dob: p.dateOfBirth || "1990-01-01",
+          insuranceProvider: p.insuranceProvider || "BlueCross Premier PPO",
+          lastVisit: "Recent Consultation",
+          totalAppointments: 1,
+        }));
+      }
+    } catch {
+      // Graceful fallback to local directory store
+    }
     return [...directoryStore];
   },
 
   async createPatient(
     data: Omit<DirectoryPatient, "id" | "totalAppointments">
   ): Promise<DirectoryPatient> {
-    await new Promise((r) => setTimeout(r, 60));
-    const newPat: DirectoryPatient = {
-      ...data,
-      id: `dp-${Date.now()}`,
-      totalAppointments: 1,
-    };
-    directoryStore.unshift(newPat);
-    return newPat;
+    try {
+      const created = await apiPatientService.createPatient({
+        name: data.name,
+        email: data.email,
+        phone: data.contact,
+        dateOfBirth: data.dob,
+        insuranceProvider: data.insuranceProvider,
+      });
+      const dirPat: DirectoryPatient = {
+        id: created.id,
+        mrn: created.mrn,
+        name: created.name,
+        contact: created.phone,
+        email: created.email,
+        dob: created.dateOfBirth || data.dob,
+        insuranceProvider: created.insuranceProvider || data.insuranceProvider,
+        lastVisit: data.lastVisit || "Today (Intake)",
+        totalAppointments: 1,
+      };
+      directoryStore.unshift(dirPat);
+      return dirPat;
+    } catch {
+      const newPat: DirectoryPatient = {
+        ...data,
+        id: `dp-${Date.now()}`,
+        totalAppointments: 1,
+      };
+      directoryStore.unshift(newPat);
+      return newPat;
+    }
   },
 
   async getDoctorSchedules(): Promise<DoctorScheduleSlot[]> {
