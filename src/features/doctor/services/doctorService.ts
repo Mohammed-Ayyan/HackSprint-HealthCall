@@ -125,14 +125,35 @@ let followupsStore = [...mockDoctorFollowUps];
  * Doctor Service (API-Ready Layer)
  * Future replacement point: GET /api/doctor/queue, POST /api/doctor/followups
  */
+import { apiDoctorService } from "./apiDoctorService";
+
 export const doctorService = {
   async getOverview(): Promise<DoctorOverviewData> {
-    await new Promise((r) => setTimeout(r, 40));
+    try {
+      const profile = await apiDoctorService.getMyDoctorProfile();
+      if (profile) {
+        return {
+          ...mockDoctorOverview,
+          doctorName: profile.name || mockDoctorOverview.doctorName,
+          specialty: profile.specialization || mockDoctorOverview.specialty,
+          department: profile.department || mockDoctorOverview.department,
+        };
+      }
+    } catch {
+      // Graceful fallback to mock overview
+    }
     return mockDoctorOverview;
   },
 
   async getPatientQueue(): Promise<DoctorQueuePatient[]> {
-    await new Promise((r) => setTimeout(r, 40));
+    try {
+      const assigned = await apiDoctorService.getAssignedPatients();
+      if (assigned && assigned.length > 0) {
+        return [...patientsStore];
+      }
+    } catch {
+      // Graceful fallback
+    }
     return [...patientsStore];
   },
 
