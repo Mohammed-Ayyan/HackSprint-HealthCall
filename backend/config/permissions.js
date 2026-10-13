@@ -30,10 +30,12 @@ const PERMISSIONS = Object.freeze({
 
   // Operations / Manager domain
   VIEW_DEPARTMENT_OPERATIONS: "view_department_operations",
+  VIEW_DEPARTMENT_USERS: "view_department_users",
   MANAGE_WORKLOADS: "manage_workloads",
   RESOLVE_ESCALATIONS: "resolve_escalations",
 
   // Administrator domain
+  MANAGE_USERS: "manage_users",
   FULL_ACCESS: "*",
 });
 
@@ -68,6 +70,7 @@ const ROLE_PERMISSIONS = Object.freeze({
   [USER_ROLES.DEPARTMENT_MANAGER]: [
     PERMISSIONS.VIEW_OWN_PROFILE,
     PERMISSIONS.VIEW_DEPARTMENT_OPERATIONS,
+    PERMISSIONS.VIEW_DEPARTMENT_USERS,
     PERMISSIONS.MANAGE_WORKLOADS,
     PERMISSIONS.RESOLVE_ESCALATIONS,
   ],

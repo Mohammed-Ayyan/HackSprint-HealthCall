@@ -61,6 +61,19 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    status: {
+      type: String,
+      enum: {
+        values: ["ACTIVE", "INACTIVE", "SUSPENDED"],
+        message: "{VALUE} is not a valid user status",
+      },
+      default: "ACTIVE",
+      index: true,
+      set: function (val) {
+        if (!val) return "ACTIVE";
+        return val.toString().toUpperCase().trim();
+      },
+    },
   },
   {
     timestamps: true,

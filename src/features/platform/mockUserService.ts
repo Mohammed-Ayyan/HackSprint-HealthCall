@@ -1,44 +1,39 @@
-import { User, UserRole } from "@/shared/types/user";
-import { DepartmentName } from "@/shared/types/action";
-import { mockUsersList } from "./mockAuthService";
-
-let currentUsers: User[] = [...mockUsersList];
+import { User } from "@/shared/types/user";
+import { apiUserService } from "./users/apiUserService";
 
 /**
- * Future backend replacement: src/features/platform/apiUserService.ts
+ * Enterprise User Management Service
+ * Bridges seamlessly between local fallback state and real backend APIs (/api/v1/users).
+ * Provides drop-in compatibility for existing UI components.
  */
 export const mockUserService = {
-  async getUsers(): Promise<User[]> {
-    await new Promise((r) => setTimeout(r, 60));
-    return [...currentUsers];
+  async getUsers(filters?: { role?: string; department?: string; status?: string; search?: string }): Promise<User[]> {
+    return apiUserService.getUsers(filters);
   },
 
-  async addUser(newUser: Omit<User, "id" | "assignedTasksCount" | "completedTasksCount" | "avgResolutionMinutes" | "lastActive">): Promise<User> {
-    await new Promise((r) => setTimeout(r, 80));
-    const user: User = {
-      ...newUser,
-      id: `usr-${Date.now()}`,
-      assignedTasksCount: 0,
-      completedTasksCount: 0,
-      avgResolutionMinutes: 0,
-      lastActive: "Just now",
-    };
-    currentUsers.unshift(user);
-    return user;
+  async getUserById(id: string): Promise<User | null> {
+    return apiUserService.getUserById(id);
+  },
+
+  async createUser(newUser: any): Promise<User> {
+    return apiUserService.createUser(newUser);
+  },
+
+  async addUser(newUser: any): Promise<User> {
+    return apiUserService.addUser(newUser);
   },
 
   async updateUser(id: string, updates: Partial<User>): Promise<User | null> {
-    await new Promise((r) => setTimeout(r, 60));
-    const index = currentUsers.findIndex((u) => u.id === id);
-    if (index === -1) return null;
-    currentUsers[index] = { ...currentUsers[index], ...updates };
-    return currentUsers[index];
+    return apiUserService.updateUser(id, updates);
+  },
+
+  async changeStatus(id: string, status: "ACTIVE" | "INACTIVE" | "SUSPENDED"): Promise<User | null> {
+    return apiUserService.changeStatus(id, status);
   },
 
   async deleteUser(id: string): Promise<boolean> {
-    await new Promise((r) => setTimeout(r, 50));
-    const initialLen = currentUsers.length;
-    currentUsers = currentUsers.filter((u) => u.id !== id);
-    return currentUsers.length < initialLen;
+    return apiUserService.deleteUser(id);
   },
 };
+
+export { apiUserService };
