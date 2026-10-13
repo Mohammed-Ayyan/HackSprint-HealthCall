@@ -1,0 +1,123 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { BarChart3, TrendingUp, CheckCircle, Clock, Flame, ShieldCheck } from "lucide-react";
+import { AppShell } from "@/shared/components/layout/AppShell";
+import { AnalyticsCharts } from "@/features/platform/components/AnalyticsCharts";
+import { ReportsExporter } from "@/features/platform/components/ReportsExporter";
+import { StatCard } from "@/shared/components/common/StatCard";
+import { mockAnalyticsService } from "@/features/platform/mockAnalyticsService";
+import {
+  AnalyticsSummary,
+  CallVolumePoint,
+  CategoryDistribution,
+  DepartmentWorkload,
+  ResolutionTimeMetric,
+} from "@/shared/types/analytics";
+import { Badge } from "@/shared/components/ui/Badge";
+
+export default function AnalyticsPage() {
+  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
+  const [volumeTrends, setVolumeTrends] = useState<CallVolumePoint[]>([]);
+  const [categories, setCategories] = useState<CategoryDistribution[]>([]);
+  const [workloads, setWorkloads] = useState<DepartmentWorkload[]>([]);
+  const [resolutionMetrics, setResolutionMetrics] = useState<ResolutionTimeMetric[]>([]);
+
+  useEffect(() => {
+    loadAnalytics();
+  }, []);
+
+  const loadAnalytics = async () => {
+    const [sum, trends, cats, load, res] = await Promise.all([
+      mockAnalyticsService.getSummary(),
+      mockAnalyticsService.getVolumeTrends(),
+      mockAnalyticsService.getIssueCategories(),
+      mockAnalyticsService.getDepartmentWorkload(),
+      mockAnalyticsService.getResolutionTimeMetrics(),
+    ]);
+
+    setSummary(sum);
+    setVolumeTrends(trends);
+    setCategories(cats);
+    setWorkloads(load);
+    setResolutionMetrics(res);
+  };
+
+  return (
+    <AppShell>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl font-extrabold tracking-tight text-white font-mono">
+                Operational Analytics & Metrics
+              </h1>
+              <Badge variant="cyan" size="sm">
+                Executive Reporting
+              </Badge>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              Comprehensive telemetry tracking call ingestion, conversion rates, and department throughput
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
+              Extraction Accuracy: <strong className="text-cyan-400">99.2%</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* Top Metric Cards */}
+        {summary && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Total Calls Processed"
+              value={summary.totalCalls.toLocaleString()}
+              changePercent={summary.callsChangePercent}
+              subtitle="24h volume"
+              icon={<BarChart3 className="h-5 w-5" />}
+              variant="cyan"
+            />
+            <StatCard
+              title="Task Resolution Velocity"
+              value={summary.completedTasks.toLocaleString()}
+              changePercent={summary.tasksChangePercent}
+              subtitle="dispatched actions"
+              icon={<CheckCircle className="h-5 w-5" />}
+              variant="emerald"
+            />
+            <StatCard
+              title="Overall SLA Compliance"
+              value={`${summary.overallSLACompliance}%`}
+              subtitle="across all departments"
+              icon={<Clock className="h-5 w-5" />}
+              variant="purple"
+            />
+            <StatCard
+              title="Avg Mean Resolution"
+              value={`${summary.avgResolutionHours} hrs`}
+              subtitle="from call to done"
+              icon={<TrendingUp className="h-5 w-5" />}
+              variant="default"
+            />
+          </div>
+        )}
+
+        {/* Main Charts */}
+        {volumeTrends.length > 0 && (
+          <AnalyticsCharts
+            volumeTrends={volumeTrends}
+            categories={categories}
+            departmentWorkloads={workloads}
+            resolutionMetrics={resolutionMetrics}
+          />
+        )}
+
+        {/* Reports Download Section */}
+        <ReportsExporter />
+      </div>
+    </AppShell>
+  );
+}
