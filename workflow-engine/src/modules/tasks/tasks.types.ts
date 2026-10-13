@@ -26,6 +26,23 @@ export interface UpdateTaskStatusDTO {
   actorId?: string;
 }
 
+export interface AssignTaskDTO {
+  employeeId?: string;
+  departmentId?: string;
+  autoAssign?: boolean;
+  actorId?: string;
+}
+
+export interface ChangePriorityDTO {
+  priority: Priority;
+  actorId?: string;
+}
+
+export interface CreateTaskNoteDTO {
+  authorId: string;
+  note: string;
+}
+
 export interface ListTasksQueryDTO {
   page: number;
   limit: number;

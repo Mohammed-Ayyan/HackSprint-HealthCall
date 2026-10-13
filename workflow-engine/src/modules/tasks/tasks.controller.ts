@@ -3,6 +3,9 @@ import { taskService, TaskService } from "./tasks.service";
 import {
   CreateTaskDTO,
   UpdateTaskStatusDTO,
+  AssignTaskDTO,
+  ChangePriorityDTO,
+  CreateTaskNoteDTO,
   ListTasksQueryDTO,
 } from "./tasks.types";
 
@@ -79,6 +82,80 @@ export class TaskController {
         success: true,
         message: `Task status successfully transitioned to '${task.status}'`,
         data: task,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  assignTask = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const id = req.params.id as string;
+      const payload = req.body as AssignTaskDTO;
+      const task = await this.service.assignTask(id, payload);
+      res.status(200).json({
+        success: true,
+        message: "Task assignment updated successfully",
+        data: task,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  changePriority = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const id = req.params.id as string;
+      const payload = req.body as ChangePriorityDTO;
+      const task = await this.service.changePriority(id, payload);
+      res.status(200).json({
+        success: true,
+        message: `Task priority updated to '${task.priority}'`,
+        data: task,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  addNote = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const id = req.params.id as string;
+      const payload = req.body as CreateTaskNoteDTO;
+      const note = await this.service.addNote(id, payload);
+      res.status(201).json({
+        success: true,
+        message: "Note added successfully",
+        data: note,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  listNotes = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const id = req.params.id as string;
+      const notes = await this.service.listNotes(id);
+      res.status(200).json({
+        success: true,
+        data: notes,
       });
     } catch (error) {
       next(error);

@@ -93,6 +93,90 @@ export const updateTaskStatusSchema = z
     actorId: data.actorId || data.actor_id || undefined,
   }));
 
+export const assignTaskSchema = z
+  .object({
+    employeeId: z.string().uuid("Invalid employeeId format").optional().nullable(),
+    departmentId: z.string().min(1).max(50).optional().nullable(),
+    autoAssign: z.boolean().optional(),
+    actorId: z.string().uuid().optional().nullable(),
+
+    // snake_case aliases
+    employee_id: z.string().uuid("Invalid employee_id format").optional().nullable(),
+    department_id: z.string().min(1).max(50).optional().nullable(),
+    auto_assign: z.boolean().optional(),
+    actor_id: z.string().uuid().optional().nullable(),
+  })
+  .transform((data) => ({
+    employeeId:
+      data.employeeId !== undefined
+        ? data.employeeId
+        : data.employee_id !== undefined
+        ? data.employee_id
+        : undefined,
+    departmentId:
+      data.departmentId !== undefined
+        ? data.departmentId
+        : data.department_id !== undefined
+        ? data.department_id
+        : undefined,
+    autoAssign:
+      data.autoAssign !== undefined
+        ? data.autoAssign
+        : data.auto_assign !== undefined
+        ? data.auto_assign
+        : undefined,
+    actorId:
+      data.actorId !== undefined
+        ? data.actorId
+        : data.actor_id !== undefined
+        ? data.actor_id
+        : undefined,
+  }))
+  .refine(
+    (data) =>
+      data.employeeId !== undefined ||
+      data.departmentId !== undefined ||
+      data.autoAssign === true,
+    {
+      message:
+        "At least one of 'employeeId', 'departmentId', or 'autoAssign: true' must be specified",
+    }
+  );
+
+export const changePrioritySchema = z
+  .object({
+    priority: TaskPriorityEnum,
+    actorId: z.string().uuid().optional().nullable(),
+    actor_id: z.string().uuid().optional().nullable(),
+  })
+  .transform((data) => ({
+    priority: data.priority,
+    actorId: data.actorId || data.actor_id || undefined,
+  }));
+
+export const createTaskNoteSchema = z
+  .object({
+    authorId: z.string().uuid("Invalid authorId format. Must be a valid UUID.").optional(),
+    author_id: z.string().uuid("Invalid author_id format. Must be a valid UUID.").optional(),
+    note: z.string().min(1, "note cannot be empty"),
+  })
+  .transform((data) => {
+    const authorId = data.authorId || data.author_id;
+    if (!authorId) {
+      throw new z.ZodError([
+        {
+          code: z.ZodIssueCode.custom,
+          path: ["authorId"],
+          message: "authorId is required and must be a valid UUID",
+        },
+      ]);
+    }
+    return {
+      authorId,
+      note: data.note,
+    };
+  });
+
 export const listTasksQuerySchema = z
   .object({
     page: z.coerce.number().int().min(1).default(1),

@@ -4,6 +4,9 @@ import { validateRequest } from "../../middleware/validateRequest";
 import {
   createTaskSchema,
   updateTaskStatusSchema,
+  assignTaskSchema,
+  changePrioritySchema,
+  createTaskNoteSchema,
   listTasksQuerySchema,
   taskIdParamSchema,
 } from "./tasks.validation";
@@ -39,6 +42,43 @@ router.patch(
     body: updateTaskStatusSchema,
   }),
   taskController.updateTaskStatus
+);
+
+// PATCH /api/v1/tasks/:id/assign - Assign or transfer task (employee, department, autoAssign)
+router.patch(
+  "/:id/assign",
+  validateRequest({
+    params: taskIdParamSchema,
+    body: assignTaskSchema,
+  }),
+  taskController.assignTask
+);
+
+// PATCH /api/v1/tasks/:id/priority - Update task priority (LOW, MEDIUM, HIGH, URGENT)
+router.patch(
+  "/:id/priority",
+  validateRequest({
+    params: taskIdParamSchema,
+    body: changePrioritySchema,
+  }),
+  taskController.changePriority
+);
+
+// POST /api/v1/tasks/:id/notes - Add operational note to task
+router.post(
+  "/:id/notes",
+  validateRequest({
+    params: taskIdParamSchema,
+    body: createTaskNoteSchema,
+  }),
+  taskController.addNote
+);
+
+// GET /api/v1/tasks/:id/notes - Retrieve chronological task notes
+router.get(
+  "/:id/notes",
+  validateRequest({ params: taskIdParamSchema }),
+  taskController.listNotes
 );
 
 export { router as taskRouter };

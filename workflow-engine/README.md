@@ -251,6 +251,23 @@ npm run build && npm start
 | `GET` | `/api/v1/tasks` | List tasks with filters (`departmentId`, `assignedEmployeeId`, `status`, `priority`, `escalationLevel`, `isOverdue`) and pagination |
 | `GET` | `/api/v1/tasks/:id` | Get full task details including department, assigned staff, notes, and audit timelines |
 | `PATCH` | `/api/v1/tasks/:id/status` | Update task status with state machine governance (`{ status, reason?, actorId? }`) |
+| `PATCH` | `/api/v1/tasks/:id/assign` | Assign, reassign, inter-department transfer, or auto-assign to least loaded employee |
+| `PATCH` | `/api/v1/tasks/:id/priority` | Update task priority (`LOW`, `MEDIUM`, `HIGH`, `URGENT`) with audit event |
+| `POST` | `/api/v1/tasks/:id/notes` | Append internal operational note to task (`{ authorId, note }`) |
+| `GET` | `/api/v1/tasks/:id/notes` | List chronological operational notes for task |
+
+---
+
+## 9. Phase 5: Employee Assignment, Transfer & Notes System
+
+### Assignment & Transfer Governance
+- **Department Boundary Enforcement**: Direct assignment requires the employee to belong to the task's current department.
+- **Active Status Check**: Inactive employees cannot be assigned tasks.
+- **Inter-Department Transfer**: Supports moving tasks between departments with optional reassignment or resetting to `PENDING`.
+- **Auto-Assignment**: Deterministically discovers the active employee with the minimum `activeTasksCount` in the target department.
+- **Atomic Concurrency Guarantee**: Decrementing previous employee workload and incrementing new employee workload occurs within an atomic database transaction.
+- **Chronological Notes Ledger**: Appends internal clinical and operational notes linked to author employees and task timelines.
+
 
 
 
