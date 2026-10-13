@@ -12,8 +12,12 @@ import {
   ArrowRight,
   ShieldCheck,
   Building2,
+  HeartPulse,
+  Stethoscope,
+  Users,
+  Activity,
   Layers,
-  Flame,
+  Leaf,
 } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
 import { StatCard } from "@/shared/components/common/StatCard";
@@ -73,43 +77,79 @@ export default function DashboardPage() {
     setResolutionMetrics(res);
   };
 
+  const portalShortcuts = [
+    { name: "Patient Portal", href: "/patient/dashboard", icon: HeartPulse, count: "Active" },
+    { name: "Doctor Portal", href: "/doctor/dashboard", icon: Stethoscope, count: "8 appts" },
+    { name: "Reception Desk", href: "/reception/dashboard", icon: Users, count: "4 pending" },
+    { name: "Insurance Hub", href: "/insurance/dashboard", icon: ShieldCheck, count: "14 claims" },
+    { name: "Dept Manager", href: "/manager/dashboard", icon: Activity, count: "18 staff" },
+    { name: "Hospital Admin", href: "/admin/dashboard", icon: Building2, count: "5 depts" },
+  ];
+
   return (
     <AppShell>
       <div className="space-y-6">
-        {/* Executive Header Banner */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+        {/* Healthcare Ecosystem Command Header */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#152c22]">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-extrabold tracking-tight text-white font-mono">
-                CareOps Operational Intelligence
+              <h1 className="text-2xl font-extrabold tracking-tight text-stone-100 font-mono">
+                Healthcare Ecosystem Command Center
               </h1>
-              <Badge variant="cyan" size="sm" dot>
-                Shift: Morning Active
+              <Badge variant="green" size="sm" dot>
+                Shift Equilibrium: Stable
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
-              Real-time voice processing, conversational NLU, and autonomous clinical dispatch
+            <p className="text-xs text-stone-400 mt-1">
+              Living system operational metrics, conversational speech synthesis, and clinical routing
             </p>
           </div>
 
           <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
-              Accuracy: <strong className="text-cyan-400">99.2%</strong>
+            <span className="px-3 py-1.5 rounded-xl bg-[#0b1712] border border-[#1b362a] text-stone-300">
+              Extraction Precision: <strong className="text-[#34d399]">99.2%</strong>
             </span>
-            <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
-              SLA Compliance: <strong className="text-emerald-400">97.4%</strong>
+            <span className="px-3 py-1.5 rounded-xl bg-[#0b1712] border border-[#1b362a] text-stone-300">
+              Commitment SLA: <strong className="text-[#34d399]">97.4%</strong>
             </span>
           </div>
+        </div>
+
+        {/* 6 Role Portal Quick Access Strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {portalShortcuts.map((ps) => {
+            const Icon = ps.icon;
+            return (
+              <Link
+                key={ps.name}
+                href={ps.href}
+                className="bg-[#0b1712] hover:bg-[#12281e] p-3 rounded-xl border border-[#1b362a] hover:border-[#34d399]/60 transition-all group flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="h-7 w-7 rounded-lg bg-[#142e23] border border-[#244f3b] flex items-center justify-center text-[#34d399] group-hover:scale-105 transition-transform">
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-stone-200 group-hover:text-[#34d399] transition-colors leading-tight">
+                      {ps.name}
+                    </p>
+                    <span className="text-[10px] font-mono text-stone-500">{ps.count}</span>
+                  </div>
+                </div>
+                <ArrowRight className="h-3 w-3 text-stone-500 group-hover:text-[#34d399] group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            );
+          })}
         </div>
 
         {/* Manager Escalation Alert if any */}
         {escalatedTasks.length > 0 && <EscalationBanner escalatedTasks={escalatedTasks} />}
 
-        {/* Top Operational KPI Cards */}
+        {/* Living System Operational Metrics */}
         {summary && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              title="Total Inbound Calls"
+              title="Patient Wellness Flow (Calls)"
               value={summary.totalCalls.toLocaleString()}
               changePercent={summary.callsChangePercent}
               subtitle="vs yesterday"
@@ -117,7 +157,7 @@ export default function DashboardPage() {
               variant="cyan"
             />
             <StatCard
-              title="Completed Actions"
+              title="Fulfilled Commitments"
               value={summary.completedTasks.toLocaleString()}
               changePercent={summary.tasksChangePercent}
               subtitle="autonomous dispatch"
@@ -125,18 +165,18 @@ export default function DashboardPage() {
               variant="emerald"
             />
             <StatCard
-              title="Pending Action Queue"
+              title="Active Clinical Flow Queue"
               value={summary.pendingActions}
-              subtitle="across 6 departments"
+              subtitle="across 5 hospital divisions"
               icon={<Clock className="h-5 w-5" />}
-              variant="purple"
+              variant="amber"
             />
             <StatCard
-              title="Critical Triage Cases"
+              title="Urgent Triage Incidents"
               value={summary.criticalCases}
               changePercent={summary.criticalChangePercent}
               subtitle="immediate attention"
-              icon={<Flame className="h-5 w-5" />}
+              icon={<Activity className="h-5 w-5" />}
               variant="rose"
             />
           </div>
@@ -159,51 +199,51 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-8 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-white font-mono">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-stone-100 font-mono">
                 Recent Patient Telephony Stream
               </h3>
               <Link
                 href="/calls"
-                className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1"
+                className="text-xs text-[#34d399] hover:underline font-semibold flex items-center gap-1"
               >
                 <span>View all calls</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 divide-y divide-slate-800/80 overflow-hidden">
+            <div className="rounded-2xl border border-[#1b362a] bg-[#0b1712] divide-y divide-[#162e24] overflow-hidden">
               {recentCalls.map((c) => (
                 <Link
                   key={c.id}
                   href={`/calls/${c.id}`}
-                  className="p-3.5 flex items-center justify-between hover:bg-slate-800/50 transition-colors group"
+                  className="p-3.5 flex items-center justify-between hover:bg-[#0e2118] transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-cyan-950/60 border border-cyan-500/20 flex items-center justify-center text-cyan-300 font-mono text-xs font-bold">
+                    <div className="h-9 w-9 rounded-xl bg-[#142e23] border border-[#23533c] flex items-center justify-center text-[#34d399] font-mono text-xs font-bold">
                       {c.callNumber.slice(-4)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors">
+                        <span className="text-xs font-bold text-stone-100 group-hover:text-[#34d399] transition-colors">
                           {c.patient.name}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-mono">{c.patient.mrn}</span>
+                        <span className="text-[10px] text-stone-500 font-mono">{c.patient.mrn}</span>
                         <Badge
-                          variant={c.priority === "critical" ? "rose" : c.priority === "high" ? "amber" : "cyan"}
+                          variant={c.priority === "critical" ? "red" : c.priority === "high" ? "amber" : "teal"}
                           size="sm"
                         >
                           {c.priority}
                         </Badge>
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5 max-w-lg truncate">
+                      <p className="text-[11px] text-stone-400 mt-0.5 max-w-lg truncate">
                         {c.intent} • {c.summary.overview}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
-                    <span className="text-slate-500">{c.duration}</span>
-                    <ArrowRight className="h-4 w-4 text-slate-600 group-hover:text-cyan-400 transition-colors" />
+                  <div className="flex items-center gap-3 text-xs font-mono text-stone-400">
+                    <span className="text-stone-500">{c.duration}</span>
+                    <ArrowRight className="h-4 w-4 text-stone-600 group-hover:text-[#34d399] transition-colors" />
                   </div>
                 </Link>
               ))}

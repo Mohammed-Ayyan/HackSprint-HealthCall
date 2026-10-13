@@ -11,12 +11,16 @@ import {
   CheckCircle2,
   Network,
   Clock,
-  Layers,
   HeartPulse,
-  Flame,
-  BarChart3,
+  Stethoscope,
   Users,
+  Building2,
   Play,
+  Leaf,
+  Sun,
+  Layers,
+  ChevronRight,
+  Radio,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/Button";
 import { Badge } from "@/shared/components/ui/Badge";
@@ -27,51 +31,102 @@ import { LiveCallSimulatorModal } from "@/features/ai-intelligence/components/Li
 export default function LandingPage() {
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
 
-  const workflowSteps = [
-    { step: "01", title: "Patient Call", desc: "SIP telephony trunk connects patient to AI voice gateway node", icon: <PhoneCall className="h-4 w-4 text-cyan-400" /> },
-    { step: "02", title: "Speech Diarization", desc: "Real-time Whisper-v3 dual-channel speaker diarization stream", icon: <Activity className="h-4 w-4 text-sky-400" /> },
-    { step: "03", title: "NLU Intelligence", desc: "Intent classifier, emotional valence, and priority inferred in 20ms", icon: <Sparkles className="h-4 w-4 text-purple-400" /> },
-    { step: "04", title: "Action Extraction", desc: "Clinical tasks & verbal commitments extracted with transcript anchors", icon: <CheckCircle2 className="h-4 w-4 text-emerald-400" /> },
-    { step: "05", title: "Department Routing", desc: "Autonomous dispatch to Reception, Insurance, Billing, or Pharmacy", icon: <Network className="h-4 w-4 text-indigo-400" /> },
-    { step: "06", title: "SLA Task Tracking", desc: "Kanban board tracking countdown deadlines and supervisor escalations", icon: <Clock className="h-4 w-4 text-amber-400" /> },
+  const ecosystemChain = [
+    { title: "Patients", desc: "Compassionate voice access & personalized care portal tracking", icon: HeartPulse, color: "#34d399" },
+    { title: "Healthcare Employees", desc: "Automated task extraction and SLA commitments triage", icon: Users, color: "#2dd4bf" },
+    { title: "Doctors", desc: "Autonomous clinical briefs & follow-up decision support", icon: Stethoscope, color: "#34d399" },
+    { title: "Departments", desc: "Dynamic workload balancing across surgical, clinics & labs", icon: Network, color: "#f59e0b" },
+    { title: "Insurance Teams", desc: "Instant prior-authorization validation & EDI claims pipeline", icon: ShieldCheck, color: "#f59e0b" },
+    { title: "Hospital Admin", desc: "Whole-ecosystem vitality metrics, governance & resource routing", icon: Building2, color: "#34d399" },
+  ];
+
+  const rolePortals = [
+    {
+      title: "Patient Portal",
+      href: "/patient/dashboard",
+      desc: "Track requests, view appointments, and access hospital speech transcripts with clarity.",
+      icon: HeartPulse,
+      badge: "Patient Experience",
+    },
+    {
+      title: "Doctor Portal",
+      href: "/doctor/dashboard",
+      desc: "Review AI clinical summaries before consultation and dispatch post-op follow-ups.",
+      icon: Stethoscope,
+      badge: "Clinical Decision Support",
+    },
+    {
+      title: "Receptionist Portal",
+      href: "/reception/dashboard",
+      desc: "Manage front-desk intake, calendar matrices, and AI-generated phone tasks.",
+      icon: Users,
+      badge: "Intake Operations",
+    },
+    {
+      title: "Insurance Employee Portal",
+      href: "/insurance/dashboard",
+      desc: "Prior-auth adjudication, conversational dispute extraction, and 4-stage lifecycle timeline.",
+      icon: ShieldCheck,
+      badge: "Revenue Cycle & RCM",
+    },
+    {
+      title: "Department Manager Portal",
+      href: "/manager/dashboard",
+      desc: "Supervise team workload equilibrium, resolve SLA escalations, and reassign commitments.",
+      icon: Activity,
+      badge: "Workload Command",
+    },
+    {
+      title: "Hospital Administrator Portal",
+      href: "/admin/dashboard",
+      desc: "Hospital-wide analytics, department governance, RBAC permissions, and AI routing rules.",
+      icon: Building2,
+      badge: "Ecosystem Governance",
+    },
   ];
 
   return (
-    <div className="min-h-screen w-screen bg-[#080c14] text-slate-100 overflow-x-hidden relative selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Background ambient light */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-gradient-to-b from-cyan-600/10 via-purple-600/5 to-transparent blur-3xl pointer-events-none" />
+    <div className="min-h-screen w-screen bg-[#07100c] text-stone-100 overflow-x-hidden relative selection:bg-[#34d399]/30 selection:text-[#34d399]">
+      {/* Solarpunk subtle organic lighting */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(52,211,153,0.12),transparent_70%)] pointer-events-none" />
 
-      {/* Top Navbar */}
-      <nav className="h-20 border-b border-slate-800/80 bg-[#080c14]/80 backdrop-blur-2xl sticky top-0 z-40 px-6 sm:px-12 flex items-center justify-between">
+      {/* Top Solarpunk Navigation Bar */}
+      <nav className="h-20 border-b border-[#152c22] bg-[#07100c]/90 backdrop-blur-2xl sticky top-0 z-40 px-6 sm:px-12 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-sky-500 to-indigo-600 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)] group-hover:scale-105 transition-transform duration-300">
-            <Activity className="h-5 w-5 text-slate-950 stroke-[2.5]" />
+          <div className="h-10 w-10 rounded-xl bg-[#142e23] border border-[#2b5946] flex items-center justify-center text-[#34d399] shadow-inner group-hover:scale-105 transition-transform duration-300">
+            <Activity className="h-5 w-5 stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-lg tracking-tight text-white font-mono">
+              <span className="font-bold text-lg tracking-tight text-stone-100 font-mono">
                 CareOps
               </span>
-              <span className="text-xs px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">
+              <span className="text-xs px-1.5 py-0.2 rounded bg-[#132c21] text-[#34d399] font-bold border border-[#24523b]">
                 AI
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 font-medium">Healthcare Operations Intelligence</p>
+            <p className="text-[10px] text-stone-400 font-medium">Healthcare Operations Intelligence</p>
           </div>
         </Link>
 
-        <div className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-300">
-          <Link href="/dashboard" className="hover:text-cyan-300 transition-colors">
-            Operations Console
+        <div className="hidden lg:flex items-center gap-6 text-xs font-semibold text-stone-300">
+          <Link href="/patient/dashboard" className="hover:text-[#34d399] transition-colors">
+            Patient Portal
           </Link>
-          <Link href="/calls" className="hover:text-cyan-300 transition-colors">
-            Call Intelligence
+          <Link href="/doctor/dashboard" className="hover:text-[#34d399] transition-colors">
+            Doctor Portal
           </Link>
-          <Link href="/actions" className="hover:text-cyan-300 transition-colors">
-            Kanban & SLA
+          <Link href="/reception/dashboard" className="hover:text-[#34d399] transition-colors">
+            Reception Desk
           </Link>
-          <Link href="/analytics" className="hover:text-cyan-300 transition-colors">
-            Analytics
+          <Link href="/insurance/dashboard" className="hover:text-[#34d399] transition-colors">
+            Insurance Hub
+          </Link>
+          <Link href="/manager/dashboard" className="hover:text-[#34d399] transition-colors">
+            Department Manager
+          </Link>
+          <Link href="/admin/dashboard" className="hover:text-[#34d399] transition-colors">
+            Hospital Admin
           </Link>
         </div>
 
@@ -80,43 +135,42 @@ export default function LandingPage() {
             onClick={() => setIsSimulatorOpen(true)}
             variant="outline"
             size="sm"
-            className="text-xs hidden sm:inline-flex gap-1.5"
+            className="text-xs hidden sm:inline-flex gap-1.5 border-[#1d4333] text-stone-200"
           >
-            <Play className="h-3.5 w-3.5 text-cyan-400" />
-            <span>Simulate Call</span>
+            <Play className="h-3.5 w-3.5 text-[#34d399]" />
+            <span>Simulate Telephony Call</span>
           </Button>
 
           <Link href="/dashboard">
-            <Button variant="primary" size="sm" className="text-xs gap-1.5 font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-              <span>Launch Dashboard</span>
+            <Button variant="primary" size="sm" className="text-xs gap-1.5 font-bold">
+              <span>Operations Command</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </Link>
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Solarpunk Philosophy */}
       <section className="relative px-6 sm:px-12 pt-20 pb-16 max-w-6xl mx-auto text-center space-y-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-xs font-mono shadow-[0_0_20px_rgba(6,182,212,0.2)]">
-          <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping inline-block" />
-          <span>Operational AI for Hospitals & Health Systems</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0d2219] border border-[#204938] text-[#34d399] text-xs font-mono shadow-sm">
+          <Leaf className="h-3.5 w-3.5" />
+          <span>Solarpunk Eco-Futurism • A Living Healthcare Operations Ecosystem</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.15]">
-          Turn Thousands of Patient Phone Calls into{" "}
-          <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
-            Organized Hospital Actions.
-          </span>
-        </h1>
-
-        <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          CareOps AI listens to inbound patient calls in real time. We diarize speech, extract clinical summaries, detect urgent intents, route tasks to hospital departments, and track promises before the caller even hangs up.
-        </p>
+        <div className="space-y-4 max-w-4xl mx-auto">
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-stone-100 leading-[1.12]">
+            Healthcare Operations Intelligence,{" "}
+            <span className="text-[#34d399]">Naturally Synchronized</span>
+          </h1>
+          <p className="text-base sm:text-lg text-stone-300 max-w-2xl mx-auto leading-relaxed">
+            Where patient speech transforms into sustainable clinical workflows. Technology remains invisible while doctors, caregivers, patients, and administrators work in human-centered harmony.
+          </p>
+        </div>
 
         {/* CTA Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
           <Link href="/dashboard">
-            <Button variant="primary" size="lg" className="gap-2 text-sm font-bold shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+            <Button variant="primary" size="lg" className="gap-2 text-sm font-bold shadow-lg">
               <span>Enter Operations Console</span>
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -124,158 +178,156 @@ export default function LandingPage() {
 
           <Button
             onClick={() => setIsSimulatorOpen(true)}
-            variant="purple"
+            variant="outline"
             size="lg"
-            className="gap-2 text-sm font-bold shadow-[0_0_30px_rgba(139,92,246,0.3)]"
+            className="gap-2 text-sm border-[#1e4334] text-stone-200 hover:bg-[#12281e]"
           >
-            <Play className="h-4 w-4 text-purple-200" />
-            <span>Interactive Live Call Simulator</span>
+            <Play className="h-4 w-4 text-[#34d399]" />
+            <span>Simulate Live Inbound Telephony</span>
           </Button>
         </div>
 
-        {/* Live Operational Metrics Ribbon */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-10 text-left">
-          {[
-            { label: "Daily Calls Ingested", value: "1,482", note: "+14.8% vs last week", color: "text-cyan-400" },
-            { label: "Extraction Accuracy", value: "99.2%", note: "Verified ground truth", color: "text-emerald-400" },
-            { label: "Mean Resolution Time", value: "1.8 hrs", note: "Down from 36 hours", color: "text-purple-400" },
-            { label: "Departments Automated", value: "6 Units", note: "Zero manual data entry", color: "text-white" },
-          ].map((stat, i) => (
-            <div
-              key={i}
-              className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl space-y-1"
-            >
-              <p className="text-xs text-slate-400 uppercase font-mono">{stat.label}</p>
-              <h3 className={`text-2xl font-extrabold font-mono ${stat.color}`}>{stat.value}</h3>
-              <p className="text-[11px] text-slate-500">{stat.note}</p>
+        {/* Live Patient Flow Simulation Banner */}
+        <div className="pt-8 max-w-3xl mx-auto">
+          <div className="bg-[#0b1712] border border-[#1b362a] rounded-2xl p-5 shadow-xl text-left">
+            <div className="flex items-center justify-between pb-3 border-b border-[#183327]">
+              <div className="flex items-center gap-3">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34d399] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#34d399]" />
+                </span>
+                <span className="text-xs font-mono text-stone-200 font-semibold">
+                  Active Call Node: CC-2026-9842 • Rahul Sharma (Post-Op Check)
+                </span>
+              </div>
+              <Badge variant="teal" size="sm">
+                Speech Diarization Streaming
+              </Badge>
             </div>
-          ))}
+
+            <div className="pt-4 space-y-3">
+              <div className="bg-[#07130e] p-3 rounded-xl border border-[#162e24]">
+                <p className="text-xs text-stone-400 font-mono mb-1 text-[11px] uppercase text-[#34d399]">
+                  Autonomous Clinical Extraction
+                </p>
+                <p className="text-xs text-stone-200">
+                  "Patient reports 100.8°F low-grade fever and wound tightness. Verified Dr. Rahul follow-up slot for Oct 15 at 10:30 AM; dispatched prior-auth ultrasound review to insurance queue."
+                </p>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-stone-400 font-mono">
+                <span>Latency: 22ms</span>
+                <span>Accuracy: 99.1% calibrated</span>
+                <span>Status: Dispatched to 3 Clinical Hubs</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Core Workflow Pipeline (Directly addresses the hackathon prompt) */}
-      <section className="px-6 sm:px-12 py-16 max-w-6xl mx-auto space-y-10">
-        <div className="text-center space-y-2">
-          <h2 className="text-xs font-mono uppercase tracking-widest text-cyan-400">
-            Autonomous Pipeline Architecture
+      {/* The Healthcare Living Chain (Product Vision) */}
+      <section className="px-6 sm:px-12 py-16 max-w-6xl mx-auto border-t border-[#152c22]">
+        <div className="text-center space-y-3 mb-12">
+          <Badge variant="teal">Connected Hospital Ecosystem</Badge>
+          <h2 className="text-2xl sm:text-3xl font-bold text-stone-100">
+            From Conversation to Whole-Hospital Action
           </h2>
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-            From Spoken Voice to Executed Clinical Workflows
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-            A deterministic pipeline replacing slow manual triage with automated hospital intelligence.
+          <p className="text-xs sm:text-sm text-stone-400 max-w-xl mx-auto">
+            CareOps AI seamlessly connects every stakeholder in modern healthcare without friction or fragmented software silos.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {workflowSteps.map((s) => (
-            <div
-              key={s.step}
-              className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-cyan-500/40 transition-all duration-300 space-y-3 group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 group-hover:border-cyan-500/30 transition-colors">
-                  {s.icon}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+          {ecosystemChain.map((node, idx) => {
+            const Icon = node.icon;
+            return (
+              <div
+                key={node.title}
+                className="bg-[#0b1712] p-4 rounded-xl border border-[#1b362a] flex flex-col justify-between text-left hover:border-[#2d5845] transition-all"
+              >
+                <div>
+                  <div className="h-9 w-9 rounded-lg bg-[#142e23] border border-[#26533f] flex items-center justify-center text-[#34d399] mb-3">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className="text-[10px] font-mono text-stone-500">Node 0{idx + 1}</span>
+                  <h3 className="text-sm font-bold text-stone-100 mt-1">{node.title}</h3>
+                  <p className="text-[11px] text-stone-400 mt-1 leading-relaxed">{node.desc}</p>
                 </div>
-                <span className="font-mono text-xs font-bold text-slate-600 group-hover:text-cyan-400 transition-colors">
-                  {s.step}
-                </span>
               </div>
-              <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
-                {s.title}
-              </h4>
-              <p className="text-xs text-slate-400 leading-relaxed">{s.desc}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* Key Feature Highlights */}
-      <section className="px-6 sm:px-12 py-16 max-w-6xl mx-auto space-y-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Card 1 */}
-          <Card variant="elevated" className="p-6 space-y-4">
-            <div className="h-10 w-10 rounded-xl bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-              <PhoneCall className="h-5 w-5" />
-            </div>
-            <h3 className="text-base font-bold text-white">Live Telephony Intelligence</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Real-time dual-channel audio waveforms, live streaming transcripts, and automatic extraction of patient MRN, symptoms, and urgency before the call terminates.
-            </p>
-            <div className="pt-2">
-              <Link href="/calls/call-live-001" className="text-xs text-cyan-400 hover:underline font-semibold flex items-center gap-1">
-                <span>Inspect Live Call Screen</span>
-                <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          </Card>
+      {/* Role-Based Portals Showcase */}
+      <section className="px-6 sm:px-12 py-16 max-w-6xl mx-auto border-t border-[#152c22]">
+        <div className="text-center space-y-3 mb-12">
+          <Badge variant="green">Role-Based Experiences</Badge>
+          <h2 className="text-2xl sm:text-3xl font-bold text-stone-100">
+            Dedicated Workspaces for Every Hospital Role
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-400 max-w-xl mx-auto">
+            Experience tailored portals designed specifically for patients, clinicians, reception, insurance, managers, and administrators.
+          </p>
+        </div>
 
-          {/* Card 2 */}
-          <Card variant="purple" className="p-6 space-y-4">
-            <div className="h-10 w-10 rounded-xl bg-purple-950/80 border border-purple-500/30 flex items-center justify-center text-purple-400">
-              <Network className="h-5 w-5" />
-            </div>
-            <h3 className="text-base font-bold text-white">Department Routing & Kanban</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Multi-label NLU routes tasks to Reception, Insurance, Billing, Pharmacy, or Clinical Team with automated staff assignment and live countdown SLA timers.
-            </p>
-            <div className="pt-2">
-              <Link href="/actions" className="text-xs text-purple-400 hover:underline font-semibold flex items-center gap-1">
-                <span>View Kanban Board</span>
-                <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {rolePortals.map((portal) => {
+            const Icon = portal.icon;
+            return (
+              <Link
+                key={portal.title}
+                href={portal.href}
+                className="group bg-[#0b1712] p-5 rounded-2xl border border-[#1b362a] hover:border-[#34d399]/60 hover:bg-[#0e2118] transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="h-10 w-10 rounded-xl bg-[#142e23] border border-[#26533f] flex items-center justify-center text-[#34d399] group-hover:scale-105 transition-transform">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <Badge variant="teal" size="sm">
+                      {portal.badge}
+                    </Badge>
+                  </div>
+                  <h3 className="text-base font-bold text-stone-100 group-hover:text-[#34d399] transition-colors">
+                    {portal.title}
+                  </h3>
+                  <p className="text-xs text-stone-400 mt-2 leading-relaxed">
+                    {portal.desc}
+                  </p>
+                </div>
 
-          {/* Card 3 */}
-          <Card className="p-6 space-y-4 border-slate-800">
-            <div className="h-10 w-10 rounded-xl bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <h3 className="text-base font-bold text-white">Commitment Tracker & Evidence</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Guarantees and promises made verbally (&ldquo;I will call you tomorrow&rdquo;) are automatically tracked with cryptographic transcript evidence quotes so nothing falls through the cracks.
-            </p>
-            <div className="pt-2">
-              <Link href="/calls/call-live-001" className="text-xs text-emerald-400 hover:underline font-semibold flex items-center gap-1">
-                <span>Explore Grounded Citations</span>
-                <ArrowRight className="h-3 w-3" />
+                <div className="mt-5 pt-3 border-t border-[#162e24] flex items-center justify-between text-xs font-semibold text-[#34d399]">
+                  <span>Launch Portal Experience</span>
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
               </Link>
-            </div>
-          </Card>
+            );
+          })}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 py-12 px-6 sm:px-12 text-center space-y-4 bg-slate-950/60">
-        <div className="flex items-center justify-center gap-2">
-          <Activity className="h-5 w-5 text-cyan-400" />
-          <span className="font-mono font-bold text-white">CareOps AI</span>
-          <span className="text-xs text-slate-500">• Hackathon Operations Intelligence Edition</span>
+      {/* Solarpunk Footer */}
+      <footer className="border-t border-[#152c22] bg-[#07100c] px-6 sm:px-12 py-12 max-w-6xl mx-auto text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-stone-400">
+        <div>
+          <p className="font-mono text-stone-200 font-bold">CareOps AI Living Platform</p>
+          <p className="mt-1 text-[11px] text-stone-500">
+            Sustainable Healthcare Operations • Built for clinicians, patients, and hospital leadership.
+          </p>
         </div>
-        <p className="text-xs text-slate-500 max-w-md mx-auto">
-          Built for hospital operations teams, nurse supervisors, and clinic administrators. HIPAA BAA ready.
-        </p>
-        <div className="pt-2 flex items-center justify-center gap-6 text-xs text-slate-400">
-          <Link href="/dashboard" className="hover:text-cyan-300">
-            Dashboard
+
+        <div className="flex items-center gap-6 font-medium">
+          <Link href="/dashboard" className="hover:text-[#34d399] transition-colors">
+            Operations Console
           </Link>
-          <Link href="/calls" className="hover:text-cyan-300">
-            Calls
+          <Link href="/patient/dashboard" className="hover:text-[#34d399] transition-colors">
+            Patient Portal
           </Link>
-          <Link href="/actions" className="hover:text-cyan-300">
-            Actions
-          </Link>
-          <Link href="/analytics" className="hover:text-cyan-300">
-            Analytics
-          </Link>
-          <Link href="/auth/login" className="hover:text-cyan-300">
-            Login
+          <Link href="/profile" className="hover:text-[#34d399] transition-colors">
+            User Profile
           </Link>
         </div>
       </footer>
 
-      {/* Live Call Simulator Modal */}
       <LiveCallSimulatorModal
         isOpen={isSimulatorOpen}
         onClose={() => setIsSimulatorOpen(false)}

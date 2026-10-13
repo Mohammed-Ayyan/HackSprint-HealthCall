@@ -413,17 +413,117 @@ All UI components continue consuming the identical TypeScript contract.
 
 ---
 
-## 11. Future Improvements
+## 11. Complete Healthcare Operations Operating System
 
-1. **Native WebRTC Audio Bridge**: Direct browser streaming to hospital VoIP PBX nodes.
-2. **Bi-directional EHR Writeback**: Automated HL7 FHIR writeback to Epic/Cerner for direct appointment slot booking.
-3. **Multilingual Speech Translation**: Real-time translation supporting Spanish, Mandarin, Hindi, and Arabic patient dialogues.
-4. **Physician Digital Signature Pad**: In-app doctor review and biometric signature verification for controlled medicine renewal requests.
-5. **Predictive Escalation Scoring**: Machine learning model forecasting SLA breach risk 30 minutes in advance based on department queue velocity.
+CareOps AI connects the entire hospital human ecosystem:
+
+```
+Patients
+   ↓
+Healthcare Employees
+   ↓
+Doctors
+   ↓
+Departments
+   ↓
+Insurance Teams
+   ↓
+Hospital Administration
+```
+
+### 11.1 Dedicated User Roles & Portals
+
+| Role | Route | Purpose | Key Features |
+|---|---|---|---|
+| **Patient** | `/patient/dashboard` | Request tracking & communications | Upcoming appointment cards, insurance status tracker, request resolution ledger, telephony transcript summaries, unread hospital alerts |
+| **Doctor** | `/doctor/dashboard` | Clinical triage & patient encounters | Live patient queue, AI clinical briefs (previous conversation, pending issue, required action), follow-up creation & dispatch |
+| **Receptionist** | `/reception/dashboard` | Front-desk scheduling & intake | Appointment queue (pending/confirmed/cancelled), AI call action execution, patient registry & search, multi-provider calendar matrix |
+| **Insurance Employee** | `/insurance/dashboard` | Prior-authorization & RCM | Claims ledger with SLA deadlines, AI claim conversation extract, 4-stage lifecycle timeline (`Submitted` → `Reviewed` → `Updated` → `Completed`) |
+| **Department Manager** | `/manager/dashboard` | Workload balancing & SLA incident command | Team capacity matrix, employee efficiency ratings, escalation command with reassignment & priority elevation |
+| **Hospital Administrator** | `/admin/dashboard` | Executive governance & compliance | Total call volume & AI accuracy metrics, user RBAC provisioning, 5-department vitality oversight, system routing rules |
 
 ---
 
-## Getting Started
+## 12. Role Permissions Matrix
+
+| Feature / Domain | Patient | Doctor | Receptionist | Insurance Employee | Dept Manager | Hospital Admin |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Personal Profile & Timeline** | View | View | View | View | View | View |
+| **View Own Medical Care Briefs** | View | Full | View | Read-Only | Full | Full |
+| **Book / Reschedule Appointments** | Request | Full | Full | - | Manage | Full |
+| **AI Call Diarization & Audio Player** | Transcript | Full | Full | - | Full | Full |
+| **Execute Front-Desk Call Actions** | - | - | Full | - | Supervise | Full |
+| **Manage Prior-Auth & Claims** | Status | Co-Sign | Status | Full | Supervise | Full |
+| **Assign / Reassign Staff Tasks** | - | Tasks | Intake | - | Full | Full |
+| **Manage RBAC Users & Roles** | - | - | - | - | - | Full |
+| **Configure AI & Routing Rules** | - | - | - | - | - | Full |
+
+---
+
+## 13. Solarpunk Eco-Futuristic Design Direction
+
+CareOps AI rejects generic SaaS neon cliches and excessive blurry glassmorphism in favor of a **Solarpunk Eco-Futuristic Living System**:
+
+- **Palette**: Deep forest moss charcoal (`#07100c`, `#0a1711`, `#12241b`), bioluminescent emerald (`#34d399`), river teal (`#2dd4bf`), solar amber (`#f59e0b`), terracotta urgency (`#f87171`).
+- **Surfaces**: Solid elevated panels (`.eco-panel`), natural contrast borders (`#1b362a`), tactile depth without eye-straining glows.
+- **Metaphors**: Patient Wellness Flow, Department Vitality, Operational Equilibrium.
+- **Human Centricity**: Technology is quiet and assistive; medical providers and patients remain the focal point.
+
+---
+
+## 14. Backend Integration Roadmap & Module API Specifications
+
+### Patient Portal Module (`/patient`)
+- `GET /api/patient/overview`: Returns `PatientOverviewData` (MRN, primary PCP, insurance status, active counts).
+- `GET /api/patient/appointments`: Returns array of `PatientAppointment`.
+- `POST /api/patient/appointments`: Books appointment slot. Payload: `{ doctorName, date, time, type, instructions }`.
+- `PUT /api/patient/appointments/:id/reschedule`: Updates appointment slot. Payload: `{ date, time }`.
+- `DELETE /api/patient/appointments/:id`: Cancels appointment.
+- `GET /api/patient/requests`: Returns telephony-extracted care requests.
+- `GET /api/patient/communications`: Returns past telephony call records, summaries, and commitments.
+
+### Doctor Portal Module (`/doctor`)
+- `GET /api/doctor/overview`: Returns clinician queue counts, today's schedule, and next patient time.
+- `GET /api/doctor/queue`: Returns arrival queue with embedded `aiBrief` (`previousConversation`, `pendingIssue`, `requiredAction`).
+- `PUT /api/doctor/queue/:id/status`: Updates patient consultation status (`Checked In`, `In Consultation`, `Pending Labs`).
+- `GET /api/doctor/followups`: Returns scheduled clinician follow-ups.
+- `POST /api/doctor/followups`: Schedules follow-up protocol and assigns nursing triage team.
+
+### Receptionist Portal Module (`/reception`)
+- `GET /api/reception/overview`: Intake desk counters and pending tasks.
+- `GET /api/reception/appointments`: Full intake appointment queue with status filters.
+- `PUT /api/reception/appointments/:id/status`: Confirms or cancels appointments.
+- `GET /api/reception/call-actions`: AI-generated front-desk tasks extracted from calls.
+- `PUT /api/reception/call-actions/:id/complete`: Marks call action resolved.
+- `GET /api/reception/patients`: Universal patient directory lookup.
+- `POST /api/reception/patients`: Registers new patient MRN and demographics.
+- `GET /api/reception/schedules`: Multi-provider daily/weekly availability slots.
+
+### Insurance Employee Module (`/insurance`)
+- `GET /api/insurance/overview`: Payer queue counters (Pending, Approved, Rejected, Urgent).
+- `GET /api/insurance/claims`: Claims table with amounts, deadlines, and current stage.
+- `PUT /api/insurance/claims/:id/stage`: Advances claim along lifecycle (`Submitted` → `Reviewed` → `Updated` → `Completed`).
+- `PUT /api/insurance/claims/:id/verify`: Submits electronic verification or appeals.
+
+### Department Manager Module (`/manager`)
+- `GET /api/manager/overview`: Total employees, active/completed tasks, overdue SLA counts, vitality score.
+- `GET /api/manager/workloads`: Real-time capacity utilization and efficiency ratings per employee.
+- `GET /api/manager/escalations`: Overdue commitments and SLA incidents.
+- `PUT /api/manager/escalations/:id/reassign`: Reassigns incident and updates urgency tier.
+- `PUT /api/manager/escalations/:id/resolve`: Clears escalation from incident command.
+
+### Hospital Administrator Module (`/admin`)
+- `GET /api/admin/overview`: Hospital-wide analytics, call throughput, and AI accuracy metrics.
+- `GET /api/admin/users`: Universal staff RBAC directory.
+- `POST /api/admin/users`: Provisions new account with role-specific policy bundles.
+- `PUT /api/admin/users/:id/toggle-status`: Activates or deactivates user accounts.
+- `GET /api/admin/departments`: 5 hospital divisions with staffing, workload, and commitments.
+- `GET /api/admin/rules`: Routing thresholds, AI confidence scores, and SLA notification rules.
+- `PUT /api/admin/rules/:id/toggle`: Activates or pauses hospital operating rules.
+
+---
+
+## 15. Getting Started
 
 ### Prerequisites
 - Node.js 18+ (tested on Node v20/v26)
@@ -435,11 +535,19 @@ All UI components continue consuming the identical TypeScript contract.
 # Install dependencies
 npm install
 
-# Run development server
+# Run development server with Turbopack
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the CareOps AI platform.
-Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard) for the Executive Operations Console.
-Press `Ctrl + K` anywhere in the app to access Omnisearch.
-Click **"Simulate Inbound Call"** in the top navigation to trigger live streaming diarization.
+- Open [http://localhost:3000](http://localhost:3000) for the CareOps AI Living System experience.
+- Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard) for the Healthcare Command Center.
+- Open [http://localhost:3000/patient/dashboard](http://localhost:3000/patient/dashboard) for the Patient Portal.
+- Open [http://localhost:3000/doctor/dashboard](http://localhost:3000/doctor/dashboard) for the Doctor Portal.
+- Open [http://localhost:3000/reception/dashboard](http://localhost:3000/reception/dashboard) for the Reception Desk.
+- Open [http://localhost:3000/insurance/dashboard](http://localhost:3000/insurance/dashboard) for the Insurance & RCM Hub.
+- Open [http://localhost:3000/manager/dashboard](http://localhost:3000/manager/dashboard) for the Department Manager Portal.
+- Open [http://localhost:3000/admin/dashboard](http://localhost:3000/admin/dashboard) for the Hospital Administrator Console.
+- Open [http://localhost:3000/profile](http://localhost:3000/profile) for User Profile & Activity Timeline.
+- Press `Ctrl + K` anywhere in the app to access Omnisearch.
+- Click **"Simulate Inbound Call"** in the top navigation to trigger live streaming diarization.
+
