@@ -69,6 +69,46 @@ async function registerUser({ name, email, password, role, department = "", phon
 
   await newUser.save();
 
+  // Auto-provision Doctor or Patient collection profile
+  if (canonicalRole === USER_ROLES.DOCTOR) {
+    try {
+      const Doctor = require("../models/Doctor");
+      const existingDoc = await Doctor.findOne({ email: cleanEmail });
+      if (!existingDoc) {
+        await Doctor.create({
+          userId: newUser._id,
+          name: newUser.name,
+          email: cleanEmail,
+          phone: newUser.phone || "",
+          department: newUser.department || "General Medicine",
+          specialization: newUser.department || "General Medicine",
+          qualification: "MBBS, MD",
+          experience: 5,
+          status: "ACTIVE",
+        });
+      }
+    } catch {
+      // Ignore
+    }
+  } else if (canonicalRole === USER_ROLES.PATIENT) {
+    try {
+      const Patient = require("../models/Patient");
+      const existingPatient = await Patient.findOne({ email: cleanEmail });
+      if (!existingPatient) {
+        await Patient.create({
+          userId: newUser._id,
+          name: newUser.name,
+          email: cleanEmail,
+          phone: newUser.phone || "+1 (555) 000-0000",
+          department: newUser.department || "General Medicine",
+          status: "ACTIVE",
+        });
+      }
+    } catch {
+      // Ignore
+    }
+  }
+
   // 5. Generate authentication token
   const token = generateToken(newUser);
 

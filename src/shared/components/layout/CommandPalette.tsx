@@ -17,7 +17,8 @@ import {
 import { Modal } from "@/shared/components/ui/Modal";
 import { mockCallsList } from "@/features/workflow/mockCallsService";
 import { mockActionItems } from "@/features/workflow/mockTasksService";
-import { mockUsersList } from "@/features/platform/mockAuthService";
+import { apiUserService } from "@/features/platform/users/apiUserService";
+import { User as UserType } from "@/shared/types/user";
 import { mockInsuranceClaims } from "@/features/insurance/services/insuranceService";
 import { Badge } from "@/shared/components/ui/Badge";
 import { cn } from "@/shared/utils/cn";
@@ -30,6 +31,13 @@ export interface CommandPaletteProps {
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [users, setUsers] = useState<UserType[]>([]);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      apiUserService.getUsers().then((u) => setUsers(u || [])).catch(() => {});
+    }
+  }, [isOpen]);
 
   const handleSelect = (url: string) => {
     onClose();
@@ -67,13 +75,13 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     : mockInsuranceClaims.slice(0, 2);
 
   const filteredUsers = q
-    ? mockUsersList.filter(
+    ? users.filter(
         (u) =>
           u.name.toLowerCase().includes(q) ||
           u.role.toLowerCase().includes(q) ||
           u.department.toLowerCase().includes(q)
       )
-    : mockUsersList.slice(0, 2);
+    : users.slice(0, 4);
 
   return (
     <Modal

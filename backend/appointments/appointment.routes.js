@@ -39,6 +39,42 @@ router.post(
   appointmentController.createAppointment
 );
 
+// GET /api/v1/appointments/patient (Convenience alias)
+router.get(
+  "/patient",
+  requireRole(
+    USER_ROLES.PATIENT,
+    USER_ROLES.RECEPTIONIST,
+    USER_ROLES.ADMIN,
+    USER_ROLES.DEPARTMENT_MANAGER
+  ),
+  appointmentController.getAppointments
+);
+
+// GET /api/v1/appointments/doctor (Convenience alias)
+router.get(
+  "/doctor",
+  requireRole(
+    USER_ROLES.DOCTOR,
+    USER_ROLES.RECEPTIONIST,
+    USER_ROLES.ADMIN,
+    USER_ROLES.DEPARTMENT_MANAGER
+  ),
+  appointmentController.getAppointments
+);
+
+// PATCH /api/v1/appointments/:id/status (Convenience alias)
+router.patch(
+  "/:id/status",
+  requireRole(
+    USER_ROLES.PATIENT,
+    USER_ROLES.DOCTOR,
+    USER_ROLES.RECEPTIONIST,
+    USER_ROLES.ADMIN
+  ),
+  appointmentController.updateAppointment
+);
+
 // PATCH /api/v1/appointments/:id
 router.patch(
   "/:id",
