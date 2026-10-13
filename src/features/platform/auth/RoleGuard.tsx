@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShieldAlert, ArrowRight, RefreshCw, Lock, CheckCircle2 } from "lucide-react";
+import { ShieldAlert, RefreshCw, ArrowRight } from "lucide-react";
 import { UserRole } from "@/shared/types/user";
 import { useAuth } from "./authContext";
 import { getRoleDashboard } from "./rolePermissions";
@@ -15,20 +15,54 @@ export interface RoleGuardProps {
   allowedRoles: UserRole[];
   children: React.ReactNode;
   moduleName?: string;
+  autoRedirect?: boolean;
 }
 
-export function RoleGuard({ allowedRoles, children, moduleName }: RoleGuardProps) {
+export function RoleGuard({
+  allowedRoles,
+  children,
+  moduleName,
+  autoRedirect = false,
+}: RoleGuardProps) {
   const router = useRouter();
-  const { user, role, switchRole } = useAuth();
+  const { user, role, switchRole, isHydrated } = useAuth();
+  const [countdown, setCountdown] = useState(3);
 
   const isAuthorized = allowedRoles.includes(role);
+  const userDashboard = getRoleDashboard(role);
+  const targetRole = allowedRoles[0];
+
+  useEffect(() => {
+    if (isHydrated && !isAuthorized && autoRedirect) {
+      const interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            router.push(userDashboard);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isHydrated, isAuthorized, autoRedirect, userDashboard, router]);
+
+  if (!isHydrated) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center p-8">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="h-8 w-8 rounded-full border-2 border-[#1b4332] border-t-transparent animate-spin" />
+          <p className="text-xs font-medium text-[#627267]">Verifying security credentials...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isAuthorized) {
     return <>{children}</>;
   }
-
-  const userDashboard = getRoleDashboard(role);
-  const targetRole = allowedRoles[0];
 
   const handleSimulateSwitch = (target: UserRole) => {
     switchRole(target);
@@ -70,6 +104,12 @@ export function RoleGuard({ allowedRoles, children, moduleName }: RoleGuardProps
             ))}
           </div>
         </div>
+
+        {autoRedirect && (
+          <p className="text-xs text-[#059669] font-medium animate-pulse">
+            Redirecting to your authorized dashboard in {countdown}s...
+          </p>
+        )}
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link href={userDashboard} className="w-full sm:w-auto">

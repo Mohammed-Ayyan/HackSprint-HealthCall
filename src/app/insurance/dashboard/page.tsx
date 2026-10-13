@@ -13,6 +13,7 @@ import { AIClaimSummaryCard } from "@/features/insurance/components/AIClaimSumma
 import { ClaimTimelineVisualizer } from "@/features/insurance/components/ClaimTimelineVisualizer";
 import { ShieldCheck, FileSpreadsheet, Bot, Clock } from "lucide-react";
 import { RoleGuard } from "@/features/platform/auth/RoleGuard";
+import { AppShell } from "@/shared/components/layout/AppShell";
 
 export default function InsuranceDashboardPage() {
   const [overview, setOverview] = useState<InsuranceOverviewData | null>(null);
@@ -65,43 +66,45 @@ export default function InsuranceDashboardPage() {
   }
 
   return (
-    <RoleGuard allowedRoles={["Insurance Employee", "Manager", "Admin"]} moduleName="Insurance & Claims Division">
-      <div className="space-y-8 max-w-7xl mx-auto pb-12">
-        {/* 1. Insurance Overview Cards */}
-        <InsuranceOverviewCards overview={overview} />
+    <AppShell>
+      <RoleGuard allowedRoles={["Insurance Employee", "Manager", "Admin"]} moduleName="Insurance & Claims Division">
+        <div className="space-y-8 max-w-7xl mx-auto pb-12">
+          {/* 1. Insurance Overview Cards */}
+          <InsuranceOverviewCards overview={overview} />
 
-        {/* 2. Side-by-side layout: Claims Table + AI Claim Summary + Claim Timeline */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Claims Management Table (7 cols) */}
-          <div className="lg:col-span-7">
-            <ClaimsManagementTable
-              claims={claims}
-              selectedClaimId={selectedClaim?.id || ""}
-              onSelectClaim={(c) => setSelectedClaim(c)}
-            />
-          </div>
+          {/* 2. Side-by-side layout: Claims Table + AI Claim Summary + Claim Timeline */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left Column: Claims Management Table (7 cols) */}
+            <div className="lg:col-span-7">
+              <ClaimsManagementTable
+                claims={claims}
+                selectedClaimId={selectedClaim?.id || ""}
+                onSelectClaim={(c) => setSelectedClaim(c)}
+              />
+            </div>
 
-          {/* Right Column: AI Claim Summary & Timeline Visualizer (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            {selectedClaim ? (
-              <>
-                <AIClaimSummaryCard
-                  claim={selectedClaim}
-                  onVerifyStatus={handleVerifyStatus}
-                />
-                <ClaimTimelineVisualizer
-                  claim={selectedClaim}
-                  onAdvanceStage={handleAdvanceStage}
-                />
-              </>
-            ) : (
-              <div className="p-8 text-center bg-white rounded-xl border border-[#e2e8df] text-xs text-[#627267] shadow-sm">
-                Select a claim to inspect AI summary and lifecycle timeline.
-              </div>
-            )}
+            {/* Right Column: AI Claim Summary & Timeline Visualizer (5 cols) */}
+            <div className="lg:col-span-5 space-y-6">
+              {selectedClaim ? (
+                <>
+                  <AIClaimSummaryCard
+                    claim={selectedClaim}
+                    onVerifyStatus={handleVerifyStatus}
+                  />
+                  <ClaimTimelineVisualizer
+                    claim={selectedClaim}
+                    onAdvanceStage={handleAdvanceStage}
+                  />
+                </>
+              ) : (
+                <div className="p-8 text-center bg-white rounded-xl border border-[#e2e8df] text-xs text-[#627267] shadow-sm">
+                  Select a claim to inspect AI summary and lifecycle timeline.
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </RoleGuard>
+      </RoleGuard>
+    </AppShell>
   );
 }

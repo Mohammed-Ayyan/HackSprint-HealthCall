@@ -13,6 +13,7 @@ import {
   Radio,
 } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/Card";
 import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
@@ -33,7 +34,8 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <RoleGuard allowedRoles={["Admin", "Manager"]} moduleName="Platform Engine Configuration">
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
@@ -232,6 +234,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      </RoleGuard>
     </AppShell>
   );
 }

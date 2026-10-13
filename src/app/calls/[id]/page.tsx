@@ -18,6 +18,7 @@ import {
   Activity,
 } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { AudioPlayer } from "@/shared/components/common/AudioPlayer";
 import { AISummaryCard } from "@/features/ai-intelligence/components/AISummaryCard";
 import { IntentDetector } from "@/features/ai-intelligence/components/IntentDetector";
@@ -118,7 +119,11 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <RoleGuard
+        allowedRoles={["Doctor", "Receptionist", "Insurance Employee", "Manager", "Admin"]}
+        moduleName="Call Dossier & Audio Intelligence"
+      >
+        <div className="space-y-6">
         {/* Navigation Breadcrumb & Back */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div className="flex items-center gap-3">
@@ -309,6 +314,7 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
           </div>
         )}
       </div>
+      </RoleGuard>
     </AppShell>
   );
 }

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { BarChart3, TrendingUp, CheckCircle, Clock, Flame, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { AnalyticsCharts } from "@/features/platform/components/AnalyticsCharts";
 import { ReportsExporter } from "@/features/platform/components/ReportsExporter";
 import { StatCard } from "@/shared/components/common/StatCard";
@@ -45,7 +46,8 @@ export default function AnalyticsPage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <RoleGuard allowedRoles={["Admin", "Manager"]} moduleName="Operational Analytics & Reporting">
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
@@ -118,6 +120,7 @@ export default function AnalyticsPage() {
         {/* Reports Download Section */}
         <ReportsExporter />
       </div>
+      </RoleGuard>
     </AppShell>
   );
 }
