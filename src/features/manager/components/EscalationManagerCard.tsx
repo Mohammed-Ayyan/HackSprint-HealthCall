@@ -65,7 +65,12 @@ export function EscalationManagerCard({ initialEscalations }: EscalationManagerC
         </CardHeader>
 
         <div className="divide-y divide-[#edf2ea]">
-          {escalations.map((esc) => (
+          {escalations.length === 0 ? (
+            <div className="p-8 text-center text-xs text-[#627267]">
+              No active escalations. Department operating within SLA.
+            </div>
+          ) : (
+            escalations.map((esc) => (
             <div
               key={esc.id}
               className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
@@ -138,7 +143,8 @@ export function EscalationManagerCard({ initialEscalations }: EscalationManagerC
                 )}
               </div>
             </div>
-          ))}
+          ))
+        )}
         </div>
       </Card>
 

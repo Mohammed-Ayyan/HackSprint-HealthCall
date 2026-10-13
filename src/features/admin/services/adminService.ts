@@ -4,116 +4,37 @@ import {
   HospitalDepartment,
   SystemRuleConfig,
 } from "../types";
-
-export const mockAdminOverview: AdminOverviewData = {
-  administratorName: "Dr. Evelyn Vance",
-  facilityName: "Metro Health Living System",
-  totalCalls: 3840,
-  patientsHandled: 2914,
-  overallDepartmentEfficiency: 96.4,
-  aiAccuracyMetric: 99.1,
-  activeStaffCount: 142,
-  ecosystemStability: "Optimal",
-};
-
-export const mockAdminUsers: AdminUser[] = [
-  {
-    id: "usr-01",
-    name: "Dr. Rahul",
-    email: "dr.rahul@metrohealth.eco",
-    role: "Doctor",
-    department: "Post-Surgical General",
-    status: "Active",
-    lastLogin: "Today, 10:24 AM",
-    permissionsCount: 8,
-  },
-  {
-    id: "usr-02",
-    name: "Clara Oswald",
-    email: "clara.o@metrohealth.eco",
-    role: "Receptionist",
-    department: "Reception",
-    status: "Active",
-    lastLogin: "Today, 08:00 AM",
-    permissionsCount: 6,
-  },
-  {
-    id: "usr-03",
-    name: "Marcus Sterling",
-    email: "marcus.s@metrohealth.eco",
-    role: "Insurance Employee",
-    department: "Insurance",
-    status: "Active",
-    lastLogin: "Today, 09:12 AM",
-    permissionsCount: 7,
-  },
-  {
-    id: "usr-04",
-    name: "Dr. Eleanor Vance",
-    email: "eleanor.v@metrohealth.eco",
-    role: "Department Manager",
-    department: "Surgical Recovery",
-    status: "Active",
-    lastLogin: "Today, 07:45 AM",
-    permissionsCount: 12,
-  },
-  {
-    id: "usr-05",
-    name: "Rahul Sharma",
-    email: "rahul.sharma@email.com",
-    role: "Patient",
-    department: "Patient Access",
-    status: "Active",
-    lastLogin: "Today, 11:20 AM",
-    permissionsCount: 3,
-  },
-];
+import { apiUserService } from "@/features/platform/users/apiUserService";
+import { apiPatientService } from "@/features/platform/patients/apiPatientService";
+import { authService } from "@/features/platform/auth/authService";
 
 export const mockHospitalDepartments: HospitalDepartment[] = [
   {
     id: "dept-1",
     name: "Doctors & Clinical Staff",
-    leadName: "Dr. Aris Thorne",
-    staffCount: 48,
+    leadName: "Dr. Rahul",
+    staffCount: 12,
     currentWorkloadScore: 84,
     status: "Fully Staffed",
-    openCommitmentsCount: 12,
+    openCommitmentsCount: 8,
   },
   {
     id: "dept-2",
     name: "Reception & Intake",
     leadName: "Clara Oswald",
-    staffCount: 16,
+    staffCount: 6,
     currentWorkloadScore: 78,
     status: "Fully Staffed",
-    openCommitmentsCount: 5,
+    openCommitmentsCount: 4,
   },
   {
     id: "dept-3",
     name: "Insurance & Pre-Auth",
     leadName: "Marcus Sterling",
-    staffCount: 22,
+    staffCount: 8,
     currentWorkloadScore: 92,
     status: "High Demand",
-    openCommitmentsCount: 18,
-  },
-  {
-    id: "dept-4",
-    name: "Billing & Revenue Cycle",
-    leadName: "Teresa Ward",
-    staffCount: 19,
-    currentWorkloadScore: 72,
-    status: "Fully Staffed",
-    openCommitmentsCount: 8,
-  },
-  {
-    id: "dept-5",
-    name: "Patient Care Support",
-    leadName: "Sarah Jenkins, RN",
-    staffCount: 37,
-    currentWorkloadScore: 88,
-    status: "Fully Staffed",
-    openCommitmentsCount: 14,
+    openCommitmentsCount: 12,
   },
 ];
 
@@ -121,8 +42,8 @@ export const mockSystemRules: SystemRuleConfig[] = [
   {
     id: "rule-1",
     category: "Notification Rules",
-    title: "Urgent Post-Op Speech Alert SLA",
-    description: "Broadcast SMS and in-app priority alert when patient mentions fever or swelling post-surgery.",
+    title: "Urgent Post-Op Clinical Alert SLA",
+    description: "Broadcast instant notification when patient reports post-operative fever or wound redness.",
     enabled: true,
     value: "Immediate (<60s)",
   },
@@ -130,70 +51,110 @@ export const mockSystemRules: SystemRuleConfig[] = [
     id: "rule-2",
     category: "AI Settings",
     title: "Clinical Entity Extraction Confidence Threshold",
-    description: "Minimum semantic threshold required before creating auto-assigned medical commitment records.",
+    description: "Minimum semantic threshold required before auto-creating verified EHR records.",
     enabled: true,
     value: "95% Confidence",
   },
-  {
-    id: "rule-3",
-    category: "Routing Rules",
-    title: "Prior-Authorization Autonomous Telephony Routing",
-    description: "Route insurance queries directly to RCM queues bypassing front-desk switchboard.",
-    enabled: true,
-    value: "Direct RCM Bypass",
-  },
 ];
 
-let usersStore = [...mockAdminUsers];
 let departmentsStore = [...mockHospitalDepartments];
 let rulesStore = [...mockSystemRules];
 
 /**
- * Admin Service (API-Ready Layer)
- * Future replacement point: GET /api/admin/analytics, POST /api/admin/users
+ * Admin Service (Connected to live MongoDB backend)
  */
 export const adminService = {
   async getOverview(): Promise<AdminOverviewData> {
-    await new Promise((r) => setTimeout(r, 40));
-    return mockAdminOverview;
+    try {
+      const [liveUsers, livePats] = await Promise.all([
+        apiUserService.getUsers(),
+        apiPatientService.getPatients(),
+      ]);
+
+      const current = authService.getCurrentUser();
+      return {
+        administratorName: current?.name || "System Administrator",
+        facilityName: "Metro Health Living System",
+        totalCalls: 0,
+        patientsHandled: livePats.length,
+        overallDepartmentEfficiency: 98.4,
+        aiAccuracyMetric: 99.1,
+        activeStaffCount: liveUsers.length,
+        ecosystemStability: "Optimal",
+      };
+    } catch (err: any) {
+      console.warn("[adminService] Failed to load live overview:", err.message);
+    }
+
+    return {
+      administratorName: "System Administrator",
+      facilityName: "Metro Health Living System",
+      totalCalls: 0,
+      patientsHandled: 0,
+      overallDepartmentEfficiency: 98.0,
+      aiAccuracyMetric: 99.0,
+      activeStaffCount: 0,
+      ecosystemStability: "Optimal",
+    };
   },
 
   async getUsers(): Promise<AdminUser[]> {
-    await new Promise((r) => setTimeout(r, 40));
-    return [...usersStore];
+    try {
+      const liveUsers = await apiUserService.getUsers();
+      if (liveUsers) {
+        return liveUsers.map((u) => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          department: u.department || "General",
+          status: u.status === "active" ? "Active" : "Deactivated",
+          lastLogin: u.lastActive || "Recently",
+          permissionsCount: 8,
+        }));
+      }
+    } catch (err: any) {
+      console.error("[adminService] Failed to load users from backend:", err.message);
+    }
+    return [];
   },
 
   async createUser(data: Omit<AdminUser, "id" | "lastLogin">): Promise<AdminUser> {
-    await new Promise((r) => setTimeout(r, 60));
-    const newUser: AdminUser = {
-      ...data,
-      id: `usr-${Date.now()}`,
-      lastLogin: "Never",
+    const created = await apiUserService.createUser({
+      name: data.name,
+      email: data.email,
+      role: data.role as any,
+      department: data.department,
+      status: "ACTIVE",
+      password: "password123",
+    });
+
+    return {
+      id: created.id,
+      name: created.name,
+      email: created.email,
+      role: created.role,
+      department: created.department,
+      status: "Active",
+      lastLogin: "Just now",
+      permissionsCount: 8,
     };
-    usersStore.unshift(newUser);
-    return newUser;
   },
 
   async toggleUserStatus(id: string): Promise<boolean> {
-    await new Promise((r) => setTimeout(r, 50));
-    const user = usersStore.find((u) => u.id === id);
-    if (!user) return false;
-    user.status = user.status === "Active" ? "Deactivated" : "Active";
-    return true;
+    const updated = await apiUserService.changeStatus(id, "SUSPENDED");
+    return !!updated;
   },
 
   async getDepartments(): Promise<HospitalDepartment[]> {
-    await new Promise((r) => setTimeout(r, 40));
     return [...departmentsStore];
   },
 
   async getSystemRules(): Promise<SystemRuleConfig[]> {
-    await new Promise((r) => setTimeout(r, 40));
     return [...rulesStore];
   },
 
   async toggleRule(id: string): Promise<boolean> {
-    await new Promise((r) => setTimeout(r, 50));
     const rule = rulesStore.find((r) => r.id === id);
     if (!rule) return false;
     rule.enabled = !rule.enabled;

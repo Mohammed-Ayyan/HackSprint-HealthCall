@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Calendar,
   Clock,
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { PatientAppointment } from "../types";
 import { patientService } from "../services/patientService";
+import { apiDoctorService, Doctor } from "@/features/platform/doctors/apiDoctorService";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/Card";
 import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
@@ -36,6 +37,10 @@ export function AppointmentManager({
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
   const [selectedAptId, setSelectedAptId] = useState<string | null>(null);
 
+  // Dynamic doctor roster from database
+  const [availableDoctors, setAvailableDoctors] = useState<Doctor[]>([]);
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
+
   // Form states
   const [doctorName, setDoctorName] = useState("Dr. Rahul");
   const [preferredDate, setPreferredDate] = useState("18 October");
@@ -45,11 +50,34 @@ export function AppointmentManager({
   const [rescheduleDate, setRescheduleDate] = useState("19 October");
   const [rescheduleTime, setRescheduleTime] = useState("03:00 PM");
 
+  useEffect(() => {
+    setAppointments(initialAppointments);
+  }, [initialAppointments]);
+
+  useEffect(() => {
+    async function fetchDoctors() {
+      setLoadingDoctors(true);
+      try {
+        const docs = await apiDoctorService.getDoctors();
+        if (docs && docs.length > 0) {
+          setAvailableDoctors(docs);
+          setDoctorName(docs[0].name);
+        }
+      } catch (err) {
+        console.error("Failed to load doctor roster from database", err);
+      } finally {
+        setLoadingDoctors(false);
+      }
+    }
+    fetchDoctors();
+  }, []);
+
   const handleRequestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const chosen = availableDoctors.find((d) => d.name === doctorName);
     const created = await patientService.requestAppointment({
       doctorName,
-      doctorSpecialty: "General Internal & Post-Op Medicine",
+      doctorSpecialty: chosen ? chosen.specialization || chosen.department : "General Care",
       date: preferredDate,
       time: preferredTime,
       location: "Pavilion 3 (Metro Health)",
@@ -199,11 +227,14 @@ export function AppointmentManager({
             label="Doctor & Department"
             value={doctorName}
             onChange={(e) => setDoctorName(e.target.value)}
-            options={[
-              { label: "Dr. Rahul (Post-Surgical General Medicine)", value: "Dr. Rahul" },
-              { label: "Dr. Aris Thorne (Surgical Director)", value: "Dr. Aris Thorne" },
-              { label: "Dr. Miriam Vance (Endocrinology)", value: "Dr. Miriam Vance" },
-            ]}
+            options={
+              availableDoctors.length > 0
+                ? availableDoctors.map((d) => ({
+                    label: `${d.name} (${d.department || d.specialization || "Clinical Team"})`,
+                    value: d.name,
+                  }))
+                : [{ label: "Loading registered doctors...", value: "" }]
+            }
           />
 
           <div className="grid grid-cols-2 gap-3">

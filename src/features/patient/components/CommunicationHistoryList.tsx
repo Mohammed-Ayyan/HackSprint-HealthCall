@@ -38,7 +38,12 @@ export function CommunicationHistoryList({ records }: CommunicationHistoryListPr
       </CardHeader>
 
       <div className="divide-y divide-[#edf2ea]">
-        {records.map((rec) => {
+        {records.length === 0 ? (
+          <div className="p-8 text-center text-xs text-[#627267]">
+            No telephony or clinical voice records found.
+          </div>
+        ) : (
+          records.map((rec) => {
           const isExpanded = expandedId === rec.id;
           return (
             <div key={rec.id} className="p-5 hover:bg-[#fbfdfb] transition-colors">
@@ -119,7 +124,7 @@ export function CommunicationHistoryList({ records }: CommunicationHistoryListPr
               )}
             </div>
           );
-        })}
+        }))}
       </div>
     </Card>
   );

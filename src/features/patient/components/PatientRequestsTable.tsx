@@ -59,7 +59,12 @@ export function PatientRequestsTable({ requests }: PatientRequestsTableProps) {
       </CardHeader>
 
       <div className="divide-y divide-[#edf2ea]">
-        {requests.map((req) => (
+        {requests.length === 0 ? (
+          <div className="p-8 text-center text-xs text-[#627267]">
+            No care requests or follow-up commitments on record.
+          </div>
+        ) : (
+          requests.map((req) => (
           <div
             key={req.id}
             className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -94,7 +99,8 @@ export function PatientRequestsTable({ requests }: PatientRequestsTableProps) {
               </span>
             </div>
           </div>
-        ))}
+        ))
+      )}
       </div>
     </Card>
   );

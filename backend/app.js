@@ -54,6 +54,7 @@ app.use(["/api/v1/auth", "/api/auth"], authRoutes);
 app.use(["/api/v1/users", "/api/users"], require("./users/user.routes"));
 app.use(["/api/v1/patients", "/api/patients"], require("./patients/patient.routes"));
 app.use(["/api/v1/doctors", "/api/doctors"], require("./doctors/doctor.routes"));
+app.use(["/api/v1/appointments", "/api/appointments"], require("./appointments/appointment.routes"));
 
 // 5. Fallback & Error Handling
 app.use(notFoundHandler);

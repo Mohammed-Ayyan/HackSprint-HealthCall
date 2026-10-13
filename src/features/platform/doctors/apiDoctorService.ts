@@ -2,9 +2,10 @@
  * CareOps AI - Real Backend Doctor Management Client
  * 
  * Direct API client for the Express / MongoDB backend (/api/v1/doctors).
- * Provides full CRUD operations, roster assignment, queue retrieval,
- * availability management, and clinical notes.
+ * Communicates strictly with live database collections using verified JWT tokens.
  */
+
+import { getClientToken } from "../auth/sessionStore";
 
 export interface DoctorAvailabilitySlot {
   day: string;
@@ -44,51 +45,9 @@ export interface CreateDoctorPayload {
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
-const TOKEN_KEY = "careops_jwt_token";
-
 function getAuthToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return getClientToken();
 }
-
-// Fallback seed data for offline / static demo environments
-const fallbackDoctors: Doctor[] = [
-  {
-    id: "doc-dr-rahul",
-    employeeId: "DOC-1001",
-    name: "Dr. Rahul",
-    email: "dr.rahul@metrohealth.eco",
-    phone: "+1 (555) 749-2101",
-    specialization: "Post-Surgical General & Acute Recovery",
-    department: "Post-Surgical General & Acute Recovery",
-    qualification: "MBBS, MD (Cardiothoracic Care)",
-    experience: 12,
-    availability: [
-      { day: "Monday", start: "09:00", end: "17:00", slots: ["10:30 AM", "11:15 AM", "02:00 PM", "04:30 PM"] },
-      { day: "Wednesday", start: "09:00", end: "17:00", slots: ["10:30 AM", "02:00 PM"] },
-    ],
-    assignedPatients: ["pat-rahul-sharma", "pat-ananya-patel"],
-    status: "ACTIVE",
-  },
-  {
-    id: "doc-dr-miriam-vance",
-    employeeId: "DOC-1002",
-    name: "Dr. Miriam Vance",
-    email: "vance.doctor@hospital.com",
-    phone: "+1 (555) 892-1200",
-    specialization: "Endocrinology & Metabolic Care",
-    department: "Endocrinology",
-    qualification: "MD, Endocrinology",
-    experience: 9,
-    availability: [
-      { day: "Tuesday", start: "10:00", end: "16:00", slots: ["11:45 AM", "01:15 PM", "03:00 PM"] },
-    ],
-    assignedPatients: ["pat-marcus-vance"],
-    status: "ACTIVE",
-  },
-];
-
-let localDoctorsStore: Doctor[] = [...fallbackDoctors];
 
 function normalizeDoctorFromApi(apiDoc: any): Doctor {
   return {
@@ -122,59 +81,37 @@ export const apiDoctorService = {
     search?: string;
   }): Promise<Doctor[]> {
     const token = getAuthToken();
+    if (!token) return [];
 
-    if (token) {
-      try {
-        const queryParams = new URLSearchParams();
-        if (filters?.specialization) queryParams.append("specialization", filters.specialization);
-        if (filters?.department) queryParams.append("department", filters.department);
-        if (filters?.status) queryParams.append("status", filters.status);
-        if (filters?.search) queryParams.append("search", filters.search);
+    try {
+      const queryParams = new URLSearchParams();
+      if (filters?.specialization) queryParams.append("specialization", filters.specialization);
+      if (filters?.department) queryParams.append("department", filters.department);
+      if (filters?.status) queryParams.append("status", filters.status);
+      if (filters?.search) queryParams.append("search", filters.search);
 
-        const url = `${BACKEND_BASE_URL}/doctors${
-          queryParams.toString() ? `?${queryParams.toString()}` : ""
-        }`;
+      const url = `${BACKEND_BASE_URL}/doctors${
+        queryParams.toString() ? `?${queryParams.toString()}` : ""
+      }`;
 
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && Array.isArray(data.doctors)) {
-            return data.doctors.map(normalizeDoctorFromApi);
-          }
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.doctors)) {
+          return data.doctors.map(normalizeDoctorFromApi);
         }
-      } catch (err) {
-        console.warn("[apiDoctorService] Backend request failed, using fallback store", err);
       }
+    } catch (err: any) {
+      console.error("[apiDoctorService] Backend doctors request failed:", err.message);
     }
 
-    // Fallback: local filter
-    let results = [...localDoctorsStore];
-    if (filters?.search) {
-      const q = filters.search.toLowerCase();
-      results = results.filter(
-        (d) =>
-          d.name.toLowerCase().includes(q) ||
-          d.specialization.toLowerCase().includes(q) ||
-          d.department.toLowerCase().includes(q)
-      );
-    }
-    if (filters?.department) {
-      results = results.filter(
-        (d) => d.department.toLowerCase() === filters.department?.toLowerCase()
-      );
-    }
-    if (filters?.specialization) {
-      results = results.filter(
-        (d) => d.specialization.toLowerCase() === filters.specialization?.toLowerCase()
-      );
-    }
-    return results;
+    return [];
   },
 
   /**
@@ -183,29 +120,27 @@ export const apiDoctorService = {
    */
   async getDoctorById(id: string): Promise<Doctor | null> {
     const token = getAuthToken();
+    if (!token) return null;
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/doctors/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/doctors/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.doctor) {
-            return normalizeDoctorFromApi(data.doctor);
-          }
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.doctor) {
+          return normalizeDoctorFromApi(data.doctor);
         }
-      } catch (err) {
-        console.warn(`[apiDoctorService] Failed to fetch doctor ${id}`, err);
       }
+    } catch (err: any) {
+      console.error(`[apiDoctorService] Failed to fetch doctor ${id}:`, err.message);
     }
 
-    const found = localDoctorsStore.find((d) => d.id === id || d.employeeId === id);
-    return found || null;
+    return null;
   },
 
   /**
@@ -214,28 +149,27 @@ export const apiDoctorService = {
    */
   async getMyDoctorProfile(): Promise<Doctor | null> {
     const token = getAuthToken();
+    if (!token) return null;
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/doctors/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/doctors/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.doctor) {
-            return normalizeDoctorFromApi(data.doctor);
-          }
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.doctor) {
+          return normalizeDoctorFromApi(data.doctor);
         }
-      } catch (err) {
-        console.warn("[apiDoctorService] Failed to fetch /doctors/me", err);
       }
+    } catch (err: any) {
+      console.error("[apiDoctorService] Failed to fetch /doctors/me:", err.message);
     }
 
-    return localDoctorsStore[0] || null;
+    return null;
   },
 
   /**
@@ -244,33 +178,32 @@ export const apiDoctorService = {
    */
   async getAssignedPatients(doctorId?: string): Promise<any[]> {
     const token = getAuthToken();
+    if (!token) return [];
+
     const idToUse = doctorId || "me";
 
-    if (token) {
-      try {
-        // If "me" was specified, resolve current doctor ID first
-        let targetId = idToUse;
-        if (targetId === "me") {
-          const meProfile = await this.getMyDoctorProfile();
-          if (meProfile) targetId = meProfile.id;
-        }
-
-        const res = await fetch(`${BACKEND_BASE_URL}/doctors/${targetId}/patients`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && Array.isArray(data.patients)) {
-            return data.patients;
-          }
-        }
-      } catch (err) {
-        console.warn("[apiDoctorService] Failed to fetch doctor patient queue", err);
+    try {
+      let targetId = idToUse;
+      if (targetId === "me") {
+        const meProfile = await this.getMyDoctorProfile();
+        if (meProfile) targetId = meProfile.id;
       }
+
+      const res = await fetch(`${BACKEND_BASE_URL}/doctors/${targetId}/patients`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.patients)) {
+          return data.patients;
+        }
+      }
+    } catch (err: any) {
+      console.error("[apiDoctorService] Failed to fetch doctor patient queue:", err.message);
     }
 
     return [];
@@ -282,31 +215,28 @@ export const apiDoctorService = {
    */
   async updateAvailability(doctorId: string, availability: any[]): Promise<any[]> {
     const token = getAuthToken();
+    if (!token) return availability;
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/doctors/${doctorId}/availability`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ availability }),
-        });
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/doctors/${doctorId}/availability`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ availability }),
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.availability) {
-            return data.availability;
-          }
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.availability) {
+          return data.availability;
         }
-      } catch (err) {
-        console.warn("[apiDoctorService] Failed to update availability on backend", err);
       }
+    } catch (err: any) {
+      console.error("[apiDoctorService] Failed to update availability on backend:", err.message);
     }
 
-    const doc = localDoctorsStore.find((d) => d.id === doctorId);
-    if (doc) doc.availability = availability;
     return availability;
   },
 
@@ -316,34 +246,29 @@ export const apiDoctorService = {
    */
   async assignPatient(doctorId: string, patientId: string): Promise<Doctor | null> {
     const token = getAuthToken();
+    if (!token) return null;
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/doctors/${doctorId}/patients`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ patientId }),
-        });
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/doctors/${doctorId}/patients`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ patientId }),
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.doctor) {
-            return normalizeDoctorFromApi(data.doctor);
-          }
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.doctor) {
+          return normalizeDoctorFromApi(data.doctor);
         }
-      } catch (err) {
-        console.warn("[apiDoctorService] Failed to assign patient on backend", err);
       }
+    } catch (err: any) {
+      console.error("[apiDoctorService] Failed to assign patient on backend:", err.message);
     }
 
-    const doc = localDoctorsStore.find((d) => d.id === doctorId);
-    if (doc && !doc.assignedPatients?.includes(patientId)) {
-      doc.assignedPatients = [...(doc.assignedPatients || []), patientId];
-    }
-    return doc || null;
+    return null;
   },
 
   /**
@@ -352,27 +277,26 @@ export const apiDoctorService = {
    */
   async addClinicalNote(doctorId: string, patientId: string, note: string): Promise<any> {
     const token = getAuthToken();
+    if (!token) return { success: false, message: "No token" };
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/doctors/${doctorId}/notes`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ patientId, note }),
-        });
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/doctors/${doctorId}/notes`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ patientId, note }),
+      });
 
-        if (res.ok) {
-          return await res.json();
-        }
-      } catch (err) {
-        console.warn("[apiDoctorService] Failed to record clinical note on backend", err);
+      if (res.ok) {
+        return await res.json();
       }
+    } catch (err: any) {
+      console.error("[apiDoctorService] Failed to record clinical note on backend:", err.message);
     }
 
-    return { success: true, note, simulated: true };
+    return { success: false };
   },
 
   /**
@@ -381,50 +305,23 @@ export const apiDoctorService = {
    */
   async createDoctor(payload: CreateDoctorPayload): Promise<Doctor> {
     const token = getAuthToken();
+    if (!token) throw new Error("Authentication token required");
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/doctors`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+    const res = await fetch(`${BACKEND_BASE_URL}/doctors`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.doctor) {
-            const created = normalizeDoctorFromApi(data.doctor);
-            localDoctorsStore.unshift(created);
-            return created;
-          }
-        } else {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.message || "Failed to create doctor profile");
-        }
-      } catch (err: any) {
-        if (err.message && !err.message.includes("fetch")) throw err;
-      }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success || !data.doctor) {
+      throw new Error(data.message || "Failed to create doctor profile");
     }
 
-    const newDoc: Doctor = {
-      id: `doc-${Date.now()}`,
-      userId: payload.userId,
-      employeeId: payload.employeeId || `DOC-${Math.floor(1000 + Math.random() * 9000)}`,
-      name: "Dr. Clinician",
-      email: "doctor@metrohealth.eco",
-      specialization: payload.specialization,
-      department: payload.department,
-      qualification: payload.qualification || "MBBS, MD",
-      experience: payload.experience || 5,
-      availability: payload.availability || [],
-      assignedPatients: [],
-      status: "ACTIVE",
-    };
-    localDoctorsStore.unshift(newDoc);
-    return newDoc;
+    return normalizeDoctorFromApi(data.doctor);
   },
 
   /**
@@ -433,34 +330,28 @@ export const apiDoctorService = {
    */
   async updateDoctor(doctorId: string, updates: Partial<Doctor>): Promise<Doctor | null> {
     const token = getAuthToken();
+    if (!token) return null;
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/doctors/${doctorId}`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updates),
-        });
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/doctors/${doctorId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updates),
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.doctor) {
-            return normalizeDoctorFromApi(data.doctor);
-          }
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.doctor) {
+          return normalizeDoctorFromApi(data.doctor);
         }
-      } catch (err) {
-        console.warn("[apiDoctorService] Failed to update doctor profile on backend", err);
       }
+    } catch (err: any) {
+      console.error("[apiDoctorService] Failed to update doctor profile on backend:", err.message);
     }
 
-    const idx = localDoctorsStore.findIndex((d) => d.id === doctorId);
-    if (idx !== -1) {
-      localDoctorsStore[idx] = { ...localDoctorsStore[idx], ...updates };
-      return localDoctorsStore[idx];
-    }
     return null;
   },
 };
