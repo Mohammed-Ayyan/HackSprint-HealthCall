@@ -1,3 +1,8 @@
+import { Priority } from "@prisma/client";
+
+export type TaskPriority = Priority;
+export { Priority as TaskPriorityEnum };
+
 export type SLAHealthStatus =
   | "ON_TRACK"
   | "NEAR_BREACH"

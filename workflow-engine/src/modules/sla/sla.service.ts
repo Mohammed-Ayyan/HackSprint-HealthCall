@@ -37,6 +37,14 @@ export class SLAService {
   }
 
   /**
+   * Evaluates dynamic health status and minutes for a given task.
+   * Alias / shorthand for evaluateSLA per Phase 6 requirements.
+   */
+  getMetrics(task: TaskSLAInput, referenceTime: Date = new Date()): SLAMetrics {
+    return this.evaluateSLA(task, referenceTime);
+  }
+
+  /**
    * SLA Health Status Evaluator:
    * Evaluates task status, deadline, and timestamps relative to a reference time (default: now).
    *

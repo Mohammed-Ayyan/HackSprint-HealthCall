@@ -270,7 +270,7 @@ async function getMyProfile({ requester }) {
       userId: requester.id,
       name: requester.name,
       email: requester.email.toLowerCase(),
-      phone: requester.phone || "",
+      phone: requester.phone && requester.phone.trim() ? requester.phone.trim() : "+1 (555) 000-0000",
       department: requester.department || "General Medicine",
       status: "ACTIVE",
     });

@@ -13,6 +13,12 @@ const { errorHandler, notFoundHandler } = require("./middleware/errorMiddleware"
 
 const app = express();
 
+// 0. Request Logging Middleware
+app.use((req, res, next) => {
+  console.log(`[HTTP ${new Date().toLocaleTimeString()}] ${req.method} ${req.url} (Origin: ${req.headers.origin || "none"})`);
+  next();
+});
+
 // 1. Cross-Origin Resource Sharing (CORS)
 const allowedOrigins = [
   "http://localhost:3000",
@@ -23,7 +29,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, postman) or matching whitelist
       if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
         callback(null, true);
       } else {
@@ -32,7 +37,7 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
   })
 );
 

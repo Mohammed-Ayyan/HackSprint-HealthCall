@@ -143,7 +143,7 @@ export class TaskRepository {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ deadlineAt: "asc" }, { createdAt: "desc" }],
         include: {
           department: { select: { id: true, name: true } },
           assignedEmployee: {
