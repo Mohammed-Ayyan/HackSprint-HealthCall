@@ -44,62 +44,62 @@ export function EscalationManagerCard({ initialEscalations }: EscalationManagerC
 
   return (
     <>
-      <Card className="bg-[#0b1712] border-[#1b362a]">
-        <CardHeader className="border-b border-[#1b362a] pb-4">
+      <Card className="bg-white border-[#e2e8df] shadow-sm">
+        <CardHeader className="border-b border-[#edf2ea] pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-lg bg-[#231515] border border-[#4d2525] flex items-center justify-center text-[#f87171]">
+              <div className="h-9 w-9 rounded-lg bg-[#fee2e2] text-[#dc2626] flex items-center justify-center">
                 <AlertTriangle className="h-4 w-4" />
               </div>
               <div>
-                <CardTitle className="text-base text-stone-100">Escalation & SLA Incident Command</CardTitle>
-                <p className="text-xs text-stone-400 mt-0.5">
+                <CardTitle className="text-base text-[#142019]">Escalation & SLA Incident Command</CardTitle>
+                <p className="text-xs text-[#627267] mt-0.5">
                   Overdue commitments, clinical approvals, and urgent patient speech triggers
                 </p>
               </div>
             </div>
-            <span className="text-xs font-mono text-[#f87171] bg-[#201515] px-3 py-1 rounded-full border border-[#4d2525]">
+            <span className="text-xs font-mono font-bold text-[#dc2626] bg-[#fef2f2] px-3 py-1 rounded-full border border-[#fecaca]">
               {escalations.filter((e) => e.status !== "Resolved").length} Active Incidents
             </span>
           </div>
         </CardHeader>
 
-        <div className="divide-y divide-[#162e24]">
+        <div className="divide-y divide-[#edf2ea]">
           {escalations.map((esc) => (
             <div
               key={esc.id}
-              className="p-5 hover:bg-[#0e2019]/60 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+              className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
             >
               <div className="flex items-start gap-3.5">
-                <div className="h-10 w-10 rounded-xl bg-[#201515] border border-[#4d2525] flex items-center justify-center text-[#f87171] flex-shrink-0 mt-0.5">
+                <div className="h-10 w-10 rounded-xl bg-[#fee2e2] text-[#dc2626] flex items-center justify-center flex-shrink-0 mt-0.5">
                   <ShieldAlert className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <h4 className="text-sm font-bold text-stone-100">{esc.patientName}</h4>
-                    <span className="text-xs font-mono text-stone-400">({esc.callId})</span>
-                    <Badge variant={esc.priority === "Urgent" ? "red" : "amber"} size="sm">
+                    <h4 className="text-sm font-bold text-[#142019]">{esc.patientName}</h4>
+                    <span className="text-xs font-mono text-[#627267]">({esc.callId})</span>
+                    <Badge variant={esc.priority === "Urgent" ? "rose" : "amber"} size="sm">
                       {esc.priority.toUpperCase()}
                     </Badge>
                     <Badge variant="teal" size="sm">
                       {esc.type}
                     </Badge>
                     <Badge
-                      variant={esc.status === "Resolved" ? "green" : "gray"}
+                      variant={esc.status === "Resolved" ? "emerald" : "default"}
                       size="sm"
                     >
                       {esc.status}
                     </Badge>
                   </div>
 
-                  <p className="text-xs text-stone-200 font-medium mt-1.5">{esc.issue}</p>
+                  <p className="text-xs text-[#28382e] font-medium mt-1.5">{esc.issue}</p>
 
-                  <div className="flex items-center gap-4 text-xs text-stone-400 mt-2 font-mono flex-wrap">
-                    <span className="text-[#f87171] font-semibold bg-[#1a1111] px-2 py-0.5 rounded border border-[#3f1e1e]">
+                  <div className="flex items-center gap-4 text-xs text-[#627267] mt-2 font-mono flex-wrap">
+                    <span className="text-[#dc2626] font-semibold bg-[#fef2f2] px-2 py-0.5 rounded border border-[#fecaca]">
                       Overdue: {esc.overdueBy}
                     </span>
                     <span>•</span>
-                    <span className="text-stone-300">Assignee: {esc.assignedTo}</span>
+                    <span className="text-[#28382e]">Assignee: {esc.assignedTo}</span>
                   </div>
                 </div>
               </div>
@@ -116,9 +116,9 @@ export function EscalationManagerCard({ initialEscalations }: EscalationManagerC
                         setNewAssignee(esc.assignedTo);
                         setNewPriority(esc.priority);
                       }}
-                      className="border-[#214b38] text-stone-300 hover:text-[#34d399] flex items-center gap-1.5"
+                      className="border-[#dce8df] text-[#28382e] hover:text-[#1b4332] flex items-center gap-1.5"
                     >
-                      <UserCheck className="h-3.5 w-3.5 text-[#34d399]" />
+                      <UserCheck className="h-3.5 w-3.5 text-[#059669]" />
                       <span>Reassign / Prioritize</span>
                     </Button>
                     <Button
@@ -132,7 +132,7 @@ export function EscalationManagerCard({ initialEscalations }: EscalationManagerC
                     </Button>
                   </>
                 ) : (
-                  <span className="text-xs font-mono text-[#34d399] bg-[#0c241a] px-3 py-1.5 rounded-lg border border-[#1c4533]">
+                  <span className="text-xs font-mono text-[#059669] bg-[#f0fdf4] px-3 py-1.5 rounded-lg border border-[#bbf7d0]">
                     Incident Cleared
                   </span>
                 )}
@@ -148,49 +148,49 @@ export function EscalationManagerCard({ initialEscalations }: EscalationManagerC
           isOpen={!!selectedEscalation}
           onClose={() => setSelectedEscalation(null)}
           title={`Escalation Control • ${selectedEscalation.patientName}`}
-          className="max-w-md bg-[#091510] border-[#1b362a]"
+          className="max-w-md bg-white border-[#e2e8df]"
         >
           <form onSubmit={handleReassignSubmit} className="space-y-4 pt-2">
             <div>
-              <p className="text-xs text-stone-300 font-medium mb-1">Issue Overview</p>
-              <p className="text-xs text-stone-400 bg-[#081510] p-2.5 rounded-lg border border-[#183327]">
+              <p className="text-xs text-[#142019] font-semibold mb-1">Issue Overview</p>
+              <p className="text-xs text-[#28382e] bg-[#f7f9f6] p-2.5 rounded-xl border border-[#e2e8df]">
                 {selectedEscalation.issue}
               </p>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-stone-300 block mb-1.5">
+              <label className="text-xs font-semibold text-[#142019] block mb-1.5">
                 Assign Employee
               </label>
               <Select
                 value={newAssignee}
                 onChange={(e) => setNewAssignee(e.target.value)}
-                className="bg-[#0b1813] border-[#1b382b] text-stone-200"
-              >
-                <option value="Marcus Sterling">Marcus Sterling (Insurance Lead)</option>
-                <option value="Sarah Jenkins, RN">Sarah Jenkins, RN (Post-Op Triage)</option>
-                <option value="Clara Oswald">Clara Oswald (Front Desk Lead)</option>
-                <option value="Dr. Rahul">Dr. Rahul (Surgical Director)</option>
-                <option value="James Patel">James Patel (Pharmacy)</option>
-              </Select>
+                options={[
+                  { label: "Marcus Sterling (Insurance Lead)", value: "Marcus Sterling" },
+                  { label: "Sarah Jenkins, RN (Post-Op Triage)", value: "Sarah Jenkins, RN" },
+                  { label: "Clara Oswald (Front Desk Lead)", value: "Clara Oswald" },
+                  { label: "Dr. Rahul (Surgical Director)", value: "Dr. Rahul" },
+                  { label: "James Patel (Pharmacy)", value: "James Patel" },
+                ]}
+              />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-stone-300 block mb-1.5">
+              <label className="text-xs font-semibold text-[#142019] block mb-1.5">
                 Urgency / Priority Tier
               </label>
               <Select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value as EscalationCase["priority"])}
-                className="bg-[#0b1813] border-[#1b382b] text-stone-200"
-              >
-                <option value="Urgent">Urgent (Immediate Dispatch)</option>
-                <option value="High">High (Within 1 Hour)</option>
-                <option value="Medium">Medium (Within Shift)</option>
-              </Select>
+                options={[
+                  { label: "Urgent (Immediate Dispatch)", value: "Urgent" },
+                  { label: "High (Within 1 Hour)", value: "High" },
+                  { label: "Medium (Within Shift)", value: "Medium" },
+                ]}
+              />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#183629]">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#edf2ea]">
               <Button
                 type="button"
                 variant="outline"

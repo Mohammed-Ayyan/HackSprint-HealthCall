@@ -9,7 +9,7 @@ export interface StatCardProps {
   changePercent?: number;
   subtitle?: string;
   icon?: React.ReactNode;
-  variant?: "cyan" | "purple" | "rose" | "emerald" | "amber" | "default";
+  variant?: "cyan" | "purple" | "rose" | "emerald" | "amber" | "default" | "teal";
   className?: string;
 }
 
@@ -25,44 +25,46 @@ export function StatCard({
   const isPositive = changePercent !== undefined && changePercent > 0;
   const isNegative = changePercent !== undefined && changePercent < 0;
 
-  const glowStyles = {
-    cyan: "border-cyan-500/20 hover:border-cyan-500/40 hover:shadow-[0_15px_35px_-10px_rgba(6,182,212,0.2)]",
-    purple: "border-purple-500/20 hover:border-purple-500/40 hover:shadow-[0_15px_35px_-10px_rgba(139,92,246,0.2)]",
-    rose: "border-rose-500/20 hover:border-rose-500/40 hover:shadow-[0_15px_35px_-10px_rgba(239,68,68,0.2)]",
-    amber: "border-amber-500/20 hover:border-amber-500/40 hover:shadow-[0_15px_35px_-10px_rgba(245,158,11,0.2)]",
-    emerald: "border-emerald-500/20 hover:border-emerald-500/40 hover:shadow-[0_15px_35px_-10px_rgba(16,185,129,0.2)]",
-    default: "border-slate-800 hover:border-slate-700",
+  const cardBorderStyles = {
+    cyan: "border-[#e2e8df] hover:border-[#0d9488]/40 hover:shadow-sm",
+    teal: "border-[#e2e8df] hover:border-[#0d9488]/40 hover:shadow-sm",
+    purple: "border-[#e2e8df] hover:border-[#1b4332]/40 hover:shadow-sm",
+    rose: "border-[#e2e8df] hover:border-[#dc2626]/40 hover:shadow-sm",
+    amber: "border-[#e2e8df] hover:border-[#d97706]/40 hover:shadow-sm",
+    emerald: "border-[#e2e8df] hover:border-[#059669]/40 hover:shadow-sm",
+    default: "border-[#e2e8df] hover:border-[#1b4332]/30 hover:shadow-sm",
   };
 
   const iconBgStyles = {
-    cyan: "bg-cyan-950/60 text-cyan-400 border border-cyan-500/30",
-    purple: "bg-purple-950/60 text-purple-400 border border-purple-500/30",
-    rose: "bg-rose-950/60 text-rose-400 border border-rose-500/30",
-    amber: "bg-amber-950/60 text-amber-400 border border-amber-500/30",
-    emerald: "bg-emerald-950/60 text-emerald-400 border border-emerald-500/30",
-    default: "bg-slate-800 text-slate-300 border border-slate-700",
+    cyan: "bg-[#ccfbf1] text-[#0d9488]",
+    teal: "bg-[#ccfbf1] text-[#0d9488]",
+    purple: "bg-[#e8f3ec] text-[#1b4332]",
+    rose: "bg-[#fee2e2] text-[#dc2626]",
+    amber: "bg-[#fef3c7] text-[#d97706]",
+    emerald: "bg-[#e8f3ec] text-[#059669]",
+    default: "bg-[#f4f7f4] text-[#28382e]",
   };
 
   return (
     <Card
       className={cn(
-        "relative overflow-hidden transition-all duration-300 group cursor-default",
-        glowStyles[variant],
+        "bg-white relative overflow-hidden transition-all duration-300 group cursor-default shadow-xs p-5",
+        cardBorderStyles[variant],
         className
       )}
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-xs font-medium text-slate-400 tracking-wide uppercase">{title}</p>
+          <p className="text-xs font-semibold text-[#627267] tracking-wider uppercase">{title}</p>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-2xl font-bold tracking-tight text-white font-mono">{value}</h3>
+            <h3 className="text-2xl font-bold tracking-tight text-[#142019] font-mono">{value}</h3>
           </div>
         </div>
 
         {icon && (
           <div
             className={cn(
-              "h-10 w-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110",
+              "h-10 w-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105",
               iconBgStyles[variant]
             )}
           >
@@ -75,10 +77,10 @@ export function StatCard({
         {changePercent !== undefined && (
           <span
             className={cn(
-              "inline-flex items-center gap-0.5 font-semibold font-mono px-1.5 py-0.5 rounded",
-              isPositive && "bg-emerald-500/10 text-emerald-400",
-              isNegative && "bg-rose-500/10 text-rose-400",
-              !isPositive && !isNegative && "bg-slate-800 text-slate-400"
+              "inline-flex items-center gap-0.5 font-bold font-mono px-1.5 py-0.5 rounded text-[11px]",
+              isPositive && "bg-[#dcfce7] text-[#166534]",
+              isNegative && "bg-[#fee2e2] text-[#991b1b]",
+              !isPositive && !isNegative && "bg-[#f4f7f4] text-[#627267]"
             )}
           >
             {isPositive && <TrendingUp className="h-3 w-3" />}
@@ -87,17 +89,19 @@ export function StatCard({
             {Math.abs(changePercent)}%
           </span>
         )}
-        <span className="text-slate-400">{subtitle || "vs last 24h"}</span>
+        <span className="text-[#627267]">{subtitle || "vs last 24h"}</span>
       </div>
 
-      {/* Subtle bottom gradient line */}
+      {/* Subtle bottom botanical accent line */}
       <div
         className={cn(
-          "absolute bottom-0 left-0 right-0 h-[2px] opacity-40 group-hover:opacity-100 transition-opacity",
-          variant === "cyan" && "bg-gradient-to-r from-transparent via-cyan-500 to-transparent",
-          variant === "purple" && "bg-gradient-to-r from-transparent via-purple-500 to-transparent",
-          variant === "rose" && "bg-gradient-to-r from-transparent via-rose-500 to-transparent",
-          variant === "emerald" && "bg-gradient-to-r from-transparent via-emerald-500 to-transparent"
+          "absolute bottom-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity",
+          variant === "cyan" && "bg-[#0d9488]",
+          variant === "purple" && "bg-[#1b4332]",
+          variant === "rose" && "bg-[#dc2626]",
+          variant === "amber" && "bg-[#d97706]",
+          variant === "emerald" && "bg-[#059669]",
+          variant === "default" && "bg-[#1b4332]"
         )}
       />
     </Card>

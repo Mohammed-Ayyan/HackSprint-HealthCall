@@ -51,14 +51,14 @@ export function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-[#040806]/85 backdrop-blur-md transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-[#142019]/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
       <div
         className={cn(
-          "relative w-full rounded-2xl bg-[#091510] border border-[#1b362a] p-6 shadow-2xl z-10 transition-all",
+          "relative w-full rounded-2xl bg-white border border-[#e2e8df] p-6 shadow-xl z-10 transition-all text-[#142019]",
           "animate-in fade-in-50 zoom-in-95 duration-200",
           sizeClasses[size],
           className
@@ -68,20 +68,20 @@ export function Modal({
       >
         {/* Header */}
         {(title || description) && (
-          <div className="flex items-start justify-between pb-4 border-b border-[#183327] mb-5">
+          <div className="flex items-start justify-between pb-4 border-b border-[#edf2ea] mb-5">
             <div className="space-y-1 pr-6">
               {title && (
                 typeof title === "string" ? (
-                  <h3 className="text-lg font-bold text-stone-100 tracking-tight">{title}</h3>
+                  <h3 className="text-lg font-bold text-[#142019] tracking-tight">{title}</h3>
                 ) : (
                   <div>{title}</div>
                 )
               )}
-              {description && <p className="text-xs text-stone-400">{description}</p>}
+              {description && <p className="text-xs text-[#627267]">{description}</p>}
             </div>
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-stone-400 hover:text-stone-200 hover:bg-[#12281e] transition-colors cursor-pointer"
+              className="rounded-lg p-1.5 text-[#627267] hover:text-[#142019] hover:bg-[#f0f4ef] transition-colors cursor-pointer"
               aria-label="Close modal"
             >
               <X className="h-4 w-4" />

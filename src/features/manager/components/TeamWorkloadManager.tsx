@@ -14,29 +14,29 @@ export function TeamWorkloadManager({ workloads }: TeamWorkloadManagerProps) {
   const getWorkloadBadge = (status: EmployeeWorkload["workloadStatus"]) => {
     switch (status) {
       case "Optimal":
-        return <Badge variant="green">OPTIMAL</Badge>;
+        return <Badge variant="emerald">OPTIMAL</Badge>;
       case "Balanced":
         return <Badge variant="teal">BALANCED</Badge>;
       case "Near Capacity":
         return <Badge variant="amber">NEAR CAPACITY</Badge>;
       case "Overloaded":
-        return <Badge variant="red">OVERLOADED</Badge>;
+        return <Badge variant="rose">OVERLOADED</Badge>;
       default:
-        return <Badge variant="gray">{status}</Badge>;
+        return <Badge variant="default">{status}</Badge>;
     }
   };
 
   return (
-    <Card className="bg-[#0b1712] border-[#1b362a]">
-      <CardHeader className="border-b border-[#1b362a] pb-4">
+    <Card className="bg-white border-[#e2e8df] shadow-sm">
+      <CardHeader className="border-b border-[#edf2ea] pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-[#11261d] border border-[#204937] flex items-center justify-center text-[#34d399]">
+            <div className="h-9 w-9 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
               <Users className="h-4 w-4" />
             </div>
             <div>
-              <CardTitle className="text-base text-stone-100">Team Workload & Performance Matrix</CardTitle>
-              <p className="text-xs text-stone-400 mt-0.5">
+              <CardTitle className="text-base text-[#142019]">Team Workload & Performance Matrix</CardTitle>
+              <p className="text-xs text-[#627267] mt-0.5">
                 Real-time task distribution, throughput efficiency, and clinical workload capacity
               </p>
             </div>
@@ -45,14 +45,14 @@ export function TeamWorkloadManager({ workloads }: TeamWorkloadManagerProps) {
         </div>
       </CardHeader>
 
-      <div className="divide-y divide-[#162e24]">
+      <div className="divide-y divide-[#edf2ea]">
         {workloads.map((emp) => (
           <div
             key={emp.id}
-            className="p-5 hover:bg-[#0e2019]/60 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
+            className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
           >
             <div className="flex items-start gap-3.5">
-              <div className="h-10 w-10 rounded-xl bg-[#132c21] border border-[#23533c] flex items-center justify-center text-[#34d399] flex-shrink-0 mt-0.5 font-bold font-mono text-xs">
+              <div className="h-10 w-10 rounded-xl bg-[#e8f3ec] text-[#1b4332] border border-[#dce8df] flex items-center justify-center flex-shrink-0 mt-0.5 font-bold font-mono text-xs">
                 {emp.name
                   .split(" ")
                   .map((n) => n[0])
@@ -60,38 +60,38 @@ export function TeamWorkloadManager({ workloads }: TeamWorkloadManagerProps) {
               </div>
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <h4 className="text-sm font-bold text-stone-100">{emp.name}</h4>
-                  <span className="text-xs text-stone-400">{emp.role}</span>
+                  <h4 className="text-sm font-bold text-[#142019]">{emp.name}</h4>
+                  <span className="text-xs text-[#627267]">{emp.role}</span>
                   {getWorkloadBadge(emp.workloadStatus)}
                 </div>
 
-                <div className="flex items-center gap-4 text-xs text-stone-400 mt-1.5 flex-wrap font-mono">
-                  <span className="text-stone-300">Active Tasks: <strong className="text-white">{emp.activeTasks}</strong></span>
+                <div className="flex items-center gap-4 text-xs text-[#627267] mt-1.5 flex-wrap font-mono">
+                  <span className="text-[#28382e]">Active Tasks: <strong className="text-[#142019]">{emp.activeTasks}</strong></span>
                   <span>•</span>
-                  <span className="text-[#34d399]">Completed: {emp.completedToday}</span>
+                  <span className="text-[#059669] font-semibold">Completed: {emp.completedToday}</span>
                   <span>•</span>
                   {emp.overdueTasks > 0 ? (
-                    <span className="text-[#f87171] font-semibold">Overdue: {emp.overdueTasks}</span>
+                    <span className="text-[#dc2626] font-semibold">Overdue: {emp.overdueTasks}</span>
                   ) : (
-                    <span className="text-stone-500">0 Overdue</span>
+                    <span className="text-[#94a399]">0 Overdue</span>
                   )}
                 </div>
 
                 {/* Progress bar visual for workload load */}
                 <div className="mt-2.5 flex items-center gap-3">
-                  <div className="w-48 h-1.5 rounded-full bg-[#162c22] overflow-hidden">
+                  <div className="w-48 h-1.5 rounded-full bg-[#e2e8df] overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         emp.workloadStatus === "Overloaded"
-                          ? "bg-[#f87171]"
+                          ? "bg-[#dc2626]"
                           : emp.workloadStatus === "Near Capacity"
-                          ? "bg-[#f59e0b]"
-                          : "bg-[#34d399]"
+                          ? "bg-[#d97706]"
+                          : "bg-[#059669]"
                       }`}
                       style={{ width: `${Math.min(emp.activeTasks * 10, 100)}%` }}
                     />
                   </div>
-                  <span className="text-[11px] font-mono text-stone-400">
+                  <span className="text-[11px] font-mono text-[#627267]">
                     Cap: {emp.activeTasks * 10}%
                   </span>
                 </div>
@@ -99,11 +99,11 @@ export function TeamWorkloadManager({ workloads }: TeamWorkloadManagerProps) {
             </div>
 
             <div className="flex flex-col md:items-end justify-between pl-12 md:pl-0">
-              <div className="bg-[#091510] px-3.5 py-1.5 rounded-xl border border-[#1a382c] text-right">
-                <span className="text-[11px] text-stone-400 uppercase tracking-wider block font-mono">
+              <div className="bg-[#f7f9f6] px-3.5 py-1.5 rounded-xl border border-[#e2e8df] text-right">
+                <span className="text-[11px] text-[#627267] uppercase tracking-wider block font-mono">
                   Efficiency Rating
                 </span>
-                <span className="text-sm font-mono font-bold text-[#34d399]">
+                <span className="text-sm font-mono font-bold text-[#1b4332]">
                   {emp.efficiencyRating}%
                 </span>
               </div>

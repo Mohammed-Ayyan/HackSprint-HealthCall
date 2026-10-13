@@ -43,7 +43,7 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
     setName(u.name);
     setEmail(u.email);
     setRole(u.role);
-    setDepartment(u.department);
+    setDepartment(u.department as DepartmentName);
     setPhone(u.phone || "");
     setIsModalOpen(true);
   };
@@ -90,7 +90,7 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
       <CardHeader>
         <div>
           <CardTitle>Hospital Staff & Access Governance</CardTitle>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[#607264] mt-1">
             Manage hospital personnel, departmental task queues, and role-based operational permissions
           </p>
         </div>
@@ -102,7 +102,7 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
 
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400 font-mono text-[10px] uppercase">
+          <thead className="bg-[#f4f7f4] border-b border-[#e2e8df] text-[#607264] font-mono text-[10px] uppercase">
             <tr>
               <th className="py-3 px-4">Staff Member</th>
               <th className="py-3 px-4">Role</th>
@@ -113,19 +113,19 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
               <th className="py-3 px-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
+          <tbody className="divide-y divide-[#e8eee6]">
             {users.map((u) => (
-              <tr key={u.id} className="hover:bg-slate-800/40 transition-colors">
+              <tr key={u.id} className="hover:bg-[#f7f9f6] transition-colors">
                 <td className="py-3.5 px-4">
                   <div className="flex items-center gap-3">
                     <img
                       src={u.avatar}
                       alt={u.name}
-                      className="h-8 w-8 rounded-xl object-cover border border-slate-700"
+                      className="h-8 w-8 rounded-xl object-cover border border-[#d2ddd0]"
                     />
                     <div>
-                      <p className="font-bold text-white">{u.name}</p>
-                      <p className="text-[11px] text-slate-400 font-mono">{u.email}</p>
+                      <p className="font-bold text-[#142019]">{u.name}</p>
+                      <p className="text-[11px] text-[#607264] font-mono">{u.email}</p>
                     </div>
                   </div>
                 </td>
@@ -136,9 +136,9 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
                       u.role === "Admin"
                         ? "rose"
                         : u.role === "Doctor"
-                        ? "cyan"
+                        ? "teal"
                         : u.role === "Manager"
-                        ? "purple"
+                        ? "amber"
                         : "default"
                     }
                     size="sm"
@@ -147,14 +147,14 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
                   </Badge>
                 </td>
 
-                <td className="py-3.5 px-4 font-medium text-slate-300">{u.department}</td>
+                <td className="py-3.5 px-4 font-medium text-[#2d3a30]">{u.department}</td>
 
                 <td className="py-3.5 px-4 font-mono">
-                  <span className="text-cyan-300 font-bold">{u.assignedTasksCount}</span> active /{" "}
-                  <span className="text-slate-400">{u.completedTasksCount} done</span>
+                  <span className="text-[#059669] font-bold">{u.assignedTasksCount}</span> active /{" "}
+                  <span className="text-[#607264]">{u.completedTasksCount} done</span>
                 </td>
 
-                <td className="py-3.5 px-4 font-mono text-slate-300">
+                <td className="py-3.5 px-4 font-mono text-[#2d3a30]">
                   {u.avgResolutionMinutes} mins
                 </td>
 
@@ -172,13 +172,13 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
                   <div className="flex items-center justify-end gap-1.5">
                     <button
                       onClick={() => openEditModal(u)}
-                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg bg-[#f0f4ef] hover:bg-[#e4ece2] text-[#2d3a30] border border-[#dce5da] transition-colors cursor-pointer"
                     >
                       <Edit2 className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => handleDelete(u.id)}
-                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg bg-[#f0f4ef] hover:bg-[#fee2e2] text-[#607264] hover:text-[#dc2626] border border-[#dce5da] transition-colors cursor-pointer"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -252,7 +252,7 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
             placeholder="+1 (555) 019-2831"
           />
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <div className="flex justify-end gap-2 pt-3 border-t border-[#e2e8df]">
             <Button
               type="button"
               variant="outline"

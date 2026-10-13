@@ -14,24 +14,24 @@ export function Card({
   ...props
 }: CardProps) {
   const variantStyles = {
-    default: "bg-[#0c1813] border border-[#1b362a] text-slate-100 shadow-[0_4px_16px_rgba(2,8,6,0.4)]",
+    default: "bg-white border border-[#e2e8df] text-[#142019] shadow-[0_1px_3px_0_rgba(20,32,25,0.05)]",
     elevated:
-      "bg-gradient-to-b from-[#11231b] to-[#0d1c15] border border-emerald-500/25 text-slate-100 shadow-[0_10px_28px_-6px_rgba(2,8,6,0.6),0_0_12px_rgba(52,211,153,0.06)]",
+      "bg-white border border-[#d6ded4] text-[#142019] shadow-[0_4px_12px_rgba(20,32,25,0.06)]",
     purple:
-      "bg-gradient-to-b from-[#14261d] to-[#0e1a14] border border-teal-500/25 text-slate-100 shadow-[0_10px_28px_-6px_rgba(2,8,6,0.6)]",
+      "bg-white border border-[#ccfbf1] text-[#142019] shadow-[0_4px_12px_rgba(13,148,136,0.06)]",
     amber:
-      "bg-gradient-to-b from-[#1d1a10] to-[#13110a] border border-amber-500/25 text-slate-100 shadow-[0_10px_28px_-6px_rgba(2,8,6,0.6)]",
+      "bg-[#fffdf5] border border-[#fde68a] text-[#142019] shadow-[0_2px_8px_rgba(217,119,6,0.06)]",
     critical:
-      "bg-gradient-to-b from-[#221213] to-[#150a0b] border border-rose-500/30 text-slate-100 shadow-[0_10px_28px_-6px_rgba(2,8,6,0.6)]",
-    subtle: "bg-[#09140f] border border-[#152a21] text-slate-200",
+      "bg-[#fff8f8] border border-[#fecaca] text-[#142019] shadow-[0_2px_8px_rgba(220,38,38,0.06)]",
+    subtle: "bg-[#fbfcfb] border border-[#e8eee6] text-[#142019]",
   };
 
   return (
     <div
       className={cn(
-        "rounded-xl p-5 transition-all duration-200",
+        "rounded-2xl p-5 transition-all duration-200",
         variantStyles[variant],
-        glow && "hover:border-emerald-400/40 hover:shadow-[0_12px_32px_-4px_rgba(52,211,153,0.12)]",
+        glow && "hover:border-[#059669] hover:shadow-[0_8px_20px_-4px_rgba(5,150,105,0.1)]",
         className
       )}
       {...props}
@@ -47,7 +47,7 @@ export function CardHeader({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("flex items-center justify-between pb-3.5 border-b border-[#183126]", className)} {...props}>
+    <div className={cn("flex items-center justify-between pb-3.5 border-b border-[#edf2ea]", className)} {...props}>
       {children}
     </div>
   );
@@ -59,7 +59,10 @@ export function CardTitle({
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={cn("text-sm font-bold tracking-tight text-white", className)} {...props}>
+    <h3
+      className={cn("text-base font-bold tracking-tight text-[#142019]", className)}
+      {...props}
+    >
       {children}
     </h3>
   );
@@ -71,8 +74,20 @@ export function CardDescription({
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn("text-xs text-slate-400", className)} {...props}>
+    <p className={cn("text-xs text-[#627267] mt-1", className)} {...props}>
       {children}
     </p>
+  );
+}
+
+export function CardContent({
+  children,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn("pt-4", className)} {...props}>
+      {children}
+    </div>
   );
 }

@@ -16,6 +16,7 @@ import { PatientDirectory } from "@/features/reception/components/PatientDirecto
 import { AppointmentCalendarView } from "@/features/reception/components/AppointmentCalendarView";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/Tabs";
 import { Calendar, Bot, Users, CalendarDays } from "lucide-react";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 
 export default function ReceptionDashboardPage() {
   const [overview, setOverview] = useState<ReceptionOverviewData | null>(null);
@@ -53,70 +54,72 @@ export default function ReceptionDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded-full border-2 border-[#34d399] border-t-transparent animate-spin" />
-          <p className="text-xs font-mono text-[#34d399]">Connecting to Front Desk Operations Matrix...</p>
+          <div className="h-8 w-8 rounded-full border-2 border-[#1b4332] border-t-transparent animate-spin" />
+          <p className="text-xs font-mono text-[#1b4332]">Connecting to Front Desk Operations Matrix...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* 1. Front Desk Overview Cards */}
-      <ReceptionOverviewCards overview={overview} />
+    <RoleGuard allowedRoles={["Receptionist", "Manager", "Admin"]} moduleName="Reception & Intake Gateway">
+      <div className="space-y-8 max-w-7xl mx-auto pb-12">
+        {/* 1. Front Desk Overview Cards */}
+        <ReceptionOverviewCards overview={overview} />
 
-      {/* 2. Operations Tabs */}
-      <Tabs defaultValue="appointments" className="w-full">
-        <TabsList className="bg-[#0b1712] border border-[#1b362a] p-1 rounded-xl">
-          <TabsTrigger
-            value="appointments"
-            className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2"
-          >
-            <Calendar className="h-4 w-4" />
-            Appointment Queue ({appointments.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="call-actions"
-            className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2"
-          >
-            <Bot className="h-4 w-4" />
-            AI Call Actions ({callActions.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="directory"
-            className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2"
-          >
-            <Users className="h-4 w-4" />
-            Patient Directory ({patients.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="calendar"
-            className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2"
-          >
-            <CalendarDays className="h-4 w-4" />
-            Provider Calendar
-          </TabsTrigger>
-        </TabsList>
+        {/* 2. Operations Tabs */}
+        <Tabs defaultValue="appointments" className="w-full">
+          <TabsList className="bg-[#edf2ea] border border-[#d8e2d6] p-1 rounded-xl">
+            <TabsTrigger
+              value="appointments"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <Calendar className="h-4 w-4" />
+              Appointment Queue ({appointments.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="call-actions"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <Bot className="h-4 w-4" />
+              AI Call Actions ({callActions.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="directory"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <Users className="h-4 w-4" />
+              Patient Directory ({patients.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="calendar"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <CalendarDays className="h-4 w-4" />
+              Provider Calendar
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="appointments" className="mt-6">
-          <AppointmentQueueList initialAppointments={appointments} />
-        </TabsContent>
+          <TabsContent value="appointments" className="mt-6">
+            <AppointmentQueueList initialAppointments={appointments} />
+          </TabsContent>
 
-        <TabsContent value="call-actions" className="mt-6">
-          <CallActionQueue initialCallActions={callActions} />
-        </TabsContent>
+          <TabsContent value="call-actions" className="mt-6">
+            <CallActionQueue initialCallActions={callActions} />
+          </TabsContent>
 
-        <TabsContent value="directory" className="mt-6">
-          <PatientDirectory initialPatients={patients} />
-        </TabsContent>
+          <TabsContent value="directory" className="mt-6">
+            <PatientDirectory initialPatients={patients} />
+          </TabsContent>
 
-        <TabsContent value="calendar" className="mt-6">
-          <AppointmentCalendarView
-            doctorSchedules={doctorSchedules}
-            appointments={appointments}
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
+          <TabsContent value="calendar" className="mt-6">
+            <AppointmentCalendarView
+              doctorSchedules={doctorSchedules}
+              appointments={appointments}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </RoleGuard>
   );
 }

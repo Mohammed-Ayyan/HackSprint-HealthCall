@@ -1,7 +1,7 @@
 # CareOps AI — Intelligence Engine Backend
 
 > **Autonomous Clinical Telephony Processing, NLU Intent Classification, and Actionable Intelligence Engine**  
-> **Phase 1: Backend Foundation**
+> **Phase 2: Local Audio Transcription Engine**
 
 ---
 
@@ -9,66 +9,60 @@
 
 **CareOps AI** transforms healthcare phone conversations into structured, verified hospital actions in real time. Designed as an operational intelligence engine for hospital command centers, nursing supervisors, and departmental leads, CareOps AI ensures zero dropped patient follow-ups, prompt insurance prior-authorizations, and SLA enforcement.
 
-The eventual end-to-end intelligence workflow will be:
+The pipeline architecture is structured into incremental stages:
 
 ```
 Audio recording
     ↓
-Speech-to-text transcription (Faster Whisper)
+Speech-to-text transcription (Faster Whisper)       [PHASE 2 - COMPLETED]
     ↓
-Transcript processing & Diarization
+Transcript processing & Diarization                 [PHASE 3 - PLANNED]
     ↓
-Intent classification (Appointment, Insurance, Billing, Complaint, Refill, Emergency)
+Intent classification, Summary, Sentiment, Priority [PHASE 4 - PLANNED]
     ↓
-Summary generation (Clinical flags & Key takeaways)
+Action extraction & Department routing              [PHASE 5 - PLANNED]
     ↓
-Sentiment analysis & Urgency scoring
+Staff commitment detection & Evidence grounding     [PHASE 6 - PLANNED]
     ↓
-Priority classification (CRITICAL, HIGH, MEDIUM, LOW)
+Multilingual processing & PHI privacy masking       [PHASE 7 - PLANNED]
     ↓
-Action extraction (Tasks, Target departments, Deadlines)
-    ↓
-Staff commitment detection (Verbal promises & Owner accountability)
-    ↓
-Evidence validation (Cryptographically anchored verbatim quotes)
-    ↓
-Sensitive information masking (PHI/HIPAA redaction)
-    ↓
-Structured results dispatched to the Frontend UI
+Frontend live service replacement & E2E testing     [PHASE 8 - PLANNED]
 ```
 
 ---
 
-## 2. Current Scope: Phase 1 (Backend Foundation)
+## 2. Current Scope: Phase 2 (Audio Transcription Engine)
 
-**Phase 1 establishes ONLY the backend foundation.**
+### What IS implemented in Phase 2:
+- **Local Faster Whisper Speech Recognition**:
+  - Locally runnable, privacy-preserving speech-to-text without paid external cloud transcription APIs.
+  - Configurable model size (default `base`, configurable to `tiny`, `small`, `medium`, `large-v3`).
+  - Optimized for CPU execution by default with `int8` quantization (configurable to CUDA / GPU).
+  - Lazy singleton model initialization: cached and reused across requests; never downloaded or loaded on import.
+- **Audio Upload API (`POST /api/v1/transcribe`)**:
+  - Accepts `multipart/form-data` with audio file (`file`) and optional language hint (`language`).
+  - Supports common healthcare telephony formats: **WAV, MP3, M4A, FLAC, OGG**.
+  - Chunked streaming upload size enforcement (default limit: 25 MB) preventing unbounded memory consumption.
+  - Non-empty file validation and PyAV-based container decoding verification.
+  - Safe temporary file lifecycle: files are deleted immediately after transcription in a `finally:` block.
+- **Language Hints & Automatic Detection**:
+  - Supported initial language hints: English (`en`), Hindi (`hi`), Kannada (`kn`).
+  - Automatic language detection when no hint is supplied.
+  - Unsupported language codes rejected with clear HTTP 422 error messages.
+- **Structured Response Contract**:
+  - Returns `success`, consolidated `transcript`, detected `language`, `language_probability`, `duration_seconds`, timestamped `segments` (`start`, `end`, `text`), and server `processing_time_seconds`.
+- **Privacy & Healthcare Security**:
+  - Zero external API transmission: all audio remains strictly on the local machine.
+  - Telemetry logging records only file extension, size in bytes, duration, language, and processing latency; never logs raw audio or transcript contents.
+- **Comprehensive Automated Test Suite**:
+  - 27 automated tests covering health checks, file validation, boundary limits, corrupted audio, mock model testing, temporary file cleanup verification, and real Faster Whisper live transcription.
 
-### What IS implemented in Phase 1:
-- Clean modular application architecture (`app/api`, `app/core`, `app/models`, `app/services`)
-- FastAPI application initialization with CORS middleware configured for the Next.js frontend
-- Centralized environment configuration via Pydantic Settings
-- Request schema validation for future transcript processing
-- Extensible domain response schemas matching the frontend contract (Intents, Sentiment, Priority, Actions, Commitments, Privacy)
-- Centralized, sanitized error handling (no leaked stack traces or filesystem paths)
-- Privacy-aware structured logging (no raw patient transcripts logged)
-- Operational health-check endpoint (`GET /api/v1/health`)
-- Transcript schema validation endpoint (`POST /api/v1/transcript/validate`)
-- Comprehensive automated test suite using `pytest` and FastAPI `TestClient`
-- Windows-friendly setup guides and virtual environment configuration
-
-### What is explicitly NOT implemented in Phase 1:
-The following capabilities are reserved for subsequent phases and are **NOT** active in Phase 1:
-- ❌ Audio transcription (Faster Whisper)
-- ❌ Intent classification
-- ❌ Clinical summary generation
-- ❌ Acoustic/lexical sentiment analysis
-- ❌ Priority classification
-- ❌ Action extraction
-- ❌ Staff commitment detection
-- ❌ Evidence quote verification
-- ❌ Multilingual neural translation
-- ❌ Automated PHI/HIPAA redaction
-- ❌ Live frontend data replacement (the existing frontend mock services remain active and intact)
+### What is explicitly NOT implemented in Phase 2 (Reserved for Future Phases):
+- ❌ Intent classification, Clinical summary, Sentiment analysis, Priority classification (Phase 4)
+- ❌ Action extraction and department routing (Phase 5)
+- ❌ Staff commitment detection & evidence quote anchoring (Phase 6)
+- ❌ PHI redaction & multilingual neural translation (Phase 7)
+- ❌ Modifying frontend UI or removing hardcoded mock datasets (Phase 8)
 
 ---
 
@@ -77,218 +71,188 @@ The following capabilities are reserved for subsequent phases and are **NOT** ac
 ```
 ai-engine/
 ├── .env.example              # Safe template environment variables
-├── .gitignore                # Python and environment ignores
-├── requirements.txt          # Minimal Phase 1 dependencies
-├── README.md                 # Backend documentation
+├── .env                      # Local environment configuration
+├── .gitignore                # Python, virtualenv, and cache ignores
+├── requirements.txt          # Phase 2 dependencies (fastapi, faster-whisper, av<19, etc.)
+├── README.md                 # Backend documentation and testing guide
 ├── app/
 │   ├── __init__.py           # Application package marker
 │   ├── main.py               # FastAPI entry point, CORS, and exception handlers
 │   ├── api/
 │   │   ├── __init__.py       # API package marker
-│   │   └── routes.py         # /health and /transcript/validate endpoints
+│   │   └── routes.py         # /health, /transcript/validate, and /transcribe endpoints
 │   ├── core/
 │   │   ├── __init__.py       # Core package marker
-│   │   └── config.py         # Centralized Pydantic settings
+│   │   └── config.py         # Centralized Pydantic settings & Whisper configuration
 │   ├── models/
 │   │   ├── __init__.py       # Models package marker
-│   │   └── schemas.py        # Pydantic schemas, enums, and error contracts
+│   │   └── schemas.py        # Pydantic models for transcript validation, transcription, and errors
 │   └── services/
-│       └── __init__.py       # Service layer marker (Phase 2+ implementation point)
+│       ├── __init__.py       # Services package marker
+│       └── transcription_service.py # Faster Whisper engine, validation, and PyAV decoding
 └── tests/
     ├── __init__.py           # Tests package marker
     ├── conftest.py           # Pytest TestClient fixture & path setup
     ├── test_health.py        # Health-check endpoint tests
-    └── test_validation.py    # Transcript validation & error handling tests
+    ├── test_validation.py    # Transcript text validation tests
+    └── test_transcription.py # Phase 2 audio upload, validation, cleanup, and live model tests
 ```
 
 ---
 
-## 4. Prerequisites
+## 4. Prerequisites & Environment Setup
 
 - **Python**: 3.10 to 3.13 (Verified on Python 3.13)
 - **pip**: 23.0+
-- **OS**: Windows, macOS, or Linux (commands below include Windows PowerShell)
-
----
-
-## 5. Local Setup Instructions (Windows / VS Code)
+- **OS**: Windows, macOS, or Linux (PowerShell commands below)
 
 ### Step 1: Open Terminal in `ai-engine` Directory
-In PowerShell or VS Code terminal:
 ```powershell
 cd ai-engine
 ```
 
-### Step 2: Create a Virtual Environment
-```powershell
-python -m venv .venv
-```
-
-### Step 3: Activate the Virtual Environment
+### Step 2: Activate the Virtual Environment
 **On Windows (PowerShell):**
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
-*(If PowerShell restricts script execution, run: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned`)*
 
-**On Windows (Command Prompt):**
-```cmd
-.venv\Scripts\activate.bat
-```
-
-**On Linux/macOS:**
-```bash
-source .venv/bin/activate
-```
-
-### Step 4: Install Dependencies
+### Step 3: Install Dependencies
 ```powershell
-python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Step 5: Configure Environment Variables
-Copy the template configuration:
+### Step 4: Configure Environment Variables
+Copy the template configuration if not already configured:
 ```powershell
 Copy-Item .env.example .env
 ```
-*(On Linux/macOS: `cp .env.example .env`)*
+
+Configuration variables in `.env`:
+```env
+WHISPER_MODEL_SIZE=base
+WHISPER_DEVICE=cpu
+WHISPER_COMPUTE_TYPE=int8
+MAX_AUDIO_UPLOAD_SIZE_MB=25
+ALLOWED_AUDIO_EXTENSIONS=[".wav", ".mp3", ".m4a", ".flac", ".ogg"]
+SUPPORTED_AUDIO_LANGUAGES=["en", "hi", "kn"]
+```
 
 ---
 
-## 6. Running the Backend Server
+## 5. Running the Backend Server
 
-Start the development server with Uvicorn:
+Start the Uvicorn development server:
 
 ```powershell
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-The server will be available at:
-- **Base URL**: `http://127.0.0.1:8000`
-- **Interactive OpenAPI Documentation (Swagger UI)**: `http://127.0.0.1:8000/api/v1/docs`
-- **ReDoc Documentation**: `http://127.0.0.1:8000/api/v1/redoc`
+Interactive API documentation will be available at:
+- **Swagger UI**: [http://127.0.0.1:8000/api/v1/docs](http://127.0.0.1:8000/api/v1/docs)
+- **ReDoc**: [http://127.0.0.1:8000/api/v1/redoc](http://127.0.0.1:8000/api/v1/redoc)
 
 ---
 
-## 7. API Endpoints
+## 6. Audio Upload & Transcription API
 
-### 1. Health Check
-- **Endpoint**: `GET /api/v1/health`
-- **Description**: Verifies the backend engine is running. Does not claim AI models are loaded.
-- **Response (HTTP 200)**:
-```json
-{
-  "status": "ok",
-  "service": "careops-ai-engine",
-  "version": "1.0.0"
-}
-```
+### Endpoint: `POST /api/v1/transcribe`
 
-### 2. Transcript Request Validation
-- **Endpoint**: `POST /api/v1/transcript/validate`
-- **Description**: Validates transcript input format, character limits, and language codes without executing AI inference.
-- **Example Request**:
+Accepts `multipart/form-data`:
+* `file` (Required): Audio recording file (`.wav`, `.mp3`, `.m4a`, `.flac`, `.ogg`, max 25MB).
+* `language` (Optional): ISO language hint (`en`, `hi`, `kn`). If omitted, automatic language detection is performed.
+
+#### Example Response (HTTP 200 OK):
 ```json
 {
-  "transcript": "Hello, I need to check if my post-op follow-up appointment is confirmed for tomorrow morning.",
-  "language": "en"
-}
-```
-- **Successful Response (HTTP 200)**:
-```json
-{
-  "status": "valid",
-  "message": "Transcript accepted for future processing pipeline.",
-  "character_count": 96,
+  "success": true,
+  "transcript": "Hello, I am calling following my surgery with Dr. Thorne. I have developed a low-grade fever and need to confirm my follow-up appointment.",
   "language": "en",
-  "max_allowed_characters": 50000
-}
-```
-
----
-
-## 8. Request Validation Rules
-
-| Rule | Behavior | HTTP Status |
-|---|---|---|
-| **Non-empty string** | Rejects `""` or missing `transcript` field | `422 Unprocessable Entity` |
-| **Whitespace-only** | Rejects strings containing only spaces, tabs, or newlines | `422 Unprocessable Entity` |
-| **Trimming** | Automatically trims leading/trailing whitespace | Processed cleanly |
-| **Max length** | Rejects transcripts longer than 50,000 characters without silent truncation | `422 Unprocessable Entity` |
-| **Supported languages** | Accepts `en` (English), `hi` (Hindi), `kn` (Kannada). Rejects other codes with clear error | `422 Unprocessable Entity` |
-| **Extensible payload** | Accepts optional `call_id`, `patient_mrn`, `audio_url`, `metadata` | Passed through |
-
-### Error Response Format
-All errors return a consistent, secure JSON structure:
-```json
-{
-  "error": "Validation Error",
-  "message": "Request payload failed schema validation.",
-  "details": [
+  "language_probability": 0.9854,
+  "duration_seconds": 7.42,
+  "segments": [
     {
-      "field": "transcript",
-      "message": "Transcript must not be empty or contain only whitespace."
+      "id": 0,
+      "start": 0.0,
+      "end": 3.8,
+      "text": "Hello, I am calling following my surgery with Dr. Thorne."
+    },
+    {
+      "id": 1,
+      "start": 3.8,
+      "end": 7.42,
+      "text": "I have developed a low-grade fever and need to confirm my follow-up appointment."
     }
   ],
-  "status_code": 422
+  "processing_time_seconds": 1.48
 }
 ```
 
 ---
 
-## 9. Running Automated Tests
+## 7. How to Test the Transcription Endpoint
 
-Run the test suite using `pytest`:
+### Method A: Interactive Browser (Swagger UI)
+1. Navigate to [http://127.0.0.1:8000/api/v1/docs](http://127.0.0.1:8000/api/v1/docs)
+2. Expand **`POST /api/v1/transcribe`** and click **"Try it out"**
+3. Choose an audio file (e.g., `.wav`, `.mp3`)
+4. Optionally enter `en`, `hi`, or `kn` in the `language` field
+5. Click **"Execute"** and view the structured transcript and segments.
 
+### Method B: PowerShell `curl` / `Invoke-RestMethod`
 ```powershell
-pytest
+$form = @{
+    file = Get-Item "C:\path\to\recording.wav"
+    language = "en"
+}
+$response = Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/v1/transcribe" -Method Post -Form $form
+$response | ConvertTo-Json -Depth 5
 ```
 
-Or for verbose output with detailed test names:
+### Method C: Linux / macOS `curl`
+```bash
+curl -X POST "http://127.0.0.1:8000/api/v1/transcribe" \
+     -F "file=@/path/to/recording.wav" \
+     -F "language=en"
+```
+
+---
+
+## 8. Automated Test Suite
+
+Run the full automated test suite using `pytest`:
+
 ```powershell
 pytest -v
 ```
 
-### Verified Test Suite:
-1. `test_health_check_returns_200`
-2. `test_health_check_response_structure`
-3. `test_root_endpoint_returns_200`
-4. `test_valid_transcript_passes_validation`
-5. `test_empty_transcript_is_rejected`
-6. `test_whitespace_only_transcript_is_rejected`
-7. `test_unsupported_language_is_rejected`
-8. `test_oversized_transcript_is_rejected`
-9. `test_error_response_structure`
-10. `test_all_supported_languages_accepted` (`en`, `hi`, `kn`)
-11. `test_transcript_whitespace_trimming`
-12. `test_missing_transcript_field_rejected`
-13. `test_non_string_transcript_rejected`
+### Test Coverage (27 Tests, 100% Passing):
+1. **Health Check Tests**:
+   - `test_health_check_returns_200`
+   - `test_health_check_response_structure`
+   - `test_root_endpoint_returns_200`
+   - `test_health_check_still_works`
+2. **Audio Upload Validation Tests**:
+   - `test_missing_audio_file_rejected` (HTTP 422)
+   - `test_empty_upload_rejected` (HTTP 400)
+   - `test_unsupported_audio_extension_rejected` (HTTP 400)
+   - `test_oversized_upload_rejected` (HTTP 413)
+   - `test_unsupported_language_hint_rejected` (HTTP 422)
+   - `test_corrupted_audio_handled_safely` (HTTP 400)
+3. **Transcription & Lifecycle Tests**:
+   - `test_successful_transcription_response_schema` (Validates contract)
+   - `test_temporary_files_are_cleaned_up` (Confirms immediate temp file deletion)
+   - `test_model_initialization_failure_handling` (HTTP 503)
+   - `test_automatic_language_detection` (Auto-detects when hint is omitted)
+   - `test_real_faster_whisper_transcription_live` (Live model transcription integration test)
+4. **Transcript Text Validation Tests**:
+   - 12 tests covering length, stripping, non-string, and multilingual text validation (`en`, `hi`, `kn`).
 
 ---
 
-## 10. Frontend Integration Requirements (For Phase 8)
+## 9. Current Limitations & Roadmap
 
-The frontend currently uses mock data defined in `src/features/ai-intelligence/mockCallService.ts` and types in `src/shared/types/call.ts`.
-
-When connecting the real AI backend in later phases:
-1. The frontend environment will configure:
-   ```env
-   NEXT_PUBLIC_AI_API_URL=http://127.0.0.1:8000/api/v1
-   ```
-2. The AI Engine CORS configuration already allows `http://localhost:3000`.
-3. In Phase 8, `mockCallService.ts` will be replaced with `apiCallService.ts` calling the verified backend endpoints.
-4. **Existing frontend mock data must remain in place until the backend pipeline is verified and fully functional.**
-
----
-
-## 11. Incremental Development Roadmap
-
-- **Phase 1 (Completed)**: Backend Foundation, Configuration, Schemas, Validation, Error Handling, Health API, Automated Tests.
-- **Phase 2**: Local dual-channel audio transcription (Faster Whisper).
-- **Phase 3**: Transcript normalization and diarization pipeline.
-- **Phase 4**: Intent classification, clinical summary generation, sentiment scoring, priority classification.
-- **Phase 5**: Action extraction with department routing and deadline inference.
-- **Phase 6**: Verbal commitment detection and transcript evidence grounding.
-- **Phase 7**: Multilingual processing (`hi`, `kn`) and PHI redaction.
-- **Phase 8**: Frontend service replacement, end-to-end integration, and removal of mock data.
+- **Audio Length**: Default maximum file size is 25 MB (~25-30 minutes of compressed audio).
+- **Background Noise**: Clinical speech with severe acoustic background noise may require diarization filtering (scheduled for Phase 3).
+- **First-Run Model Download**: Faster Whisper downloads model weights automatically on its first run to the local HuggingFace cache directory (`~/.cache/huggingface/hub`).
+- **Next Phase (Phase 3)**: Transcript segmentation, speaker diarization, and text normalization.

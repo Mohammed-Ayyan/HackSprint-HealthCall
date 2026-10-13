@@ -3,19 +3,22 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Activity, ArrowRight, ShieldCheck } from "lucide-react";
+import { HeartHandshake, ArrowRight, ShieldCheck } from "lucide-react";
 import { UserRole } from "@/shared/types/user";
 import { DepartmentName } from "@/shared/types/action";
 import { mockUserService } from "@/features/platform/mockUserService";
-import { mockAuthService } from "@/features/platform/mockAuthService";
+import { useAuth } from "@/features/platform/auth/authContext";
 import { Button } from "@/shared/components/ui/Button";
 import { Input, Select } from "@/shared/components/ui/Input";
 import { Card } from "@/shared/components/ui/Card";
+import { Badge } from "@/shared/components/ui/Badge";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("Doctor");
   const [department, setDepartment] = useState<DepartmentName>("Clinical Team");
   const [loading, setLoading] = useState(false);
@@ -31,41 +34,60 @@ export default function SignupPage() {
       status: "active",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
     });
-    await mockAuthService.login(email, role);
-    router.push("/dashboard");
+    const res = await login({ email, password, role });
+    if (res.success && res.redirectTo) {
+      router.push(res.redirectTo);
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center p-4 bg-[#080c14] relative overflow-hidden">
-      <div className="w-full max-w-md space-y-6 relative z-10">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-[#f7f9f6] text-[#142019] relative overflow-hidden">
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-emerald-100/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-amber-100/40 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="w-full max-w-md space-y-6 relative z-10 py-8">
         <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 rounded-2xl bg-gradient-to-tr from-cyan-600 via-sky-500 to-indigo-600 items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.4)]">
-            <Activity className="h-6 w-6 text-slate-950 stroke-[2.5]" />
+          <div className="inline-flex h-12 w-12 rounded-2xl bg-[#1b4332] items-center justify-center shadow-[0_4px_16px_rgba(27,67,50,0.2)] mb-1">
+            <HeartHandshake className="h-6 w-6 text-[#74c69d]" />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white font-mono">
-            Register Staff Account
-          </h1>
-          <p className="text-xs text-slate-400">
-            Join your hospital department queue in CareOps AI
+          <div className="flex items-center justify-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-[#142019] font-heading">
+              Join Hospital Network
+            </h1>
+            <Badge variant="emerald">Self-Registration</Badge>
+          </div>
+          <p className="text-xs text-[#627267]">
+            Register staff or clinical credentials into CareOps AI
           </p>
         </div>
 
-        <Card variant="elevated" className="p-6 border-slate-700/80 space-y-5">
+        <Card variant="elevated" className="p-6 sm:p-8 bg-white border-[#d8e2d6] shadow-[0_8px_30px_rgba(20,32,25,0.06)] space-y-5">
           <form onSubmit={handleSignup} className="space-y-4">
             <Input
-              label="Full Name & Title"
+              label="Full Name & Clinical Credentials"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Dr. Jordan Hayes"
+              placeholder="Dr. Jordan Hayes, MD"
               required
             />
 
             <Input
-              label="Hospital Email"
+              label="Hospital Staff Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="j.hayes@metrohealth.org"
+              placeholder="j.hayes@metrohealth.eco"
+              required
+            />
+
+            <Input
+              label="Create Secure Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••••••"
               required
             />
 
@@ -75,11 +97,12 @@ export default function SignupPage() {
                 value={role}
                 onChange={(e) => setRole(e.target.value as UserRole)}
                 options={[
-                  { label: "Admin", value: "Admin" },
                   { label: "Doctor", value: "Doctor" },
+                  { label: "Patient", value: "Patient" },
                   { label: "Receptionist", value: "Receptionist" },
                   { label: "Insurance Employee", value: "Insurance Employee" },
                   { label: "Manager", value: "Manager" },
+                  { label: "Admin", value: "Admin" },
                 ]}
               />
 
@@ -104,9 +127,9 @@ export default function SignupPage() {
             </Button>
           </form>
 
-          <div className="pt-3 border-t border-slate-800 text-center text-xs text-slate-400">
-            Already registered?{" "}
-            <Link href="/auth/login" className="text-cyan-400 hover:underline font-semibold">
+          <div className="pt-3 border-t border-[#edf2ea] text-center text-xs text-[#627267]">
+            Already an active member?{" "}
+            <Link href="/auth/login" className="text-[#1b4332] hover:underline font-semibold">
               Sign In Here
             </Link>
           </div>

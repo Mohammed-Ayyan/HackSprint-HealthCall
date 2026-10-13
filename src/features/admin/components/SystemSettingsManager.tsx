@@ -25,27 +25,27 @@ export function SystemSettingsManager({ initialRules }: SystemSettingsManagerPro
   const getCategoryIcon = (category: SystemRuleConfig["category"]) => {
     switch (category) {
       case "Notification Rules":
-        return <Bell className="h-4 w-4 text-[#34d399]" />;
+        return <Bell className="h-4 w-4 text-[#059669]" />;
       case "AI Settings":
-        return <Sparkles className="h-4 w-4 text-[#2dd4bf]" />;
+        return <Sparkles className="h-4 w-4 text-[#0d9488]" />;
       case "Routing Rules":
-        return <Route className="h-4 w-4 text-[#f59e0b]" />;
+        return <Route className="h-4 w-4 text-[#d97706]" />;
       default:
-        return <Sliders className="h-4 w-4 text-stone-400" />;
+        return <Sliders className="h-4 w-4 text-[#627267]" />;
     }
   };
 
   return (
-    <Card className="bg-[#0b1712] border-[#1b362a]">
-      <CardHeader className="border-b border-[#1b362a] pb-4">
+    <Card className="bg-white border-[#e2e8df] shadow-sm">
+      <CardHeader className="border-b border-[#edf2ea] pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-[#11261d] border border-[#204937] flex items-center justify-center text-[#34d399]">
+            <div className="h-9 w-9 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
               <Sliders className="h-4 w-4" />
             </div>
             <div>
-              <CardTitle className="text-base text-stone-100">CareOps System Policy & Routing Engine</CardTitle>
-              <p className="text-xs text-stone-400 mt-0.5">
+              <CardTitle className="text-base text-[#142019]">CareOps System Policy & Routing Engine</CardTitle>
+              <p className="text-xs text-[#627267] mt-0.5">
                 Configure notification escalations, speech extraction thresholds, and autonomous department routing
               </p>
             </div>
@@ -54,27 +54,27 @@ export function SystemSettingsManager({ initialRules }: SystemSettingsManagerPro
         </div>
       </CardHeader>
 
-      <div className="divide-y divide-[#162e24]">
+      <div className="divide-y divide-[#edf2ea]">
         {rules.map((rule) => (
           <div
             key={rule.id}
-            className="p-5 hover:bg-[#0e2019]/60 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
+            className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
           >
             <div className="flex items-start gap-3.5">
-              <div className="h-9 w-9 rounded-xl bg-[#142d22] border border-[#234e3b] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="h-9 w-9 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center flex-shrink-0 mt-0.5">
                 {getCategoryIcon(rule.category)}
               </div>
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <h4 className="text-sm font-bold text-stone-100">{rule.title}</h4>
-                  <Badge variant="gray" size="sm">
+                  <h4 className="text-sm font-bold text-[#142019]">{rule.title}</h4>
+                  <Badge variant="default" size="sm">
                     {rule.category}
                   </Badge>
-                  <span className="text-xs font-mono text-[#34d399] bg-[#0c2419] px-2 py-0.5 rounded border border-[#1c4734]">
+                  <span className="text-xs font-mono font-semibold text-[#1b4332] bg-[#e8f3ec] px-2 py-0.5 rounded border border-[#cbe2d1]">
                     Param: {rule.value}
                   </span>
                 </div>
-                <p className="text-xs text-stone-300 mt-1.5 max-w-2xl leading-relaxed">
+                <p className="text-xs text-[#28382e] mt-1.5 max-w-2xl leading-relaxed">
                   {rule.description}
                 </p>
               </div>
@@ -88,7 +88,7 @@ export function SystemSettingsManager({ initialRules }: SystemSettingsManagerPro
                 className={
                   rule.enabled
                     ? "flex items-center gap-1.5"
-                    : "border-[#382828] text-stone-400 hover:text-stone-200"
+                    : "border-[#e2e8df] text-[#627267] hover:text-[#142019]"
                 }
               >
                 {rule.enabled ? (

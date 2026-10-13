@@ -33,11 +33,11 @@ export interface AnalyticsChartsProps {
 }
 
 const customTooltipStyle = {
-  backgroundColor: "rgba(15, 23, 42, 0.95)",
-  borderColor: "rgba(51, 65, 85, 0.8)",
+  backgroundColor: "#ffffff",
+  borderColor: "#e2e8e0",
   borderRadius: "12px",
-  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.6)",
-  color: "#f8fafc",
+  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.08)",
+  color: "#142019",
   fontSize: "12px",
 };
 
@@ -56,11 +56,11 @@ export function AnalyticsCharts({
           <CardHeader>
             <div>
               <CardTitle>Inbound Telephony Volume & Resolution Velocity</CardTitle>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#607264] mt-0.5">
                 Hourly call arrivals vs automated task completion stream
               </p>
             </div>
-            <Badge variant="cyan" size="sm">
+            <Badge variant="emerald" size="sm">
               Live Stream
             </Badge>
           </CardHeader>
@@ -70,24 +70,24 @@ export function AnalyticsCharts({
               <AreaChart data={volumeTrends}>
                 <defs>
                   <linearGradient id="callGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#059669" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#059669" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="resolvedGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#a855f7" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#a855f7" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#0d9488" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#0d9488" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="time" stroke="#64748b" fontSize={11} />
-                <YAxis stroke="#64748b" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8e0" />
+                <XAxis dataKey="time" stroke="#607264" fontSize={11} />
+                <YAxis stroke="#607264" fontSize={11} />
                 <Tooltip contentStyle={customTooltipStyle} />
                 <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
                 <Area
                   type="monotone"
                   dataKey="totalCalls"
                   name="Inbound Calls"
-                  stroke="#22d3ee"
+                  stroke="#059669"
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#callGradient)"
@@ -96,7 +96,7 @@ export function AnalyticsCharts({
                   type="monotone"
                   dataKey="resolvedActions"
                   name="Resolved Actions"
-                  stroke="#a855f7"
+                  stroke="#0d9488"
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#resolvedGradient)"
@@ -111,7 +111,7 @@ export function AnalyticsCharts({
           <CardHeader>
             <div>
               <CardTitle>Clinical Intent Distribution</CardTitle>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#607264] mt-0.5">
                 Breakdown of patient conversation intents
               </p>
             </div>
@@ -139,15 +139,15 @@ export function AnalyticsCharts({
             </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-slate-800 text-[11px]">
+          <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-[#e2e8e0] text-[11px]">
             {categories.slice(0, 4).map((c) => (
               <div key={c.category} className="flex items-center gap-1.5">
                 <span
                   className="h-2 w-2 rounded-full flex-shrink-0"
                   style={{ backgroundColor: c.color }}
                 />
-                <span className="text-slate-300 truncate">{c.category}</span>
-                <span className="text-slate-500 font-mono">({c.percentage}%)</span>
+                <span className="text-[#142019] truncate">{c.category}</span>
+                <span className="text-[#607264] font-mono">({c.percentage}%)</span>
               </div>
             ))}
           </div>
@@ -161,11 +161,11 @@ export function AnalyticsCharts({
           <CardHeader>
             <div>
               <CardTitle>Department Workload & Active Task Queue</CardTitle>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#607264] mt-0.5">
                 Active tasks distributed across operational units
               </p>
             </div>
-            <Badge variant="purple" size="sm">
+            <Badge variant="teal" size="sm">
               Live Capacities
             </Badge>
           </CardHeader>
@@ -173,21 +173,21 @@ export function AnalyticsCharts({
           <div className="h-64 w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={departmentWorkloads}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="department" stroke="#64748b" fontSize={11} />
-                <YAxis stroke="#64748b" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8e0" />
+                <XAxis dataKey="department" stroke="#607264" fontSize={11} />
+                <YAxis stroke="#607264" fontSize={11} />
                 <Tooltip contentStyle={customTooltipStyle} />
                 <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
                 <Bar
                   dataKey="activeTasks"
                   name="Active In-Flight"
-                  fill="#22d3ee"
+                  fill="#0d9488"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   dataKey="completedToday"
                   name="Completed Today"
-                  fill="#10b981"
+                  fill="#059669"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -200,7 +200,7 @@ export function AnalyticsCharts({
           <CardHeader>
             <div>
               <CardTitle>Resolution Time vs SLA Target (Hours)</CardTitle>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#607264] mt-0.5">
                 Actual operational hours to resolve vs SLA mandate
               </p>
             </div>
@@ -212,21 +212,21 @@ export function AnalyticsCharts({
           <div className="h-64 w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={resolutionMetrics}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="department" stroke="#64748b" fontSize={11} />
-                <YAxis stroke="#64748b" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8e0" />
+                <XAxis dataKey="department" stroke="#607264" fontSize={11} />
+                <YAxis stroke="#607264" fontSize={11} />
                 <Tooltip contentStyle={customTooltipStyle} />
                 <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
                 <Bar
                   dataKey="actualHours"
                   name="Actual Mean (Hrs)"
-                  fill="#06b6d4"
+                  fill="#0284c7"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   dataKey="targetHours"
                   name="SLA Threshold (Hrs)"
-                  fill="#f59e0b"
+                  fill="#d97706"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>

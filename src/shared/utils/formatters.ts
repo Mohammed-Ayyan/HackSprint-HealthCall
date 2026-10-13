@@ -22,47 +22,47 @@ export function formatTimeAgo(dateString: string): string {
 export function getPriorityBadgeClass(priority: CallPriority): string {
   switch (priority) {
     case "critical":
-      return "bg-rose-500/15 text-rose-400 border border-rose-500/30";
+      return "bg-[#fee2e2] text-[#dc2626] border border-[#fca5a5]";
     case "high":
-      return "bg-amber-500/15 text-amber-400 border border-amber-500/30";
+      return "bg-[#fffbeb] text-[#d97706] border border-[#fde68a]";
     case "medium":
-      return "bg-cyan-500/15 text-cyan-400 border border-cyan-500/30";
+      return "bg-[#f0fdfa] text-[#0d9488] border border-[#99f6e4]";
     case "low":
-      return "bg-slate-500/15 text-slate-400 border border-slate-500/30";
+      return "bg-[#f0f4ef] text-[#607264] border border-[#dce5da]";
   }
 }
 
 export function getSentimentBadgeClass(sentiment: CallSentiment): string {
   switch (sentiment) {
     case "positive":
-      return "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
+      return "bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]";
     case "neutral":
-      return "bg-slate-500/15 text-slate-300 border border-slate-600/30";
+      return "bg-[#f0f4ef] text-[#607264] border border-[#dce5da]";
     case "concerned":
-      return "bg-amber-500/15 text-amber-400 border border-amber-500/30";
+      return "bg-[#fffbeb] text-[#d97706] border border-[#fde68a]";
     case "frustrated":
-      return "bg-orange-500/15 text-orange-400 border border-orange-500/30";
+      return "bg-[#fff7ed] text-[#ea580c] border border-[#fed7aa]";
     case "angry":
-      return "bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse";
+      return "bg-[#fee2e2] text-[#dc2626] border border-[#fca5a5]";
   }
 }
 
 export function getDepartmentColorClass(dept: string): string {
   switch (dept.toLowerCase()) {
     case "reception":
-      return "text-cyan-400 bg-cyan-950/40 border-cyan-800/40";
+      return "text-[#0d9488] bg-[#f0fdfa] border-[#99f6e4]";
     case "insurance":
-      return "text-purple-400 bg-purple-950/40 border-purple-800/40";
+      return "text-[#7c3aed] bg-[#f5f3ff] border-[#ddd6fe]";
     case "customer support":
-      return "text-blue-400 bg-blue-950/40 border-blue-800/40";
+      return "text-[#2563eb] bg-[#eff6ff] border-[#bfdbfe]";
     case "billing":
-      return "text-amber-400 bg-amber-950/40 border-amber-800/40";
+      return "text-[#d97706] bg-[#fffbeb] border-[#fde68a]";
     case "pharmacy":
-      return "text-emerald-400 bg-emerald-950/40 border-emerald-800/40";
+      return "text-[#059669] bg-[#ecfdf5] border-[#a7f3d0]";
     case "emergency triage":
     case "emergency":
-      return "text-rose-400 bg-rose-950/40 border-rose-800/40";
+      return "text-[#dc2626] bg-[#fee2e2] border-[#fca5a5]";
     default:
-      return "text-slate-400 bg-slate-800/40 border-slate-700/40";
+      return "text-[#607264] bg-[#f0f4ef] border-[#dce5da]";
   }
 }

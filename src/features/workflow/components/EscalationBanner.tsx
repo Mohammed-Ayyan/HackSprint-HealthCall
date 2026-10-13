@@ -18,22 +18,22 @@ export function EscalationBanner({
   if (escalatedTasks.length === 0) return null;
 
   return (
-    <div className="rounded-2xl p-4 bg-gradient-to-r from-rose-950/40 via-red-950/30 to-rose-950/40 border border-rose-500/40 shadow-xl shadow-rose-950/20 backdrop-blur-xl space-y-3">
+    <div className="rounded-2xl p-4 bg-red-50/80 border border-red-200/90 shadow-sm space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 animate-pulse">
+          <div className="h-10 w-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 animate-pulse">
             <ShieldAlert className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+              <h3 className="text-sm font-bold text-red-900 uppercase tracking-wider">
                 Manager Escalation Watchlist ({escalatedTasks.length})
               </h3>
-              <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/30">
+              <span className="px-2 py-0.5 rounded bg-red-100 text-red-700 text-[10px] font-bold border border-red-200">
                 Action Required
               </span>
             </div>
-            <p className="text-xs text-rose-300/80">
+            <p className="text-xs text-red-700/80">
               Tasks overdue or flagged by AI for compliance breach risk.
             </p>
           </div>
@@ -47,19 +47,19 @@ export function EscalationBanner({
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t border-rose-900/40">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t border-red-200/60">
         {escalatedTasks.slice(0, 2).map((t) => (
           <div
             key={t.id}
-            className="p-2.5 rounded-xl bg-slate-950/60 border border-rose-800/40 text-xs flex items-center justify-between gap-2"
+            className="p-2.5 rounded-xl bg-white border border-red-200 text-xs flex items-center justify-between gap-2 shadow-xs"
           >
             <div>
-              <p className="font-bold text-white truncate max-w-xs">{t.task}</p>
-              <p className="text-[11px] text-rose-300">
+              <p className="font-bold text-stone-900 truncate max-w-xs">{t.task}</p>
+              <p className="text-[11px] text-red-600">
                 Patient: {t.patientName} • {t.escalationReason || "SLA Window Critical"}
               </p>
             </div>
-            <span className="text-[10px] font-mono text-rose-400 font-bold whitespace-nowrap">
+            <span className="text-[10px] font-mono text-red-700 font-bold whitespace-nowrap">
               {t.sla.remainingHours.toFixed(1)}h left
             </span>
           </div>

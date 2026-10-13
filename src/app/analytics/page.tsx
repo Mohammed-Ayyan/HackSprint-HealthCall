@@ -47,24 +47,24 @@ export default function AnalyticsPage() {
     <AppShell>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-extrabold tracking-tight text-white font-mono">
+              <h1 className="text-2xl font-extrabold tracking-tight text-[#1b4332] font-mono">
                 Operational Analytics & Metrics
               </h1>
-              <Badge variant="cyan" size="sm">
+              <Badge variant="emerald" size="sm">
                 Executive Reporting
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#607264] mt-1">
               Comprehensive telemetry tracking call ingestion, conversion rates, and department throughput
             </p>
           </div>
 
           <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
-              Extraction Accuracy: <strong className="text-cyan-400">99.2%</strong>
+            <span className="px-3 py-1.5 rounded-xl bg-white border border-[#e2e8e0] text-[#142019] shadow-2xs">
+              Extraction Accuracy: <strong className="text-[#059669]">99.2%</strong>
             </span>
           </div>
         </div>
@@ -78,7 +78,7 @@ export default function AnalyticsPage() {
               changePercent={summary.callsChangePercent}
               subtitle="24h volume"
               icon={<BarChart3 className="h-5 w-5" />}
-              variant="cyan"
+              variant="teal"
             />
             <StatCard
               title="Task Resolution Velocity"
@@ -93,7 +93,7 @@ export default function AnalyticsPage() {
               value={`${summary.overallSLACompliance}%`}
               subtitle="across all departments"
               icon={<Clock className="h-5 w-5" />}
-              variant="purple"
+              variant="amber"
             />
             <StatCard
               title="Avg Mean Resolution"

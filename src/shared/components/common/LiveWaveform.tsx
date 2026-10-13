@@ -6,7 +6,7 @@ import { cn } from "@/shared/utils/cn";
 export interface LiveWaveformProps {
   isPlaying?: boolean;
   barsCount?: number;
-  variant?: "cyan" | "purple" | "rose";
+  variant?: "cyan" | "purple" | "rose" | "emerald" | "teal";
   className?: string;
 }
 
@@ -35,9 +35,11 @@ export function LiveWaveform({
   }, [isPlaying, barsCount]);
 
   const colorVariants = {
-    cyan: "bg-gradient-to-t from-cyan-500 to-sky-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]",
-    purple: "bg-gradient-to-t from-purple-500 to-indigo-400 shadow-[0_0_8px_rgba(139,92,246,0.3)]",
-    rose: "bg-gradient-to-t from-rose-500 to-orange-400 shadow-[0_0_8px_rgba(239,68,68,0.3)]",
+    cyan: "bg-gradient-to-t from-[#0d9488] to-[#2dd4bf]",
+    teal: "bg-gradient-to-t from-[#0d9488] to-[#2dd4bf]",
+    emerald: "bg-gradient-to-t from-[#059669] to-[#34d399]",
+    purple: "bg-gradient-to-t from-[#1b4332] to-[#2d6a4f]",
+    rose: "bg-gradient-to-t from-[#dc2626] to-[#f87171]",
   };
 
   return (

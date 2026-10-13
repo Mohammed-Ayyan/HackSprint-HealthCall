@@ -58,29 +58,29 @@ export function ReportsExporter({ className }: { className?: string }) {
     <Card className={className}>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <div className="h-8 w-8 rounded-lg bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332]">
             <Download className="h-4 w-4" />
           </div>
           <div>
             <CardTitle>Enterprise Compliance & Operational Reporting</CardTitle>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[#607264]">
               Generate certified CSV datasets and audit-ready PDF dossiers for hospital executive review
             </p>
           </div>
         </div>
-        <Badge variant="cyan" size="sm">
+        <Badge variant="emerald" size="sm">
           Audit Compliant
         </Badge>
       </CardHeader>
 
       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Call Report */}
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-2 text-cyan-300">
+        <div className="p-4 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] space-y-3">
+          <div className="flex items-center gap-2 text-[#0d9488]">
             <FileSpreadsheet className="h-4 w-4" />
-            <h4 className="text-xs font-bold text-white">Call Intelligence Report</h4>
+            <h4 className="text-xs font-bold text-[#142019]">Call Intelligence Report</h4>
           </div>
-          <p className="text-[11px] text-slate-400 leading-snug">
+          <p className="text-[11px] text-[#607264] leading-snug">
             Full conversational transcripts, clinical NLU summaries, and triage priority distribution.
           </p>
           <div className="flex items-center gap-2 pt-1">
@@ -96,12 +96,12 @@ export function ReportsExporter({ className }: { className?: string }) {
         </div>
 
         {/* Department Report */}
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-2 text-purple-300">
+        <div className="p-4 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] space-y-3">
+          <div className="flex items-center gap-2 text-[#d97706]">
             <FileText className="h-4 w-4" />
-            <h4 className="text-xs font-bold text-white">Department Workflow Report</h4>
+            <h4 className="text-xs font-bold text-[#142019]">Department Workflow Report</h4>
           </div>
-          <p className="text-[11px] text-slate-400 leading-snug">
+          <p className="text-[11px] text-[#607264] leading-snug">
             Active departmental queues, staff assignments, SLA performance, and escalation logs.
           </p>
           <div className="flex items-center gap-2 pt-1">
@@ -117,12 +117,12 @@ export function ReportsExporter({ className }: { className?: string }) {
         </div>
 
         {/* Performance & Quality Report */}
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-2 text-emerald-300">
+        <div className="p-4 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] space-y-3">
+          <div className="flex items-center gap-2 text-[#059669]">
             <CheckCircle className="h-4 w-4" />
-            <h4 className="text-xs font-bold text-white">Quality & SLA Performance</h4>
+            <h4 className="text-xs font-bold text-[#142019]">Quality & SLA Performance</h4>
           </div>
-          <p className="text-[11px] text-slate-400 leading-snug">
+          <p className="text-[11px] text-[#607264] leading-snug">
             Turnaround times, commitment fulfillment audits, and resolution metrics by clinic.
           </p>
           <div className="flex items-center gap-2 pt-1">
@@ -139,8 +139,8 @@ export function ReportsExporter({ className }: { className?: string }) {
       </div>
 
       {downloadSuccess && (
-        <div className="mt-3 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
-          <CheckCircle className="h-4 w-4" />
+        <div className="mt-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-emerald-600" />
           <span>{downloadSuccess}</span>
         </div>
       )}

@@ -20,29 +20,29 @@ export function Input({
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-semibold text-stone-300">
+        <label htmlFor={inputId} className="block text-xs font-semibold text-[#334139]">
           {label}
         </label>
       )}
       <div className="relative flex items-center">
         {icon && (
-          <div className="absolute left-3 text-stone-400 pointer-events-none">
+          <div className="absolute left-3 text-[#627267] pointer-events-none">
             {icon}
           </div>
         )}
         <input
           id={inputId}
           className={cn(
-            "w-full rounded-xl bg-[#0b1813] border border-[#1b382b] px-3.5 py-2 text-sm text-stone-100 placeholder:text-stone-500",
-            "focus:outline-none focus:border-[#34d399] focus:ring-1 focus:ring-[#34d399]/30 transition-all duration-200",
+            "w-full rounded-xl bg-white border border-[#d8e2d6] px-3.5 py-2 text-sm text-[#142019] placeholder:text-[#94a390] shadow-2xs",
+            "focus:outline-none focus:border-[#1b4332] focus:ring-2 focus:ring-[#1b4332]/10 transition-all duration-200",
             icon && "pl-9",
-            error && "border-rose-500 focus:border-rose-500 focus:ring-rose-500/30",
+            error && "border-[#dc2626] focus:border-[#dc2626] focus:ring-[#dc2626]/10",
             className
           )}
           {...props}
         />
       </div>
-      {error && <p className="text-xs text-[#f87171] font-medium">{error}</p>}
+      {error && <p className="text-xs text-[#dc2626] font-medium">{error}</p>}
     </div>
   );
 }
@@ -68,16 +68,16 @@ export function Select({
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label htmlFor={selectId} className="block text-xs font-semibold text-stone-300">
+        <label htmlFor={selectId} className="block text-xs font-semibold text-[#334139]">
           {label}
         </label>
       )}
       <select
         id={selectId}
         className={cn(
-          "w-full rounded-xl bg-[#0b1813] border border-[#1b382b] px-3.5 py-2 text-sm text-stone-100",
-          "focus:outline-none focus:border-[#34d399] focus:ring-1 focus:ring-[#34d399]/30 transition-all duration-200 cursor-pointer",
-          error && "border-rose-500 focus:border-rose-500 focus:ring-rose-500/30",
+          "w-full rounded-xl bg-white border border-[#d8e2d6] px-3.5 py-2 text-sm text-[#142019] shadow-2xs",
+          "focus:outline-none focus:border-[#1b4332] focus:ring-2 focus:ring-[#1b4332]/10 transition-all duration-200 cursor-pointer",
+          error && "border-[#dc2626] focus:border-[#dc2626] focus:ring-[#dc2626]/10",
           className
         )}
         {...props}
@@ -85,12 +85,12 @@ export function Select({
         {children
           ? children
           : options?.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-[#0b1813] text-stone-100">
+              <option key={opt.value} value={opt.value} className="bg-white text-[#142019]">
                 {opt.label}
               </option>
             ))}
       </select>
-      {error && <p className="text-xs text-[#f87171] font-medium">{error}</p>}
+      {error && <p className="text-xs text-[#dc2626] font-medium">{error}</p>}
     </div>
   );
 }

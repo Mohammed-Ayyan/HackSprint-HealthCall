@@ -56,7 +56,7 @@ export function AudioPlayer({
   return (
     <div
       className={cn(
-        "rounded-2xl p-4 bg-slate-900/90 border border-slate-800/90 shadow-xl backdrop-blur-xl flex flex-col gap-3",
+        "rounded-2xl p-4 bg-white border border-[#e2e8e0] shadow-sm flex flex-col gap-3",
         className
       )}
     >
@@ -65,15 +65,15 @@ export function AudioPlayer({
         <div className="flex items-center gap-2">
           <button
             onClick={togglePlay}
-            className="h-10 w-10 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-slate-950 font-bold flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.35)] transition-transform active:scale-95 cursor-pointer"
+            className="h-10 w-10 rounded-xl bg-gradient-to-r from-[#059669] to-[#0d9488] hover:from-[#047857] hover:to-[#0f766e] text-white font-bold flex items-center justify-center shadow-sm transition-transform active:scale-95 cursor-pointer"
           >
-            {isPlaying ? <Pause className="h-5 w-5 fill-slate-950" /> : <Play className="h-5 w-5 fill-slate-950 ml-0.5" />}
+            {isPlaying ? <Pause className="h-5 w-5 fill-white text-white" /> : <Play className="h-5 w-5 fill-white text-white ml-0.5" />}
           </button>
 
           <button
             onClick={handleReset}
             title="Reset to start"
-            className="h-8 w-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 flex items-center justify-center transition-colors cursor-pointer"
+            className="h-8 w-8 rounded-lg text-[#607264] hover:text-[#142019] hover:bg-[#edf2ec] flex items-center justify-center transition-colors cursor-pointer"
           >
             <RotateCcw className="h-4 w-4" />
           </button>
@@ -81,18 +81,18 @@ export function AudioPlayer({
 
         {/* Live waveform center */}
         <div className="flex-1 flex items-center justify-center overflow-hidden">
-          <LiveWaveform isPlaying={isPlaying} barsCount={36} variant="cyan" />
+          <LiveWaveform isPlaying={isPlaying} barsCount={36} variant="emerald" />
         </div>
 
         {/* Speed & volume indicator */}
         <div className="flex items-center gap-2">
           <button
             onClick={toggleSpeed}
-            className="px-2 py-1 rounded-lg bg-slate-800 text-xs font-semibold text-cyan-300 hover:bg-slate-700 transition-colors cursor-pointer"
+            className="px-2 py-1 rounded-lg bg-[#f7f9f6] text-xs font-semibold text-[#1b4332] hover:bg-[#edf2ec] border border-[#e2e8e0] transition-colors cursor-pointer"
           >
             {playbackRate}x
           </button>
-          <div className="hidden sm:flex items-center text-slate-400">
+          <div className="hidden sm:flex items-center text-[#607264]">
             <Volume2 className="h-4 w-4" />
           </div>
         </div>
@@ -101,7 +101,7 @@ export function AudioPlayer({
       {/* Progress scrubber */}
       <div className="space-y-1">
         <div
-          className="relative h-2 w-full bg-slate-800 rounded-full overflow-hidden cursor-pointer group"
+          className="relative h-2 w-full bg-[#edf2ec] rounded-full overflow-hidden cursor-pointer group"
           onClick={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
             const clickPos = (e.clientX - rect.left) / rect.width;
@@ -111,14 +111,14 @@ export function AudioPlayer({
           }}
         >
           <div
-            className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-100 group-hover:brightness-125"
+            className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-[#059669] to-[#0d9488] rounded-full transition-all duration-100 group-hover:brightness-110"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
 
-        <div className="flex justify-between text-[11px] font-mono text-slate-400">
+        <div className="flex justify-between text-[11px] font-mono text-[#607264]">
           <span>{formatDuration(Math.floor(currentTime))}</span>
-          <span className="text-slate-500">Duration: {formatDuration(durationSeconds)}</span>
+          <span className="text-[#8fa394]">Duration: {formatDuration(durationSeconds)}</span>
         </div>
       </div>
     </div>

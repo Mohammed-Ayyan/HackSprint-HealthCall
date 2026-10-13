@@ -1,7 +1,7 @@
 """Centralized configuration management for CareOps AI Engine."""
 
 import json
-from typing import List, Union
+from typing import List, Optional, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -30,9 +30,38 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
     ]
 
+    # =========================================================================
+    # Phase 2: Audio Transcription Engine Configuration
+    # =========================================================================
+    WHISPER_MODEL_SIZE: str = "base"
+    WHISPER_DEVICE: str = "cpu"
+    WHISPER_COMPUTE_TYPE: str = "int8"
+    WHISPER_DOWNLOAD_ROOT: Optional[str] = None
+    MAX_AUDIO_UPLOAD_SIZE_MB: int = 25
+    ALLOWED_AUDIO_EXTENSIONS: List[str] = [".wav", ".mp3", ".m4a", ".flac", ".ogg"]
+    SUPPORTED_AUDIO_LANGUAGES: List[str] = ["en", "hi", "kn"]
+
+    @property
+    def max_upload_size_bytes(self) -> int:
+        """Maximum audio upload file size in bytes."""
+        return self.MAX_AUDIO_UPLOAD_SIZE_MB * 1024 * 1024
+
     @field_validator("ALLOWED_LANGUAGES", mode="before")
     @classmethod
     def parse_allowed_languages(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, str):
+            v = v.strip()
+            if v.startswith("[") and v.endswith("]"):
+                try:
+                    return json.loads(v)
+                except Exception:
+                    pass
+            return [item.strip() for item in v.split(",") if item.strip()]
+        return v
+
+    @field_validator("ALLOWED_AUDIO_EXTENSIONS", mode="before")
+    @classmethod
+    def parse_allowed_audio_extensions(cls, v: Union[str, List[str]]) -> List[str]:
         if isinstance(v, str):
             v = v.strip()
             if v.startswith("[") and v.endswith("]"):

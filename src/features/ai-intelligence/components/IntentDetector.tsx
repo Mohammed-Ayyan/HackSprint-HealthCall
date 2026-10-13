@@ -60,12 +60,12 @@ export function IntentDetector({
     <Card className={className}>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <div className="h-8 w-8 rounded-lg bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332]">
             <Target className="h-4 w-4" />
           </div>
           <div>
             <CardTitle>Clinical Intent Classification</CardTitle>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[#607264]">
               Multi-label intent classifier mapping to hospital departmental routing
             </p>
           </div>
@@ -83,10 +83,10 @@ export function IntentDetector({
               className={cn(
                 "p-3 rounded-xl border transition-all duration-200 relative overflow-hidden",
                 isPrimary
-                  ? "bg-cyan-950/40 border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/30"
+                  ? "bg-[#f0fdf4] border-[#059669] shadow-xs ring-1 ring-[#059669]/20"
                   : isSecondary
-                  ? "bg-purple-950/30 border-purple-500/40 text-purple-200"
-                  : "bg-slate-900/40 border-slate-800/60 opacity-60 hover:opacity-90"
+                  ? "bg-[#f0fdfa] border-[#0d9488]"
+                  : "bg-[#f7f9f6] border-[#e2e8e0] opacity-75 hover:opacity-100"
               )}
             >
               <div className="flex items-center justify-between mb-1.5">
@@ -94,36 +94,31 @@ export function IntentDetector({
                   className={cn(
                     "p-1.5 rounded-lg",
                     isPrimary
-                      ? "bg-cyan-500/20 text-cyan-300"
+                      ? "bg-[#e8f5e9] text-[#059669]"
                       : isSecondary
-                      ? "bg-purple-500/20 text-purple-300"
-                      : "bg-slate-800 text-slate-400"
+                      ? "bg-[#ccfbf1] text-[#0d9488]"
+                      : "bg-[#edf2ec] text-[#607264]"
                   )}
                 >
                   {item.icon}
                 </div>
 
                 {isPrimary && (
-                  <span className="text-[10px] font-mono font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">
+                  <span className="text-[10px] font-mono font-bold text-[#059669] bg-[#e8f5e9] px-2 py-0.5 rounded-full border border-[#c8e6c9]">
                     Primary Intent (98%)
                   </span>
                 )}
                 {isSecondary && (
-                  <span className="text-[10px] font-mono font-bold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30">
+                  <span className="text-[10px] font-mono font-bold text-[#0d9488] bg-[#ccfbf1] px-2 py-0.5 rounded-full border border-[#99f6e4]">
                     Secondary (84%)
                   </span>
                 )}
               </div>
 
-              <h4
-                className={cn(
-                  "text-xs font-bold",
-                  isPrimary ? "text-white" : isSecondary ? "text-purple-200" : "text-slate-300"
-                )}
-              >
+              <h4 className="text-xs font-bold text-[#142019]">
                 {item.name}
               </h4>
-              <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">{item.desc}</p>
+              <p className="text-[11px] text-[#607264] mt-0.5 leading-snug">{item.desc}</p>
             </div>
           );
         })}

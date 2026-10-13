@@ -12,6 +12,7 @@ import { ClaimsManagementTable } from "@/features/insurance/components/ClaimsMan
 import { AIClaimSummaryCard } from "@/features/insurance/components/AIClaimSummaryCard";
 import { ClaimTimelineVisualizer } from "@/features/insurance/components/ClaimTimelineVisualizer";
 import { ShieldCheck, FileSpreadsheet, Bot, Clock } from "lucide-react";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 
 export default function InsuranceDashboardPage() {
   const [overview, setOverview] = useState<InsuranceOverviewData | null>(null);
@@ -56,49 +57,51 @@ export default function InsuranceDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded-full border-2 border-[#34d399] border-t-transparent animate-spin" />
-          <p className="text-xs font-mono text-[#34d399]">Connecting to Payer Adjudication Engine...</p>
+          <div className="h-8 w-8 rounded-full border-2 border-[#1b4332] border-t-transparent animate-spin" />
+          <p className="text-xs font-mono text-[#1b4332]">Connecting to Payer Adjudication Engine...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* 1. Insurance Overview Cards */}
-      <InsuranceOverviewCards overview={overview} />
+    <RoleGuard allowedRoles={["Insurance Employee", "Manager", "Admin"]} moduleName="Insurance & Claims Division">
+      <div className="space-y-8 max-w-7xl mx-auto pb-12">
+        {/* 1. Insurance Overview Cards */}
+        <InsuranceOverviewCards overview={overview} />
 
-      {/* 2. Side-by-side or stacked layout: Claims Table + AI Claim Summary + Claim Timeline */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Claims Management Table (7 cols) */}
-        <div className="lg:col-span-7">
-          <ClaimsManagementTable
-            claims={claims}
-            selectedClaimId={selectedClaim?.id || ""}
-            onSelectClaim={(c) => setSelectedClaim(c)}
-          />
-        </div>
+        {/* 2. Side-by-side layout: Claims Table + AI Claim Summary + Claim Timeline */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Claims Management Table (7 cols) */}
+          <div className="lg:col-span-7">
+            <ClaimsManagementTable
+              claims={claims}
+              selectedClaimId={selectedClaim?.id || ""}
+              onSelectClaim={(c) => setSelectedClaim(c)}
+            />
+          </div>
 
-        {/* Right Column: AI Claim Summary & Timeline Visualizer (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          {selectedClaim ? (
-            <>
-              <AIClaimSummaryCard
-                claim={selectedClaim}
-                onVerifyStatus={handleVerifyStatus}
-              />
-              <ClaimTimelineVisualizer
-                claim={selectedClaim}
-                onAdvanceStage={handleAdvanceStage}
-              />
-            </>
-          ) : (
-            <div className="p-8 text-center bg-[#0b1712] rounded-xl border border-[#1b362a] text-xs text-stone-400">
-              Select a claim to inspect AI summary and lifecycle timeline.
-            </div>
-          )}
+          {/* Right Column: AI Claim Summary & Timeline Visualizer (5 cols) */}
+          <div className="lg:col-span-5 space-y-6">
+            {selectedClaim ? (
+              <>
+                <AIClaimSummaryCard
+                  claim={selectedClaim}
+                  onVerifyStatus={handleVerifyStatus}
+                />
+                <ClaimTimelineVisualizer
+                  claim={selectedClaim}
+                  onAdvanceStage={handleAdvanceStage}
+                />
+              </>
+            ) : (
+              <div className="p-8 text-center bg-white rounded-xl border border-[#e2e8df] text-xs text-[#627267] shadow-sm">
+                Select a claim to inspect AI summary and lifecycle timeline.
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </RoleGuard>
   );
 }

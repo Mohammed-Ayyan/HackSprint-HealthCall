@@ -28,18 +28,18 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variantStyles: Record<string, string> = {
-    default: "bg-[#13221b] text-slate-300 border-[#223d30]",
-    gray: "bg-[#13221b] text-stone-400 border-[#223d30]",
-    biolum: "bg-[#0c2a1e] text-[#34d399] border-emerald-500/30 shadow-[0_0_10px_rgba(52,211,153,0.15)]",
-    emerald: "bg-[#0c2a1e] text-[#34d399] border-emerald-500/30",
-    green: "bg-[#0c2a1e] text-[#34d399] border-emerald-500/30",
-    cyan: "bg-[#0b2824] text-[#2dd4bf] border-teal-500/30 shadow-[0_0_10px_rgba(45,212,191,0.12)]",
-    teal: "bg-[#0b2824] text-[#2dd4bf] border-teal-500/30 shadow-[0_0_10px_rgba(45,212,191,0.12)]",
-    amber: "bg-[#251d0e] text-[#f59e0b] border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.12)]",
-    rose: "bg-[#281315] text-[#f87171] border-rose-500/30 shadow-[0_0_10px_rgba(248,113,113,0.12)]",
-    red: "bg-[#281315] text-[#f87171] border-rose-500/30 shadow-[0_0_10px_rgba(248,113,113,0.12)]",
-    purple: "bg-[#1d162b] text-indigo-300 border-indigo-500/30",
-    outline: "bg-transparent text-slate-400 border-[#1e382d]",
+    default: "bg-[#f0f4ef] text-[#425247] border-[#d8e2d6]",
+    gray: "bg-[#f0f4ef] text-[#425247] border-[#d8e2d6]",
+    biolum: "bg-[#eaf7ee] text-[#059669] border-[#bbf0c8] shadow-[0_1px_2px_rgba(5,150,105,0.06)]",
+    emerald: "bg-[#eaf7ee] text-[#059669] border-[#bbf0c8]",
+    green: "bg-[#eaf7ee] text-[#059669] border-[#bbf0c8]",
+    cyan: "bg-[#e6fffa] text-[#0d9488] border-[#99f6e4] shadow-[0_1px_2px_rgba(13,148,136,0.06)]",
+    teal: "bg-[#e6fffa] text-[#0d9488] border-[#99f6e4] shadow-[0_1px_2px_rgba(13,148,136,0.06)]",
+    amber: "bg-[#fef3c7] text-[#b45309] border-[#fde68a] shadow-[0_1px_2px_rgba(217,119,6,0.06)]",
+    rose: "bg-[#fef2f2] text-[#dc2626] border-[#fecaca] shadow-[0_1px_2px_rgba(220,38,38,0.06)]",
+    red: "bg-[#fef2f2] text-[#dc2626] border-[#fecaca] shadow-[0_1px_2px_rgba(220,38,38,0.06)]",
+    purple: "bg-[#f5f3ff] text-[#6d28d9] border-[#ddd6fe]",
+    outline: "bg-transparent text-[#627267] border-[#d8e2d6]",
   };
 
   const sizeStyles = {
@@ -52,7 +52,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-lg border transition-all duration-150",
+        "inline-flex items-center gap-1.5 rounded-lg border transition-all duration-150 font-medium",
         variantStyles[styleKey],
         sizeStyles[size],
         className
@@ -63,13 +63,13 @@ export function Badge({
         <span
           className={cn(
             "h-1.5 w-1.5 rounded-full",
-            (variant === "cyan" || variant === "teal") && "bg-teal-400 animate-pulse",
-            (variant === "biolum" || variant === "emerald" || variant === "green") && "bg-emerald-400 animate-pulse",
-            (variant === "rose" || variant === "red") && "bg-rose-400 animate-pulse",
-            variant === "amber" && "bg-amber-400 animate-pulse",
-            variant === "purple" && "bg-indigo-400",
-            (variant === "default" || variant === "gray") && "bg-slate-400",
-            variant === "outline" && "bg-slate-500"
+            (variant === "cyan" || variant === "teal") && "bg-[#0d9488]",
+            (variant === "biolum" || variant === "emerald" || variant === "green") && "bg-[#059669]",
+            (variant === "rose" || variant === "red") && "bg-[#dc2626]",
+            variant === "amber" && "bg-[#d97706]",
+            variant === "purple" && "bg-[#7c3aed]",
+            (variant === "default" || variant === "gray") && "bg-[#627267]",
+            variant === "outline" && "bg-[#9ca3af]"
           )}
         />
       )}

@@ -3,128 +3,277 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Activity, ShieldCheck, ArrowRight, User, Lock } from "lucide-react";
+import {
+  HeartHandshake,
+  ArrowRight,
+  ShieldCheck,
+  Stethoscope,
+  UserCheck,
+  FileCheck2,
+  Users2,
+  Lock,
+  Mail,
+  Sparkles,
+} from "lucide-react";
 import { UserRole } from "@/shared/types/user";
-import { mockAuthService } from "@/features/platform/mockAuthService";
+import { useAuth } from "@/features/platform/auth/authContext";
 import { Button } from "@/shared/components/ui/Button";
 import { Input, Select } from "@/shared/components/ui/Input";
 import { Card } from "@/shared/components/ui/Card";
+import { Badge } from "@/shared/components/ui/Badge";
+
+interface RoleOption {
+  role: UserRole;
+  label: string;
+  department: string;
+  badge: "emerald" | "teal" | "amber" | "default" | "red";
+  icon: React.ComponentType<{ className?: string }>;
+  defaultEmail: string;
+  destination: string;
+}
+
+const ROLE_OPTIONS: RoleOption[] = [
+  {
+    role: "Patient",
+    label: "Patient / Care Recipient",
+    department: "Patient Access & Experience",
+    badge: "emerald",
+    icon: HeartHandshake,
+    defaultEmail: "rahul.sharma@email.com",
+    destination: "/patient/dashboard",
+  },
+  {
+    role: "Doctor",
+    label: "Doctor / Attending Physician",
+    department: "Post-Surgical General & Acute Recovery",
+    badge: "teal",
+    icon: Stethoscope,
+    defaultEmail: "dr.rahul@metrohealth.eco",
+    destination: "/doctor/dashboard",
+  },
+  {
+    role: "Receptionist",
+    label: "Receptionist / Front Intake",
+    department: "Central Intake & Scheduling",
+    badge: "default",
+    icon: UserCheck,
+    defaultEmail: "clara.o@metrohealth.eco",
+    destination: "/reception/dashboard",
+  },
+  {
+    role: "Insurance Employee",
+    label: "Insurance / Prior-Auth Specialist",
+    department: "RCM & Carrier Relations",
+    badge: "amber",
+    icon: FileCheck2,
+    defaultEmail: "marcus.s@metrohealth.eco",
+    destination: "/insurance/dashboard",
+  },
+  {
+    role: "Manager",
+    label: "Department Manager / Ops Lead",
+    department: "Surgical Recovery & Operations",
+    badge: "teal",
+    icon: Users2,
+    defaultEmail: "eleanor.v@metrohealth.eco",
+    destination: "/manager/dashboard",
+  },
+  {
+    role: "Admin",
+    label: "Hospital Administrator / Executive",
+    department: "Executive Healthcare Governance",
+    badge: "emerald",
+    icon: ShieldCheck,
+    defaultEmail: "admin@metrohealth.eco",
+    destination: "/admin/dashboard",
+  },
+];
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("e.rostova@metrohealth.org");
-  const [role, setRole] = useState<UserRole>("Admin");
+  const { login } = useAuth();
+
+  const [email, setEmail] = useState("dr.rahul@metrohealth.eco");
+  const [password, setPassword] = useState("••••••••••••");
+  const [role, setRole] = useState<UserRole>("Doctor");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleRoleChange = (newRole: UserRole) => {
+    setRole(newRole);
+    const match = ROLE_OPTIONS.find((r) => r.role === newRole);
+    if (match) {
+      setEmail(match.defaultEmail);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await mockAuthService.login(email, role);
-    router.push("/dashboard");
+    setErrorMsg(null);
+    try {
+      const res = await login({ email, password, role });
+      if (res.success && res.redirectTo) {
+        router.push(res.redirectTo);
+      } else {
+        setErrorMsg("Failed to authenticate with current credentials.");
+      }
+    } catch (err: unknown) {
+      setErrorMsg("An error occurred during authentication.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleQuickRole = async (selectedRole: UserRole, userEmail: string) => {
+  const handleQuickPreset = async (targetRole: UserRole, userEmail: string) => {
     setLoading(true);
-    await mockAuthService.login(userEmail, selectedRole);
-    router.push("/dashboard");
+    setErrorMsg(null);
+    setRole(targetRole);
+    setEmail(userEmail);
+    try {
+      const res = await login({ email: userEmail, password: "demo-password", role: targetRole });
+      if (res.success && res.redirectTo) {
+        router.push(res.redirectTo);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center p-4 bg-[#080c14] relative overflow-hidden">
-      {/* Background radial glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-cyan-600/10 via-purple-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-[#f7f9f6] text-[#142019] relative overflow-hidden">
+      {/* Solarpunk subtle background ambient blooms */}
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-emerald-100/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-amber-100/40 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-md space-y-6 relative z-10">
+      <div className="w-full max-w-lg space-y-6 relative z-10 py-8">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 rounded-2xl bg-gradient-to-tr from-cyan-600 via-sky-500 to-indigo-600 items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.4)]">
-            <Activity className="h-6 w-6 text-slate-950 stroke-[2.5]" />
+          <div className="inline-flex h-12 w-12 rounded-2xl bg-[#1b4332] items-center justify-center shadow-[0_4px_16px_rgba(27,67,50,0.2)] mb-1">
+            <HeartHandshake className="h-6 w-6 text-[#74c69d]" />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white font-mono">
-            CareOps AI
-          </h1>
-          <p className="text-xs text-slate-400">
-            Enterprise Healthcare Call Intelligence & Operations Console
+          <div className="flex items-center justify-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-[#142019] font-heading">
+              CareOps AI
+            </h1>
+            <Badge variant="emerald">Eco-Futuristic v2.4</Badge>
+          </div>
+          <p className="text-xs text-[#627267] max-w-sm mx-auto">
+            Sustainable hospital operations & intelligent healthcare call triage platform
           </p>
         </div>
 
         {/* Login Card */}
-        <Card variant="elevated" className="p-6 border-slate-700/80 space-y-5">
+        <Card variant="elevated" className="p-6 sm:p-8 bg-white border-[#d8e2d6] shadow-[0_8px_30px_rgba(20,32,25,0.06)] space-y-6">
+          {errorMsg && (
+            <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
+              <span className="font-semibold">Notice:</span> {errorMsg}
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-[#28382e] mb-1.5">
+                Select Your Hospital Role
+              </label>
+              <select
+                value={role}
+                onChange={(e) => handleRoleChange(e.target.value as UserRole)}
+                className="w-full px-3.5 py-2.5 bg-white border border-[#d8e2d6] rounded-xl text-xs font-medium text-[#142019] focus:outline-none focus:ring-2 focus:ring-[#1b4332]/30 focus:border-[#1b4332] transition-colors cursor-pointer"
+              >
+                {ROLE_OPTIONS.map((opt) => (
+                  <option key={opt.role} value={opt.role}>
+                    {opt.label} — {opt.destination}
+                  </option>
+                ))}
+              </select>
+              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#627267]">
+                <Sparkles className="h-3 w-3 text-[#059669]" />
+                <span>Redirects automatically to dedicated portal: <code className="font-mono text-[#1b4332] font-semibold">{ROLE_OPTIONS.find((r) => r.role === role)?.destination}</code></span>
+              </div>
+            </div>
+
             <Input
-              label="Hospital Staff Email"
+              label="Staff / Patient Email Address"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.rostova@metrohealth.org"
+              placeholder="dr.rahul@metrohealth.eco"
               required
             />
 
-            <Select
-              label="Operational Role"
-              value={role}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-              options={[
-                { label: "Admin (Executive Governance)", value: "Admin" },
-                { label: "Doctor (Clinical Review & Orders)", value: "Doctor" },
-                { label: "Receptionist (Triage & Scheduling)", value: "Receptionist" },
-                { label: "Insurance Employee (Prior-Auth & Claims)", value: "Insurance Employee" },
-                { label: "Manager (SLA Escalations & Operations)", value: "Manager" },
-              ]}
+            <Input
+              label="Secure Password / Passkey"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••••••"
+              required
             />
 
-            <Button type="submit" variant="primary" size="md" className="w-full gap-2" loading={loading}>
-              <span>Enter Operations Console</span>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              className="w-full gap-2 shadow-sm"
+              loading={loading}
+            >
+              <span>Sign In to {role} Console</span>
               <ArrowRight className="h-4 w-4" />
             </Button>
           </form>
 
-          {/* 1-Click Role Presets for Demo Judges */}
-          <div className="pt-4 border-t border-slate-800 space-y-2.5">
-            <p className="text-[10px] uppercase font-bold tracking-wider text-slate-500 text-center">
-              Quick Role Demo Presets (Hackathon Mode)
-            </p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                onClick={() => handleQuickRole("Admin", "e.rostova@metrohealth.org")}
-                className="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-300 hover:text-white transition-colors cursor-pointer"
-              >
-                <span className="font-bold text-rose-400 block text-[11px]">Admin Persona</span>
-                <span className="text-[10px] text-slate-400">Full platform controls</span>
-              </button>
-              <button
-                onClick={() => handleQuickRole("Doctor", "a.thorne@metrohealth.org")}
-                className="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-300 hover:text-white transition-colors cursor-pointer"
-              >
-                <span className="font-bold text-cyan-400 block text-[11px]">Doctor Persona</span>
-                <span className="text-[10px] text-slate-400">Clinical order review</span>
-              </button>
-              <button
-                onClick={() => handleQuickRole("Receptionist", "s.jenkins@metrohealth.org")}
-                className="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-300 hover:text-white transition-colors cursor-pointer"
-              >
-                <span className="font-bold text-blue-400 block text-[11px]">Receptionist</span>
-                <span className="text-[10px] text-slate-400">Appointment routing</span>
-              </button>
-              <button
-                onClick={() => handleQuickRole("Insurance Employee", "m.vance@metrohealth.org")}
-                className="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-300 hover:text-white transition-colors cursor-pointer"
-              >
-                <span className="font-bold text-purple-400 block text-[11px]">Insurance Spec.</span>
-                <span className="text-[10px] text-slate-400">Prior-auth clearances</span>
-              </button>
+          {/* Quick Persona Demo Presets for Hackathon Judges */}
+          <div className="pt-5 border-t border-[#edf2ea] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-[#627267]">
+                1-Click Role Presets (Interactive Demo)
+              </span>
+              <span className="text-[10px] text-[#059669] font-medium">Instant Login</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {ROLE_OPTIONS.map((opt) => {
+                const Icon = opt.icon;
+                const isSelected = role === opt.role;
+                return (
+                  <button
+                    key={opt.role}
+                    type="button"
+                    onClick={() => handleQuickPreset(opt.role, opt.defaultEmail)}
+                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                      isSelected
+                        ? "bg-[#e8f3ec] border-[#1b4332] shadow-sm"
+                        : "bg-[#fcfdfc] hover:bg-[#f4f7f3] border-[#e2e8df] text-[#28382e]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <div className="flex items-center gap-1.5">
+                        <Icon className="h-3.5 w-3.5 text-[#1b4332]" />
+                        <span className="font-bold text-[11px] text-[#142019]">{opt.role}</span>
+                      </div>
+                      <span className="text-[9px] font-mono text-[#627267]">{opt.destination.replace('/dashboard', '')}</span>
+                    </div>
+                    <span className="text-[10px] text-[#627267] truncate">{opt.department}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </Card>
 
         {/* Footer links */}
-        <div className="text-center text-xs text-slate-500 flex items-center justify-center gap-4">
-          <Link href="/auth/signup" className="hover:text-cyan-400 transition-colors">
-            New Hospital Staff? Request Access
+        <div className="text-center text-xs text-[#627267] flex items-center justify-center gap-3">
+          <Link href="/auth/signup" className="hover:text-[#1b4332] font-medium transition-colors">
+            Register New Staff
           </Link>
           <span>•</span>
-          <Link href="/landing" className="hover:text-cyan-400 transition-colors">
-            Product Story Showcase
+          <Link href="/landing" className="hover:text-[#1b4332] font-medium transition-colors">
+            Product Vision & Story
+          </Link>
+          <span>•</span>
+          <Link href="/dashboard" className="hover:text-[#1b4332] font-medium transition-colors">
+            Global Ops View
           </Link>
         </div>
       </div>

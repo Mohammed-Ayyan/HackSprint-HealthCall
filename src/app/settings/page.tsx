@@ -35,17 +35,17 @@ export default function SettingsPage() {
     <AppShell>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-extrabold tracking-tight text-white font-mono">
+              <h1 className="text-2xl font-extrabold tracking-tight text-[#1b4332] font-mono">
                 Platform Engine Configuration
               </h1>
-              <Badge variant="cyan" size="sm">
+              <Badge variant="teal" size="sm">
                 CareOps Core
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#607264] mt-1">
               Configure speech inference thresholds, hospital department SLAs, and EHR integration bridges
             </p>
           </div>
@@ -57,8 +57,8 @@ export default function SettingsPage() {
         </div>
 
         {savedSuccess && (
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
-            <CheckCircle className="h-4 w-4" />
+          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-emerald-600" />
             <span>Platform settings saved and propagated to all 6 operational nodes.</span>
           </div>
         )}
@@ -69,19 +69,19 @@ export default function SettingsPage() {
             <Card className="p-5 space-y-4">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Cpu className="h-4 w-4 text-cyan-400" />
+                  <Cpu className="h-4 w-4 text-[#059669]" />
                   <CardTitle>AI Inference & Dispatch Thresholds</CardTitle>
                 </div>
-                <Badge variant="cyan" size="sm">
+                <Badge variant="emerald" size="sm">
                   Whisper + Opus
                 </Badge>
               </CardHeader>
 
               <div className="space-y-4 text-xs">
                 <div>
-                  <div className="flex justify-between font-semibold text-slate-200 mb-1.5">
+                  <div className="flex justify-between font-semibold text-[#142019] mb-1.5">
                     <span>Minimum NLU Confidence for Auto-Dispatch</span>
-                    <span className="font-mono text-cyan-400">{minConfidence}%</span>
+                    <span className="font-mono text-[#059669] font-bold">{minConfidence}%</span>
                   </div>
                   <input
                     type="range"
@@ -89,18 +89,18 @@ export default function SettingsPage() {
                     max="99"
                     value={minConfidence}
                     onChange={(e) => setMinConfidence(Number(e.target.value))}
-                    className="w-full accent-cyan-400 cursor-pointer"
+                    className="w-full accent-[#059669] cursor-pointer"
                   />
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-[#607264] mt-1">
                     Conversations with confidence below this threshold require human supervisor review.
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800 space-y-3">
+                <div className="pt-3 border-t border-[#edf2ec] space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-semibold text-slate-200">Autonomous Task Routing</p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="font-semibold text-[#142019]">Autonomous Task Routing</p>
+                      <p className="text-[11px] text-[#607264]">
                         Automatically assign tasks to department queues without manual triage
                       </p>
                     </div>
@@ -108,14 +108,14 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={autoDispatchEnabled}
                       onChange={(e) => setAutoDispatchEnabled(e.target.checked)}
-                      className="h-4 w-4 accent-cyan-400 rounded cursor-pointer"
+                      className="h-4 w-4 accent-[#059669] rounded cursor-pointer"
                     />
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-semibold text-slate-200">HIPAA Audio Stream Encryption</p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="font-semibold text-[#142019]">HIPAA Audio Stream Encryption</p>
+                      <p className="text-[11px] text-[#607264]">
                         Zero-retention ephemeral audio buffer with encrypted cryptographic keys
                       </p>
                     </div>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={telephonyRecording}
                       onChange={(e) => setTelephonyRecording(e.target.checked)}
-                      className="h-4 w-4 accent-cyan-400 rounded cursor-pointer"
+                      className="h-4 w-4 accent-[#059669] rounded cursor-pointer"
                     />
                   </div>
                 </div>
@@ -134,27 +134,27 @@ export default function SettingsPage() {
             <Card className="p-5 space-y-4">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-purple-400" />
+                  <Clock className="h-4 w-4 text-[#0d9488]" />
                   <CardTitle>Department SLA Response Targets</CardTitle>
                 </div>
               </CardHeader>
 
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-500">Emergency Triage</span>
-                  <p className="font-mono font-bold text-rose-400 text-sm">10 Minutes</p>
+                <div className="p-3 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#8fa394]">Emergency Triage</span>
+                  <p className="font-mono font-bold text-red-700 text-sm">10 Minutes</p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-500">Reception Desk</span>
-                  <p className="font-mono font-bold text-cyan-400 text-sm">8 Hours</p>
+                <div className="p-3 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#8fa394]">Reception Desk</span>
+                  <p className="font-mono font-bold text-[#059669] text-sm">8 Hours</p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-500">Insurance Pre-Auth</span>
-                  <p className="font-mono font-bold text-purple-400 text-sm">4 Hours</p>
+                <div className="p-3 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#8fa394]">Insurance Pre-Auth</span>
+                  <p className="font-mono font-bold text-[#0d9488] text-sm">4 Hours</p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-500">Billing Resolution</span>
-                  <p className="font-mono font-bold text-amber-400 text-sm">3 Hours</p>
+                <div className="p-3 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#8fa394]">Billing Resolution</span>
+                  <p className="font-mono font-bold text-[#d97706] text-sm">3 Hours</p>
                 </div>
               </div>
             </Card>
@@ -165,7 +165,7 @@ export default function SettingsPage() {
             <Card className="p-5 space-y-4">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Database className="h-4 w-4 text-emerald-400" />
+                  <Database className="h-4 w-4 text-[#059669]" />
                   <CardTitle>EHR & Telephony System Bridges</CardTitle>
                 </div>
                 <Badge variant="emerald" size="sm">
@@ -202,15 +202,15 @@ export default function SettingsPage() {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between"
+                    className="p-3 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] flex items-center justify-between shadow-2xs"
                   >
                     <div>
-                      <h4 className="font-bold text-white">{item.name}</h4>
-                      <p className="text-[11px] text-slate-400 font-mono">{item.type}</p>
+                      <h4 className="font-bold text-[#142019]">{item.name}</h4>
+                      <p className="text-[11px] text-[#607264] font-mono">{item.type}</p>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[11px] text-emerald-400 font-mono font-semibold">
+                      <span className="text-[11px] text-[#059669] font-mono font-semibold">
                         {item.status}
                       </span>
                     </div>
@@ -220,9 +220,9 @@ export default function SettingsPage() {
             </Card>
 
             {/* Compliance Badge */}
-            <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800 text-xs space-y-2 text-slate-400">
-              <div className="flex items-center gap-2 text-slate-200 font-semibold">
-                <Shield className="h-4 w-4 text-cyan-400" />
+            <div className="p-4 rounded-2xl bg-white border border-[#e2e8e0] text-xs space-y-2 text-[#607264] shadow-sm">
+              <div className="flex items-center gap-2 text-[#142019] font-semibold">
+                <Shield className="h-4 w-4 text-[#059669]" />
                 <span>Enterprise Healthcare Certification</span>
               </div>
               <p className="text-[11px] leading-relaxed">
