@@ -115,6 +115,33 @@ async function seed() {
     console.log("Created Patient profile: Ananya Patel (MRN-773194)");
   }
 
+  // 3. Seed Doctor Profile for Dr. Rahul
+  const Doctor = require("../models/Doctor");
+  let rahulDoctor = await Doctor.findOne({ email: "dr.rahul@metrohealth.eco" });
+  if (!rahulDoctor) {
+    rahulDoctor = new Doctor({
+      userId: seededUsers[USER_ROLES.DOCTOR]._id,
+      employeeId: "DOC-1001",
+      name: "Dr. Rahul",
+      email: "dr.rahul@metrohealth.eco",
+      phone: "+1 (555) 749-2101",
+      specialization: "Post-Surgical General & Acute Recovery",
+      department: "Post-Surgical General & Acute Recovery",
+      qualification: "MBBS, MD (Cardiothoracic Care)",
+      experience: 12,
+      availability: [
+        { day: "Monday", start: "09:00", end: "17:00", slots: ["10:30 AM", "11:15 AM", "02:00 PM", "04:30 PM"] },
+        { day: "Wednesday", start: "09:00", end: "17:00", slots: ["10:30 AM", "02:00 PM"] },
+      ],
+      assignedPatients: [rahulPatient._id, ananyaPatient._id],
+      status: "ACTIVE",
+    });
+    await rahulDoctor.save();
+    console.log("Created Doctor profile: Dr. Rahul (DOC-1001)");
+  } else {
+    console.log("Doctor profile already exists: Dr. Rahul");
+  }
+
   await mongoose.disconnect();
   console.log("Database seeded successfully!");
 }
