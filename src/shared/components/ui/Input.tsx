@@ -20,21 +20,21 @@ export function Input({
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-semibold text-slate-300">
+        <label htmlFor={inputId} className="block text-xs font-semibold text-stone-300">
           {label}
         </label>
       )}
       <div className="relative flex items-center">
         {icon && (
-          <div className="absolute left-3 text-slate-400 pointer-events-none">
+          <div className="absolute left-3 text-stone-400 pointer-events-none">
             {icon}
           </div>
         )}
         <input
           id={inputId}
           className={cn(
-            "w-full rounded-xl bg-slate-900/90 border border-slate-700/80 px-3.5 py-2 text-sm text-slate-100 placeholder:text-slate-500",
-            "focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all duration-200",
+            "w-full rounded-xl bg-[#0b1813] border border-[#1b382b] px-3.5 py-2 text-sm text-stone-100 placeholder:text-stone-500",
+            "focus:outline-none focus:border-[#34d399] focus:ring-1 focus:ring-[#34d399]/30 transition-all duration-200",
             icon && "pl-9",
             error && "border-rose-500 focus:border-rose-500 focus:ring-rose-500/30",
             className
@@ -42,15 +42,16 @@ export function Input({
           {...props}
         />
       </div>
-      {error && <p className="text-xs text-rose-400 font-medium">{error}</p>}
+      {error && <p className="text-xs text-[#f87171] font-medium">{error}</p>}
     </div>
   );
 }
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
-  options: { label: string; value: string }[];
+  options?: { label: string; value: string }[];
   error?: string;
+  children?: React.ReactNode;
 }
 
 export function Select({
@@ -59,6 +60,7 @@ export function Select({
   error,
   className,
   id,
+  children,
   ...props
 }: SelectProps) {
   const selectId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
@@ -66,27 +68,29 @@ export function Select({
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label htmlFor={selectId} className="block text-xs font-semibold text-slate-300">
+        <label htmlFor={selectId} className="block text-xs font-semibold text-stone-300">
           {label}
         </label>
       )}
       <select
         id={selectId}
         className={cn(
-          "w-full rounded-xl bg-slate-900/90 border border-slate-700/80 px-3 py-2 text-sm text-slate-100",
-          "focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all duration-200 cursor-pointer",
-          error && "border-rose-500",
+          "w-full rounded-xl bg-[#0b1813] border border-[#1b382b] px-3.5 py-2 text-sm text-stone-100",
+          "focus:outline-none focus:border-[#34d399] focus:ring-1 focus:ring-[#34d399]/30 transition-all duration-200 cursor-pointer",
+          error && "border-rose-500 focus:border-rose-500 focus:ring-rose-500/30",
           className
         )}
         {...props}
       >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value} className="bg-slate-900 text-slate-100">
-            {opt.label}
-          </option>
-        ))}
+        {children
+          ? children
+          : options?.map((opt) => (
+              <option key={opt.value} value={opt.value} className="bg-[#0b1813] text-stone-100">
+                {opt.label}
+              </option>
+            ))}
       </select>
-      {error && <p className="text-xs text-rose-400 font-medium">{error}</p>}
+      {error && <p className="text-xs text-[#f87171] font-medium">{error}</p>}
     </div>
   );
 }
