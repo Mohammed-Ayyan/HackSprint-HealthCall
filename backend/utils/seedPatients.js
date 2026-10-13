@@ -9,6 +9,8 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const Patient = require("../models/Patient");
+const InsuranceClaim = require("../models/InsuranceClaim");
+const Department = require("../models/Department");
 const { USER_ROLES } = require("../config/roles");
 
 async function seed() {
@@ -211,6 +213,52 @@ async function seed() {
     console.log("Seeded 3 operational Insurance Claims in MongoDB.");
   } else {
     console.log(`Insurance claims already present in database: ${existingClaimsCount}`);
+  }
+
+  // 4. Seed Departments
+  const existingDeptCount = await Department.countDocuments({});
+  if (existingDeptCount === 0) {
+    const adminUser = seededUsers[USER_ROLES.ADMIN];
+    const docUser = seededUsers[USER_ROLES.DOCTOR];
+    const recUser = seededUsers[USER_ROLES.RECEPTIONIST];
+    const insUser = seededUsers[USER_ROLES.INSURANCE_EMPLOYEE];
+    const mgrUser = seededUsers[USER_ROLES.DEPARTMENT_MANAGER];
+
+    await Department.insertMany([
+      {
+        name: "Doctors & Clinical Staff",
+        description: "Inpatient, outpatient, tele-triage, and surgical follow-up specialists.",
+        managerId: docUser?._id || null,
+        status: "ACTIVE",
+      },
+      {
+        name: "Reception & Intake",
+        description: "Patient registration, front-desk coordination, and appointment scheduling.",
+        managerId: recUser?._id || null,
+        status: "ACTIVE",
+      },
+      {
+        name: "Insurance & Pre-Auth",
+        description: "Revenue cycle management, carrier prior authorizations, and claim adjudication.",
+        managerId: insUser?._id || null,
+        status: "ACTIVE",
+      },
+      {
+        name: "Surgical Recovery & Operations Management",
+        description: "Post-operative patient monitoring, wound care coordination, and bed planning.",
+        managerId: mgrUser?._id || null,
+        status: "ACTIVE",
+      },
+      {
+        name: "Executive Administration",
+        description: "Hospital governance, compliance, audit oversight, and workforce operations.",
+        managerId: adminUser?._id || null,
+        status: "ACTIVE",
+      },
+    ]);
+    console.log("Seeded 5 Hospital Departments in MongoDB.");
+  } else {
+    console.log(`Departments already present in database: ${existingDeptCount}`);
   }
 
   await mongoose.disconnect();

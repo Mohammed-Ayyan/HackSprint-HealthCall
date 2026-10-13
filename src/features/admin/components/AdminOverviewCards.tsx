@@ -1,7 +1,15 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, PhoneCall, Users, CheckCircle2, Sparkles, Building2, Activity } from "lucide-react";
+import {
+  Users,
+  Building2,
+  Activity,
+  Stethoscope,
+  CheckSquare,
+  ShieldAlert,
+  FileCheck2,
+} from "lucide-react";
 import { AdminOverviewData } from "../types";
 import { Card } from "@/shared/components/ui/Card";
 import { Badge } from "@/shared/components/ui/Badge";
@@ -11,6 +19,13 @@ export interface AdminOverviewCardsProps {
 }
 
 export function AdminOverviewCards({ overview }: AdminOverviewCardsProps) {
+  const totalUsers = overview.totalUsers ?? overview.activeStaffCount;
+  const totalPatients = overview.totalPatients ?? overview.patientsHandled;
+  const activeDoctors = overview.activeDoctors ?? 1;
+  const pendingTasks = overview.pendingTasks ?? 0;
+  const claims = overview.insuranceClaims;
+  const totalClaims = claims ? claims.total : 3;
+
   return (
     <div className="space-y-6">
       {/* Hospital System Command Header */}
@@ -31,7 +46,7 @@ export function AdminOverviewCards({ overview }: AdminOverviewCardsProps) {
                 </Badge>
               </div>
               <p className="text-xs text-[#627267] mt-1">
-                Executive Administration: {overview.administratorName} • {overview.activeStaffCount} Credentialed Personnel
+                Executive Administration: <span className="font-semibold text-[#142019]">{overview.administratorName}</span> • {totalUsers} Hospital Personnel • {activeDoctors} Active Doctors
               </p>
             </div>
           </div>
@@ -43,81 +58,102 @@ export function AdminOverviewCards({ overview }: AdminOverviewCardsProps) {
         </div>
       </div>
 
-      {/* 4 Cards: Total Calls, Patients Handled, Department Performance, AI Accuracy Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Total Calls */}
-        <Card className="bg-white border-[#e2e8df] p-4 hover:border-[#1b4332]/40 transition-all shadow-sm">
-          <div className="flex items-start justify-between">
-            <div className="h-9 w-9 rounded-lg bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
-              <PhoneCall className="h-4 w-4" />
-            </div>
-            <Badge variant="teal" size="sm">VOICE FLOW</Badge>
-          </div>
-          <div className="mt-3">
-            <p className="text-xs text-[#627267] uppercase tracking-wider font-semibold">
-              Total Calls Processed
-            </p>
-            <p className="text-xl font-bold font-mono text-[#142019] mt-1">
-              {overview.totalCalls.toLocaleString()}
-            </p>
-            <p className="text-[11px] text-[#627267] mt-0.5">Automated clinical extraction</p>
-          </div>
-        </Card>
-
-        {/* Card 2: Patients Handled */}
+      {/* 5 Real MongoDB Operational Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Card 1: Total Users */}
         <Card className="bg-white border-[#e2e8df] p-4 hover:border-[#1b4332]/40 transition-all shadow-sm">
           <div className="flex items-start justify-between">
             <div className="h-9 w-9 rounded-lg bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
               <Users className="h-4 w-4" />
             </div>
+            <Badge variant="teal" size="sm">PERSONNEL</Badge>
+          </div>
+          <div className="mt-3">
+            <p className="text-xs text-[#627267] uppercase tracking-wider font-semibold">
+              Total Users
+            </p>
+            <p className="text-xl font-bold font-mono text-[#142019] mt-1">
+              {totalUsers.toLocaleString()}
+            </p>
+            <p className="text-[11px] text-[#627267] mt-0.5">Across clinical & staff roles</p>
+          </div>
+        </Card>
+
+        {/* Card 2: Total Patients */}
+        <Card className="bg-white border-[#e2e8df] p-4 hover:border-[#1b4332]/40 transition-all shadow-sm">
+          <div className="flex items-start justify-between">
+            <div className="h-9 w-9 rounded-lg bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
+              <Activity className="h-4 w-4" />
+            </div>
             <Badge variant="emerald" size="sm">PATIENTS</Badge>
           </div>
           <div className="mt-3">
             <p className="text-xs text-[#627267] uppercase tracking-wider font-semibold">
-              Patients Handled
+              Total Patients
             </p>
             <p className="text-xl font-bold font-mono text-[#142019] mt-1">
-              {overview.patientsHandled.toLocaleString()}
+              {totalPatients.toLocaleString()}
             </p>
-            <p className="text-[11px] text-[#627267] mt-0.5">Across all 5 clinical hubs</p>
+            <p className="text-[11px] text-[#627267] mt-0.5">Active health profiles</p>
           </div>
         </Card>
 
-        {/* Card 3: Department Performance */}
+        {/* Card 3: Active Doctors */}
+        <Card className="bg-white border-[#e2e8df] p-4 hover:border-[#1b4332]/40 transition-all shadow-sm">
+          <div className="flex items-start justify-between">
+            <div className="h-9 w-9 rounded-lg bg-[#e0f2fe] text-[#0284c7] flex items-center justify-center">
+              <Stethoscope className="h-4 w-4" />
+            </div>
+            <Badge variant="teal" size="sm">CLINICIANS</Badge>
+          </div>
+          <div className="mt-3">
+            <p className="text-xs text-[#627267] uppercase tracking-wider font-semibold">
+              Active Doctors
+            </p>
+            <p className="text-xl font-bold font-mono text-[#0284c7] mt-1">
+              {activeDoctors.toLocaleString()}
+            </p>
+            <p className="text-[11px] text-[#627267] mt-0.5">Assigned to specialty care</p>
+          </div>
+        </Card>
+
+        {/* Card 4: Pending Tasks */}
         <Card className="bg-white border-[#e2e8df] p-4 hover:border-[#1b4332]/40 transition-all shadow-sm">
           <div className="flex items-start justify-between">
             <div className="h-9 w-9 rounded-lg bg-[#fef3c7] text-[#d97706] flex items-center justify-center">
-              <Activity className="h-4 w-4" />
+              <CheckSquare className="h-4 w-4" />
             </div>
-            <Badge variant="amber" size="sm">EFFICIENCY</Badge>
+            <Badge variant="amber" size="sm">WORKFLOW</Badge>
           </div>
           <div className="mt-3">
             <p className="text-xs text-[#627267] uppercase tracking-wider font-semibold">
-              Department Performance
+              Pending Tasks
             </p>
-            <p className="text-xl font-bold font-mono text-[#059669] mt-1">
-              {overview.overallDepartmentEfficiency}%
+            <p className="text-xl font-bold font-mono text-[#d97706] mt-1">
+              {pendingTasks.toLocaleString()}
             </p>
-            <p className="text-[11px] text-[#627267] mt-0.5">Commitment SLA turnaround</p>
+            <p className="text-[11px] text-[#627267] mt-0.5">Open hospital commitments</p>
           </div>
         </Card>
 
-        {/* Card 4: AI Accuracy Metrics */}
+        {/* Card 5: Insurance Claims */}
         <Card className="bg-white border-[#e2e8df] p-4 hover:border-[#1b4332]/40 transition-all shadow-sm">
           <div className="flex items-start justify-between">
             <div className="h-9 w-9 rounded-lg bg-[#ccfbf1] text-[#0d9488] flex items-center justify-center">
-              <Sparkles className="h-4 w-4" />
+              <FileCheck2 className="h-4 w-4" />
             </div>
-            <Badge variant="teal" size="sm">CALIBRATED</Badge>
+            <Badge variant="teal" size="sm">CLAIMS</Badge>
           </div>
           <div className="mt-3">
             <p className="text-xs text-[#627267] uppercase tracking-wider font-semibold">
-              AI Accuracy Metrics
+              Insurance Claims
             </p>
             <p className="text-xl font-bold font-mono text-[#0d9488] mt-1">
-              {overview.aiAccuracyMetric}%
+              {totalClaims.toLocaleString()}
             </p>
-            <p className="text-[11px] text-[#627267] mt-0.5">Autonomous intent validation</p>
+            <p className="text-[11px] text-[#627267] mt-0.5">
+              {claims ? `${claims.submitted} submitted • ${claims.underReview} review` : "Active adjudications"}
+            </p>
           </div>
         </Card>
       </div>

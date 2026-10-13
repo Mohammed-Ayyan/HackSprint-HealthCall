@@ -7,6 +7,19 @@ export interface AdminOverviewData {
   aiAccuracyMetric: number; // e.g. 99.1%
   activeStaffCount: number;
   ecosystemStability: "Optimal" | "Degraded" | "Elevated Load";
+  totalUsers?: number;
+  totalPatients?: number;
+  activeDoctors?: number;
+  pendingTasks?: number;
+  insuranceClaims?: {
+    total: number;
+    submitted: number;
+    underReview: number;
+    approved: number;
+    rejected: number;
+    completed: number;
+  };
+  activeDepartments?: number;
 }
 
 export interface AdminUser {
