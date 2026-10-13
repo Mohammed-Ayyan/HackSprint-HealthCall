@@ -58,6 +58,8 @@ export const mockSystemRules: SystemRuleConfig[] = [
 ];
 
 let departmentsStore = [...mockHospitalDepartments];
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
+
 let rulesStore = [...mockSystemRules];
 
 /**
@@ -147,7 +149,21 @@ export const adminService = {
   },
 
   async getDepartments(): Promise<HospitalDepartment[]> {
-    return [...departmentsStore];
+    try {
+      const tasks = await apiTaskService.getTasks();
+      const clinicalCount = tasks.filter((t) => t.department === "Clinical Team" && t.status !== "completed").length;
+      const receptionCount = tasks.filter((t) => t.department === "Reception" && t.status !== "completed").length;
+      const insuranceCount = tasks.filter((t) => t.department === "Insurance" && t.status !== "completed").length;
+
+      return departmentsStore.map((d) => {
+        if (d.name.includes("Clinical")) return { ...d, openCommitmentsCount: clinicalCount };
+        if (d.name.includes("Reception")) return { ...d, openCommitmentsCount: receptionCount };
+        if (d.name.includes("Insurance")) return { ...d, openCommitmentsCount: insuranceCount };
+        return d;
+      });
+    } catch {
+      return [...departmentsStore];
+    }
   },
 
   async getSystemRules(): Promise<SystemRuleConfig[]> {

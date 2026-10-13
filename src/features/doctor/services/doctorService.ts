@@ -1,9 +1,33 @@
 import { DoctorOverviewData, DoctorQueuePatient, DoctorFollowUp } from "../types";
 import { apiDoctorService } from "./apiDoctorService";
 import { apiAppointmentService } from "@/features/platform/appointments/apiAppointmentService";
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
 import { authService } from "@/features/platform/auth/authService";
 
 let followupsStore: DoctorFollowUp[] = [];
+
+function mapTaskToFollowUp(t: any): DoctorFollowUp {
+  let status: DoctorFollowUp["status"] = "Pending Clinician Review";
+  if (t.status === "completed") status = "Completed";
+  else if (t.isEscalated || t.priority === "critical") status = "Escalated";
+  else if (t.status === "in-progress" || t.status === "assigned") status = "Scheduled";
+
+  let prio: "high" | "medium" | "low" = "medium";
+  if (t.priority === "critical" || t.priority === "high") prio = "high";
+  else if (t.priority === "low") prio = "low";
+
+  return {
+    id: t.id,
+    patientId: t.patientMrn || t.id,
+    patientName: t.patientName || "Patient",
+    scheduledDate: t.deadline || "Within 24 hours",
+    protocol: t.task,
+    notes: t.description,
+    status,
+    assignedTo: t.assignedTo?.name || "Clinical Team",
+    priority: prio,
+  };
+}
 
 /**
  * Doctor Service (Connected to live MongoDB backend)
@@ -11,9 +35,10 @@ let followupsStore: DoctorFollowUp[] = [];
 export const doctorService = {
   async getOverview(): Promise<DoctorOverviewData> {
     try {
-      const [profile, apts] = await Promise.all([
+      const [profile, apts, followups] = await Promise.all([
         apiDoctorService.getMyDoctorProfile(),
         apiAppointmentService.getAppointments(),
+        this.getFollowUps(),
       ]);
 
       const currentUser = authService.getCurrentUser();
@@ -26,7 +51,7 @@ export const doctorService = {
         specialty,
         department,
         todaysAppointmentsCount: apts.length,
-        pendingFollowupsCount: followupsStore.length,
+        pendingFollowupsCount: followups.filter((f) => f.status !== "Completed").length,
         urgentCasesCount: apts.filter((a) =>
           (a.type || "").toLowerCase().includes("wound") ||
           (a.type || "").toLowerCase().includes("urgent")
@@ -128,10 +153,34 @@ export const doctorService = {
   },
 
   async getFollowUps(): Promise<DoctorFollowUp[]> {
+    try {
+      const liveTasks = await apiTaskService.getTasks({ department: "CLINICAL" });
+      if (liveTasks && liveTasks.length > 0) {
+        return liveTasks.map(mapTaskToFollowUp);
+      }
+    } catch (e: any) {
+      console.warn("[doctorService] Could not load live clinical tasks:", e.message);
+    }
     return [...followupsStore];
   },
 
   async createFollowUp(data: Omit<DoctorFollowUp, "id">): Promise<DoctorFollowUp> {
+    try {
+      const created = await apiTaskService.createTask({
+        title: data.protocol,
+        description: data.notes,
+        department: "CLINICAL",
+        priority: data.priority === "high" ? "HIGH" : data.priority === "low" ? "LOW" : "MEDIUM",
+      });
+      if (created) {
+        const fu = mapTaskToFollowUp(created);
+        followupsStore.unshift(fu);
+        return fu;
+      }
+    } catch (e: any) {
+      console.warn("[doctorService] Could not persist follow-up to backend:", e.message);
+    }
+
     const newFU: DoctorFollowUp = {
       ...data,
       id: `dfu-${Date.now()}`,
@@ -141,6 +190,16 @@ export const doctorService = {
   },
 
   async updateFollowUpStatus(id: string, status: DoctorFollowUp["status"]): Promise<boolean> {
+    try {
+      let targetStatus = "IN_PROGRESS";
+      if (status === "Completed") targetStatus = "COMPLETED";
+      else if (status === "Pending Clinician Review") targetStatus = "CREATED";
+
+      await apiTaskService.updateTaskStatus(id, targetStatus);
+    } catch (e: any) {
+      console.warn("[doctorService] Could not update task status on backend:", e.message);
+    }
+
     const fu = followupsStore.find((f) => f.id === id);
     if (!fu) return false;
     fu.status = status;

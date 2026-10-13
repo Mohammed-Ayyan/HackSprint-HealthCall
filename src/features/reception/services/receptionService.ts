@@ -8,11 +8,35 @@ import {
 import { apiPatientService } from "@/features/platform/patients/apiPatientService";
 import { apiAppointmentService } from "@/features/platform/appointments/apiAppointmentService";
 import { apiDoctorService } from "@/features/platform/doctors/apiDoctorService";
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
 import { authService } from "@/features/platform/auth/authService";
 
 export const mockReceptionCallActions: ReceptionCallAction[] = [];
 
 let callActionsStore: ReceptionCallAction[] = [];
+
+function mapTaskToReceptionCallAction(t: any): ReceptionCallAction {
+  let status: ReceptionCallAction["status"] = "Pending Action";
+  if (t.status === "completed") status = "Completed";
+  else if (t.status === "in-progress" || t.status === "assigned") status = "In Progress";
+
+  let prio: "high" | "medium" | "low" = "medium";
+  if (t.priority === "critical" || t.priority === "high") prio = "high";
+  else if (t.priority === "low") prio = "low";
+
+  return {
+    id: t.id,
+    callId: t.callId || "call-live-inbound",
+    callerName: t.patientName || "Walk-In / Caller",
+    callerPhone: "+1 (555) 019-2831",
+    taskTitle: t.task,
+    priority: prio,
+    deadline: t.deadline || "Today",
+    aiSummaryExtract: t.evidenceQuote || t.description || "Inbound reception task",
+    status,
+    assignedDoctorPreference: t.assignedTo?.name,
+  };
+}
 
 /**
  * Reception Service (Connected to live MongoDB backend)
@@ -20,9 +44,10 @@ let callActionsStore: ReceptionCallAction[] = [];
 export const receptionService = {
   async getOverview(): Promise<ReceptionOverviewData> {
     try {
-      const [apts, pats] = await Promise.all([
+      const [apts, pats, callActions] = await Promise.all([
         apiAppointmentService.getAppointments(),
         apiPatientService.getPatients(),
+        this.getCallActions(),
       ]);
 
       const currentUser = authService.getCurrentUser();
@@ -36,7 +61,7 @@ export const receptionService = {
         pendingBookingsCount: pendingCount,
         confirmedAppointmentsCount: confirmedCount,
         cancelledRequestsCount: cancelledCount,
-        openCallTasksCount: callActionsStore.filter((c) => c.status !== "Completed").length,
+        openCallTasksCount: callActions.filter((c) => c.status !== "Completed").length,
       };
     } catch (err: any) {
       console.warn("[receptionService] Failed to load live overview:", err.message);
@@ -115,6 +140,14 @@ export const receptionService = {
   },
 
   async getCallActions(): Promise<ReceptionCallAction[]> {
+    try {
+      const liveTasks = await apiTaskService.getTasks({ department: "RECEPTION" });
+      if (liveTasks && liveTasks.length > 0) {
+        return liveTasks.map(mapTaskToReceptionCallAction);
+      }
+    } catch (e: any) {
+      console.warn("[receptionService] Could not load live reception tasks:", e.message);
+    }
     return [...callActionsStore];
   },
 
@@ -122,6 +155,16 @@ export const receptionService = {
     id: string,
     status: ReceptionCallAction["status"]
   ): Promise<boolean> {
+    try {
+      let targetStatus = "IN_PROGRESS";
+      if (status === "Completed") targetStatus = "COMPLETED";
+      else if (status === "Pending Action") targetStatus = "CREATED";
+
+      await apiTaskService.updateTaskStatus(id, targetStatus);
+    } catch (e: any) {
+      console.warn("[receptionService] Could not update task status on backend:", e.message);
+    }
+
     const action = callActionsStore.find((a) => a.id === id);
     if (!action) return false;
     action.status = status;

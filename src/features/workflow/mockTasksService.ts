@@ -301,8 +301,11 @@ export const mockDepartmentRoutingRules: DepartmentRoutingRule[] = [
   },
 ];
 
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
+
 /**
- * Future backend replacement: src/features/workflow/apiTasksService.ts
+ * Healthcare Workflow & Operational Task Service
+ * Backed by live MongoDB backend (/api/v1/tasks) with fallback.
  */
 export const mockTasksService = {
   async getTasks(filters?: {
@@ -311,7 +314,15 @@ export const mockTasksService = {
     priority?: string;
     search?: string;
   }): Promise<ActionItem[]> {
-    await new Promise((r) => setTimeout(r, 60));
+    try {
+      const realTasks = await apiTaskService.getTasks(filters as any);
+      if (realTasks && realTasks.length > 0) {
+        return realTasks;
+      }
+    } catch (e: any) {
+      console.warn("[mockTasksService] Live tasks unavailable, using fallback:", e.message);
+    }
+
     let items = [...mockActionItems];
 
     if (filters?.status) {
@@ -337,7 +348,13 @@ export const mockTasksService = {
   },
 
   async updateTaskStatus(taskId: string, newStatus: TaskStatus): Promise<ActionItem | null> {
-    await new Promise((r) => setTimeout(r, 50));
+    try {
+      const updated = await apiTaskService.updateTaskStatus(taskId, newStatus);
+      if (updated) return updated;
+    } catch (e: any) {
+      console.warn("[mockTasksService] Live status update failed:", e.message);
+    }
+
     const task = mockActionItems.find((i) => i.id === taskId);
     if (!task) return null;
     task.status = newStatus;
@@ -349,7 +366,13 @@ export const mockTasksService = {
     taskId: string,
     user: { id: string; name: string; avatar: string; role: string }
   ): Promise<ActionItem | null> {
-    await new Promise((r) => setTimeout(r, 50));
+    try {
+      const updated = await apiTaskService.assignTask(taskId, user.id);
+      if (updated) return updated;
+    } catch (e: any) {
+      console.warn("[mockTasksService] Live assignment failed:", e.message);
+    }
+
     const task = mockActionItems.find((i) => i.id === taskId);
     if (!task) return null;
     task.assignedTo = user;
@@ -361,7 +384,18 @@ export const mockTasksService = {
   },
 
   async escalateTask(taskId: string, reason: string): Promise<ActionItem | null> {
-    await new Promise((r) => setTimeout(r, 50));
+    try {
+      const updated = await apiTaskService.updateTaskStatus(taskId, "IN_PROGRESS");
+      if (updated) {
+        updated.isEscalated = true;
+        updated.escalatedTo = "Operations Executive / Manager";
+        updated.escalationReason = reason;
+        return updated;
+      }
+    } catch (e: any) {
+      console.warn("[mockTasksService] Live escalate failed:", e.message);
+    }
+
     const task = mockActionItems.find((i) => i.id === taskId);
     if (!task) return null;
     task.isEscalated = true;
@@ -373,12 +407,15 @@ export const mockTasksService = {
   },
 
   async getRoutingRules(): Promise<DepartmentRoutingRule[]> {
-    await new Promise((r) => setTimeout(r, 40));
     return mockDepartmentRoutingRules;
   },
 
   async getOverdueAndEscalated(): Promise<ActionItem[]> {
-    await new Promise((r) => setTimeout(r, 40));
-    return mockActionItems.filter((i) => i.isEscalated || i.sla.isBreached || i.sla.isWarning);
+    try {
+      const allTasks = await this.getTasks();
+      return allTasks.filter((i) => i.isEscalated || i.sla.isBreached || i.sla.isWarning);
+    } catch {
+      return mockActionItems.filter((i) => i.isEscalated || i.sla.isBreached || i.sla.isWarning);
+    }
   },
 };
