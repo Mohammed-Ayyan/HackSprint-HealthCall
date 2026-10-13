@@ -2,14 +2,15 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, UserRole } from "@/shared/types/user";
-import { authService, LoginCredentials, AuthResponse } from "./authService";
-import { getRoleDashboard } from "./rolePermissions";
+import { authService, LoginCredentials, AuthResponse, MOCK_USERS } from "./authService";
+import { getClientSession, saveSession } from "./sessionStore";
 
 interface AuthContextType {
   user: User;
   role: UserRole;
   isAuthenticated: boolean;
   loading: boolean;
+  isHydrated: boolean;
   login: (creds: LoginCredentials) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   switchRole: (role: UserRole) => User;
@@ -17,20 +18,38 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User>(authService.getCurrentUser());
+export function AuthProvider({
+  children,
+  initialUser,
+}: {
+  children: React.ReactNode;
+  initialUser?: User | null;
+}) {
+  const fallback = initialUser || MOCK_USERS.Admin;
+  const [user, setUser] = useState<User>(fallback);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [loading, setLoading] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Sync with localStorage on client mount
-    setUser(authService.getCurrentUser());
-  }, []);
+    // Phase 2 -> 3: Client hydration: Resolve active user from sessionStore
+    const clientUser = getClientSession();
+    if (clientUser) {
+      setUser(clientUser);
+      setIsAuthenticated(true);
+    } else if (initialUser) {
+      saveSession(initialUser);
+      setIsAuthenticated(true);
+    }
+    setIsHydrated(true);
+  }, [initialUser]);
 
   const login = async (creds: LoginCredentials): Promise<AuthResponse> => {
     setLoading(true);
     try {
       const res = await authService.login(creds);
       setUser(res.user);
+      setIsAuthenticated(true);
       return res;
     } finally {
       setLoading(false);
@@ -41,15 +60,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     try {
       await authService.logout();
-      setUser(authService.getCurrentUser());
+      // Reset to unauthenticated admin template
+      const defaultUser = MOCK_USERS.Admin;
+      setUser(defaultUser);
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
   };
 
-  const switchRole = (role: UserRole): User => {
-    const updated = authService.switchRole(role);
+  const switchRole = (newRole: UserRole): User => {
+    const updated = authService.switchRole(newRole);
     setUser(updated);
+    setIsAuthenticated(true);
     return updated;
   };
 
@@ -58,8 +81,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         role: user.role,
-        isAuthenticated: true,
+        isAuthenticated,
         loading,
+        isHydrated,
         login,
         logout,
         switchRole,

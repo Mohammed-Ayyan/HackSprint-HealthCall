@@ -22,7 +22,7 @@ export function PatientDirectory({ initialPatients }: PatientDirectoryProps) {
 
   // New patient state
   const [newName, setNewName] = useState("");
-  const [newMrn, setNewMrn] = useState(`MRN-${Math.floor(100000 + Math.random() * 900000)}`);
+  const [newMrn, setNewMrn] = useState("MRN-884920");
   const [newContact, setNewContact] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newDob, setNewDob] = useState("1992-05-14");

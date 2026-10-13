@@ -13,6 +13,7 @@ import { EscalationManagerCard } from "@/features/manager/components/EscalationM
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/Tabs";
 import { Users, AlertTriangle, ShieldCheck } from "lucide-react";
 import { RoleGuard } from "@/features/platform/auth/RoleGuard";
+import { AppShell } from "@/shared/components/layout/AppShell";
 
 export default function ManagerDashboardPage() {
   const [overview, setOverview] = useState<ManagerOverviewData | null>(null);
@@ -52,39 +53,41 @@ export default function ManagerDashboardPage() {
   }
 
   return (
-    <RoleGuard allowedRoles={["Manager", "Admin"]} moduleName="Operations & Department Manager Console">
-      <div className="space-y-8 max-w-7xl mx-auto pb-12">
-        {/* 1. Manager Overview Cards */}
-        <ManagerOverviewCards overview={overview} />
+    <AppShell>
+      <RoleGuard allowedRoles={["Manager", "Admin"]} moduleName="Operations & Department Manager Console">
+        <div className="space-y-8 max-w-7xl mx-auto pb-12">
+          {/* 1. Manager Overview Cards */}
+          <ManagerOverviewCards overview={overview} />
 
-        {/* 2. Workload & Escalation Tabs */}
-        <Tabs defaultValue="workload" className="w-full">
-          <TabsList className="bg-[#edf2ea] border border-[#d8e2d6] p-1 rounded-xl">
-            <TabsTrigger
-              value="workload"
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
-            >
-              <Users className="h-4 w-4" />
-              Team Workload & Capacity ({workloads.length})
-            </TabsTrigger>
-            <TabsTrigger
-              value="escalations"
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
-            >
-              <AlertTriangle className="h-4 w-4" />
-              Escalation Command ({escalations.filter((e) => e.status !== "Resolved").length})
-            </TabsTrigger>
-          </TabsList>
+          {/* 2. Workload & Escalation Tabs */}
+          <Tabs defaultValue="workload" className="w-full">
+            <TabsList className="bg-[#edf2ea] border border-[#d8e2d6] p-1 rounded-xl">
+              <TabsTrigger
+                value="workload"
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+              >
+                <Users className="h-4 w-4" />
+                Team Workload & Capacity ({workloads.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="escalations"
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                Escalation Command ({escalations.filter((e) => e.status !== "Resolved").length})
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="workload" className="mt-6">
-            <TeamWorkloadManager workloads={workloads} />
-          </TabsContent>
+            <TabsContent value="workload" className="mt-6">
+              <TeamWorkloadManager workloads={workloads} />
+            </TabsContent>
 
-          <TabsContent value="escalations" className="mt-6">
-            <EscalationManagerCard initialEscalations={escalations} />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </RoleGuard>
+            <TabsContent value="escalations" className="mt-6">
+              <EscalationManagerCard initialEscalations={escalations} />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </RoleGuard>
+    </AppShell>
   );
 }

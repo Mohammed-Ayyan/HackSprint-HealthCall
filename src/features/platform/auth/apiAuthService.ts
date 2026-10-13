@@ -2,18 +2,21 @@
  * CareOps AI - Real Backend Authentication Client
  * 
  * Direct API client for the Express / MongoDB backend (/api/v1/auth).
- * Designed as a drop-in replacement for mock authentication services.
+ * Designed with dual cookie + localStorage persistence for zero hydration mismatches.
  */
 
 import { User, UserRole } from "@/shared/types/user";
 import { getRoleDashboard } from "./rolePermissions";
 import { AuthResponse, LoginCredentials, MOCK_USERS } from "./authService";
+import {
+  saveSession,
+  clearSession,
+  getClientSession,
+  getClientToken,
+} from "./sessionStore";
 
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
-
-const STORAGE_KEY = "careops_auth_session";
-const TOKEN_KEY = "careops_jwt_token";
 
 /**
  * Normalizes backend role format (e.g., 'PATIENT', 'DOCTOR')
@@ -63,18 +66,12 @@ export function mapFrontendRoleToBackend(frontendRole: UserRole): string {
 
 export const apiAuthService = {
   getToken(): string | null {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(TOKEN_KEY);
+    return getClientToken();
   },
 
   getCurrentUser(): User {
-    if (typeof window === "undefined") return MOCK_USERS.Admin;
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {
-      console.error("Failed to parse local user session", e);
-    }
+    const stored = getClientSession();
+    if (stored) return stored;
     return MOCK_USERS.Admin;
   },
 
@@ -128,10 +125,7 @@ export const apiAuthService = {
         lastActive: "Just now",
       };
 
-      if (data.token) {
-        localStorage.setItem(TOKEN_KEY, data.token);
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      saveSession(user, data.token);
 
       return {
         success: true,
@@ -142,19 +136,19 @@ export const apiAuthService = {
       };
     } catch (err: any) {
       console.warn("Backend unavailable, falling back to local session:", err.message);
-      // Fallback for seamless demo experience if backend server is not running
       const feRole = params.role;
       const fallbackUser: User = {
         ...MOCK_USERS[feRole],
         name: params.name,
         email: params.email,
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(fallbackUser));
+      const fallbackToken = `mock-jwt-token-${Date.now()}`;
+      saveSession(fallbackUser, fallbackToken);
       return {
         success: true,
         role: feRole,
         user: fallbackUser,
-        token: `mock-jwt-token-${Date.now()}`,
+        token: fallbackToken,
         redirectTo: getRoleDashboard(feRole),
       };
     }
@@ -190,10 +184,7 @@ export const apiAuthService = {
           lastActive: "Now",
         };
 
-        if (data.token) {
-          localStorage.setItem(TOKEN_KEY, data.token);
-        }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+        saveSession(user, data.token);
 
         return {
           success: true,
@@ -215,12 +206,13 @@ export const apiAuthService = {
       email: creds.email || template.email,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    const token = `careops-jwt-${Date.now()}`;
+    saveSession(user, token);
     return {
       success: true,
       role: feRole,
       user,
-      token: `careops-jwt-${Date.now()}`,
+      token,
       redirectTo: getRoleDashboard(feRole),
     };
   },
@@ -253,10 +245,10 @@ export const apiAuthService = {
           phone: data.phone || "",
           lastActive: "Now",
         };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+        saveSession(user, token);
         return user;
       }
-    } catch (e) {
+    } catch {
       console.warn("Could not reach /api/v1/auth/me, returning cached session");
     }
 
@@ -277,21 +269,16 @@ export const apiAuthService = {
           },
         });
       }
-    } catch (e) {
+    } catch {
       // Ignore network errors on logout
     }
 
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(STORAGE_KEY);
-    }
+    clearSession();
   },
 
   switchRole(role: UserRole): User {
     const user = MOCK_USERS[role] || MOCK_USERS.Admin;
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    }
+    saveSession(user);
     return user;
   },
 };

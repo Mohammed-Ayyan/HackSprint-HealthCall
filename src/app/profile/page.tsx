@@ -20,6 +20,8 @@ import Link from "next/link";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/Card";
 import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
+import { AppShell } from "@/shared/components/layout/AppShell";
+import { useAuth } from "@/features/platform/auth/authContext";
 
 interface UserProfile {
   name: string;
@@ -153,11 +155,21 @@ const activityTimelineItems = [
 ];
 
 export default function ProfilePage() {
-  const [selectedPersona, setSelectedPersona] = useState<string>("Doctor");
-  const profile = defaultProfiles[selectedPersona] || defaultProfiles.Doctor;
+  const { user, isHydrated } = useAuth();
+  const roleKey = user.role === "Insurance Employee" ? "Insurance" : user.role;
+  const [selectedPersona, setSelectedPersona] = useState<string>("Admin");
+
+  React.useEffect(() => {
+    if (isHydrated) {
+      setSelectedPersona(roleKey);
+    }
+  }, [roleKey, isHydrated]);
+
+  const profile = defaultProfiles[selectedPersona] || defaultProfiles.Admin;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+    <AppShell>
+      <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Solarpunk Profile Hero */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#eef6f0] via-[#f4f9f5] to-[#fcfdfc] p-6 border border-[#d6e5da] shadow-sm">
         <div className="absolute top-0 right-0 w-80 h-full bg-[radial-gradient(circle_at_top_right,rgba(5,150,105,0.08),transparent_70%)] pointer-events-none" />
@@ -373,5 +385,6 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+    </AppShell>
   );
 }

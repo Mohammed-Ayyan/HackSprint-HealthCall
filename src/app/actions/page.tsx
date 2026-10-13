@@ -11,6 +11,7 @@ import {
   Filter,
 } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { KanbanBoard } from "@/features/workflow/components/KanbanBoard";
 import { SLATrackerCard } from "@/features/workflow/components/SLATrackerCard";
 import { DepartmentRoutingUI } from "@/features/workflow/components/DepartmentRoutingUI";
@@ -82,7 +83,11 @@ export default function ActionsPage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <RoleGuard
+        allowedRoles={["Doctor", "Receptionist", "Insurance Employee", "Manager", "Admin"]}
+        moduleName="Operational Action Workflows"
+      >
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
@@ -173,6 +178,7 @@ export default function ActionsPage() {
           </div>
         </Modal>
       </div>
+      </RoleGuard>
     </AppShell>
   );
 }

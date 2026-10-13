@@ -20,6 +20,7 @@ import {
   Leaf,
 } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { StatCard } from "@/shared/components/common/StatCard";
 import { LiveCallMonitor } from "@/features/ai-intelligence/components/LiveCallMonitor";
 import { EscalationBanner } from "@/features/workflow/components/EscalationBanner";
@@ -88,7 +89,11 @@ export default function DashboardPage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <RoleGuard
+        allowedRoles={["Doctor", "Receptionist", "Insurance Employee", "Manager", "Admin"]}
+        moduleName="Healthcare Operations Command"
+      >
+        <div className="space-y-6">
         {/* Healthcare Ecosystem Command Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
@@ -255,6 +260,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      </RoleGuard>
     </AppShell>
   );
 }

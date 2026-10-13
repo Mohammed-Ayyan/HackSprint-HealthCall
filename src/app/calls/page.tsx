@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { PhoneCall, ShieldCheck, Flame, Clock, Filter, Plus } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { CallTable } from "@/features/workflow/components/CallTable";
 import { mockCallsService } from "@/features/workflow/mockCallsService";
 import { Call } from "@/shared/types/call";
@@ -31,7 +32,11 @@ export default function CallsPage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <RoleGuard
+        allowedRoles={["Doctor", "Receptionist", "Insurance Employee", "Manager", "Admin"]}
+        moduleName="Call Telephony & Intelligence Records"
+      >
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
@@ -90,6 +95,7 @@ export default function CallsPage() {
         {/* Main Searchable Table */}
         <CallTable calls={calls} />
       </div>
+      </RoleGuard>
     </AppShell>
   );
 }

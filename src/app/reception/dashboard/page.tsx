@@ -17,6 +17,7 @@ import { AppointmentCalendarView } from "@/features/reception/components/Appoint
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/Tabs";
 import { Calendar, Bot, Users, CalendarDays } from "lucide-react";
 import { RoleGuard } from "@/features/platform/auth/RoleGuard";
+import { AppShell } from "@/shared/components/layout/AppShell";
 
 export default function ReceptionDashboardPage() {
   const [overview, setOverview] = useState<ReceptionOverviewData | null>(null);
@@ -62,64 +63,66 @@ export default function ReceptionDashboardPage() {
   }
 
   return (
-    <RoleGuard allowedRoles={["Receptionist", "Manager", "Admin"]} moduleName="Reception & Intake Gateway">
-      <div className="space-y-8 max-w-7xl mx-auto pb-12">
-        {/* 1. Front Desk Overview Cards */}
-        <ReceptionOverviewCards overview={overview} />
+    <AppShell>
+      <RoleGuard allowedRoles={["Receptionist", "Manager", "Admin"]} moduleName="Reception & Intake Gateway">
+        <div className="space-y-8 max-w-7xl mx-auto pb-12">
+          {/* 1. Front Desk Overview Cards */}
+          <ReceptionOverviewCards overview={overview} />
 
-        {/* 2. Operations Tabs */}
-        <Tabs defaultValue="appointments" className="w-full">
-          <TabsList className="bg-[#edf2ea] border border-[#d8e2d6] p-1 rounded-xl">
-            <TabsTrigger
-              value="appointments"
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
-            >
-              <Calendar className="h-4 w-4" />
-              Appointment Queue ({appointments.length})
-            </TabsTrigger>
-            <TabsTrigger
-              value="call-actions"
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
-            >
-              <Bot className="h-4 w-4" />
-              AI Call Actions ({callActions.length})
-            </TabsTrigger>
-            <TabsTrigger
-              value="directory"
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
-            >
-              <Users className="h-4 w-4" />
-              Patient Directory ({patients.length})
-            </TabsTrigger>
-            <TabsTrigger
-              value="calendar"
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
-            >
-              <CalendarDays className="h-4 w-4" />
-              Provider Calendar
-            </TabsTrigger>
-          </TabsList>
+          {/* 2. Operations Tabs */}
+          <Tabs defaultValue="appointments" className="w-full">
+            <TabsList className="bg-[#edf2ea] border border-[#d8e2d6] p-1 rounded-xl">
+              <TabsTrigger
+                value="appointments"
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+              >
+                <Calendar className="h-4 w-4" />
+                Appointment Queue ({appointments.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="call-actions"
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+              >
+                <Bot className="h-4 w-4" />
+                AI Call Actions ({callActions.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="directory"
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+              >
+                <Users className="h-4 w-4" />
+                Patient Directory ({patients.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="calendar"
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+              >
+                <CalendarDays className="h-4 w-4" />
+                Provider Calendar
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="appointments" className="mt-6">
-            <AppointmentQueueList initialAppointments={appointments} />
-          </TabsContent>
+            <TabsContent value="appointments" className="mt-6">
+              <AppointmentQueueList initialAppointments={appointments} />
+            </TabsContent>
 
-          <TabsContent value="call-actions" className="mt-6">
-            <CallActionQueue initialCallActions={callActions} />
-          </TabsContent>
+            <TabsContent value="call-actions" className="mt-6">
+              <CallActionQueue initialCallActions={callActions} />
+            </TabsContent>
 
-          <TabsContent value="directory" className="mt-6">
-            <PatientDirectory initialPatients={patients} />
-          </TabsContent>
+            <TabsContent value="directory" className="mt-6">
+              <PatientDirectory initialPatients={patients} />
+            </TabsContent>
 
-          <TabsContent value="calendar" className="mt-6">
-            <AppointmentCalendarView
-              doctorSchedules={doctorSchedules}
-              appointments={appointments}
-            />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </RoleGuard>
+            <TabsContent value="calendar" className="mt-6">
+              <AppointmentCalendarView
+                doctorSchedules={doctorSchedules}
+                appointments={appointments}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </RoleGuard>
+    </AppShell>
   );
 }
