@@ -42,7 +42,7 @@ export function Tabs(props: CompoundTabsProps) {
     return (
       <div
         className={cn(
-          "flex items-center gap-1.5 p-1 rounded-xl bg-[#0b1712] border border-[#1b362a]",
+          "flex items-center gap-1.5 p-1 rounded-xl bg-[#edf2ea] border border-[#d8e2d6]",
           props.className
         )}
       >
@@ -53,10 +53,10 @@ export function Tabs(props: CompoundTabsProps) {
               key={tab.id}
               onClick={() => props.onChange!(tab.id)}
               className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer",
+                "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer",
                 isActive
-                  ? "bg-[#132c21] text-[#34d399] border border-[#24503a]"
-                  : "text-stone-400 hover:text-stone-200 hover:bg-[#0e2118] border border-transparent"
+                  ? "bg-white text-[#1b4332] shadow-xs border border-[#d8e2d6]"
+                  : "text-[#627267] hover:text-[#142019] hover:bg-white/60 border border-transparent"
               )}
             >
               {tab.icon && <span className="text-current">{tab.icon}</span>}
@@ -65,7 +65,7 @@ export function Tabs(props: CompoundTabsProps) {
                 <span
                   className={cn(
                     "px-1.5 py-0.2 rounded-full text-[10px]",
-                    isActive ? "bg-[#1c3f2e] text-[#34d399]" : "bg-[#12241c] text-stone-400"
+                    isActive ? "bg-[#e8f5e9] text-[#1b4332]" : "bg-[#e2e8df] text-[#627267]"
                   )}
                 >
                   {tab.count}
@@ -106,7 +106,7 @@ export function TabsList({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 p-1 rounded-xl bg-[#0b1712] border border-[#1b362a]",
+        "inline-flex items-center gap-1 p-1 rounded-xl bg-[#edf2ea] border border-[#d8e2d6]",
         className
       )}
     >
@@ -136,8 +136,8 @@ export function TabsTrigger({
       className={cn(
         "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center gap-2",
         isActive
-          ? "bg-[#132c21] text-[#34d399] border border-[#23533c] shadow-sm"
-          : "text-stone-400 hover:text-stone-200 hover:bg-[#0e2118] border border-transparent",
+          ? "bg-white text-[#1b4332] shadow-xs border border-[#d8e2d6]"
+          : "text-[#627267] hover:text-[#142019] hover:bg-white/60 border border-transparent",
         className
       )}
     >

@@ -42,29 +42,29 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
   const getTypeIcon = (type: NotificationType) => {
     switch (type) {
       case "critical-call":
-        return <AlertCircle className="h-4 w-4 text-[#f87171]" />;
+        return <AlertCircle className="h-4 w-4 text-[#dc2626]" />;
       case "escalation":
-        return <AlertTriangle className="h-4 w-4 text-[#f59e0b]" />;
+        return <AlertTriangle className="h-4 w-4 text-[#d97706]" />;
       case "deadline-missed":
-        return <Clock className="h-4 w-4 text-[#f59e0b]" />;
+        return <Clock className="h-4 w-4 text-[#d97706]" />;
       case "new-task":
-        return <Check className="h-4 w-4 text-[#34d399]" />;
+        return <Check className="h-4 w-4 text-[#059669]" />;
     }
   };
 
   return (
-    <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-[#091510] border border-[#1b362a] shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border border-[#e2e8df] shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
       {/* Header */}
-      <div className="flex items-center justify-between p-3.5 border-b border-[#183327] bg-[#07100c]">
+      <div className="flex items-center justify-between p-3.5 border-b border-[#edf2ea] bg-[#fcfdfc]">
         <div className="flex items-center gap-2">
-          <Bell className="h-4 w-4 text-[#34d399]" />
-          <h4 className="text-xs font-bold text-stone-100 uppercase tracking-wider">
+          <Bell className="h-4 w-4 text-[#1b4332]" />
+          <h4 className="text-xs font-bold text-[#142019] uppercase tracking-wider">
             CareOps Living Alerts
           </h4>
         </div>
         <button
           onClick={handleMarkAll}
-          className="flex items-center gap-1 text-[11px] text-[#34d399] hover:text-[#6ee7b7] font-medium transition-colors cursor-pointer"
+          className="flex items-center gap-1 text-[11px] text-[#059669] hover:text-[#1b4332] font-semibold transition-colors cursor-pointer"
         >
           <CheckCheck className="h-3.5 w-3.5" />
           <span>Mark all read</span>
@@ -72,7 +72,7 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
       </div>
 
       {/* Filter tabs */}
-      <div className="flex border-b border-[#183327] text-[11px] p-1 bg-[#08130e]">
+      <div className="flex border-b border-[#edf2ea] text-[11px] p-1 bg-[#f7f9f6]">
         {(["all", "critical-call", "escalation", "new-task"] as const).map((t) => (
           <button
             key={t}
@@ -80,8 +80,8 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
             className={cn(
               "flex-1 py-1 rounded-lg font-medium capitalize transition-colors text-center cursor-pointer",
               filter === t
-                ? "bg-[#132c21] text-[#34d399] border border-[#23533c]"
-                : "text-stone-400 hover:text-stone-200"
+                ? "bg-white text-[#1b4332] shadow-2xs font-semibold"
+                : "text-[#627267] hover:text-[#142019]"
             )}
           >
             {t === "all" ? "All" : t.replace("-", " ")}
@@ -90,9 +90,9 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
       </div>
 
       {/* Notifications list */}
-      <div className="max-h-80 overflow-y-auto divide-y divide-[#152e24]">
+      <div className="max-h-80 overflow-y-auto divide-y divide-[#edf2ea]">
         {notifications.length === 0 ? (
-          <div className="p-8 text-center text-xs text-stone-400">
+          <div className="p-8 text-center text-xs text-[#627267]">
             No active alerts in this category
           </div>
         ) : (
@@ -100,26 +100,26 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
             <div
               key={item.id}
               className={cn(
-                "p-3.5 hover:bg-[#0e2118] transition-colors relative group",
-                !item.read ? "bg-[#0c1e16]/50" : "opacity-75"
+                "p-3.5 hover:bg-[#fbfdfb] transition-colors relative group",
+                !item.read ? "bg-[#f4f9f5]/70" : "opacity-75"
               )}
             >
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 p-1.5 rounded-lg bg-[#142e23] border border-[#24523c] flex-shrink-0">
+                <div className="mt-0.5 p-1.5 rounded-lg bg-white border border-[#e2e8df] shadow-2xs flex-shrink-0">
                   {getTypeIcon(item.type)}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-bold text-stone-200 truncate">
+                    <p className="text-xs font-bold text-[#142019] truncate">
                       {item.title}
                     </p>
-                    <span className="text-[10px] text-stone-400 font-mono whitespace-nowrap">
+                    <span className="text-[10px] text-[#627267] font-mono whitespace-nowrap">
                       {item.timestamp}
                     </span>
                   </div>
 
-                  <p className="text-[11px] text-stone-300 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-[#4a5a50] mt-1 line-clamp-2 leading-relaxed">
                     {item.message}
                   </p>
 
@@ -128,7 +128,7 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
                       <Badge
                         variant={
                           item.priority === "critical"
-                            ? "red"
+                            ? "rose"
                             : item.priority === "high"
                             ? "amber"
                             : "teal"
@@ -138,7 +138,7 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
                         {item.priority}
                       </Badge>
                       {item.patientName && (
-                        <span className="text-[10px] text-stone-400 font-mono">
+                        <span className="text-[10px] text-[#627267] font-mono">
                           {item.patientName}
                         </span>
                       )}
@@ -148,7 +148,7 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
                       {!item.read && (
                         <button
                           onClick={() => handleMarkAsRead(item.id)}
-                          className="text-[10px] text-stone-400 hover:text-[#34d399] transition-colors"
+                          className="text-[10px] text-[#627267] hover:text-[#1b4332] transition-colors cursor-pointer"
                         >
                           Mark read
                         </button>
@@ -157,7 +157,7 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
                         <Link
                           href={item.actionUrl}
                           onClick={onClose}
-                          className="flex items-center gap-0.5 text-[10px] text-[#34d399] hover:underline font-medium"
+                          className="flex items-center gap-0.5 text-[10px] text-[#059669] hover:underline font-semibold"
                         >
                           <span>Open</span>
                           <ExternalLink className="h-2.5 w-2.5" />
@@ -173,11 +173,11 @@ export function NotificationDropdown({ onClose, onCountChange }: NotificationDro
       </div>
 
       {/* Footer */}
-      <div className="p-2 border-t border-[#183327] bg-[#07100c] text-center">
+      <div className="p-2 border-t border-[#edf2ea] bg-[#fcfdfc] text-center">
         <Link
           href="/notifications"
           onClick={onClose}
-          className="text-xs text-stone-400 hover:text-[#34d399] transition-colors block py-1 font-medium"
+          className="text-xs text-[#627267] hover:text-[#1b4332] transition-colors block py-1 font-medium"
         >
           View Notification History & Rules →
         </Link>

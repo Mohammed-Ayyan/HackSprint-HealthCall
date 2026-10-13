@@ -90,27 +90,27 @@ export default function DashboardPage() {
     <AppShell>
       <div className="space-y-6">
         {/* Healthcare Ecosystem Command Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#152c22]">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-extrabold tracking-tight text-stone-100 font-mono">
+              <h1 className="text-2xl font-extrabold tracking-tight text-[#1b4332] font-mono">
                 Healthcare Ecosystem Command Center
               </h1>
-              <Badge variant="green" size="sm" dot>
+              <Badge variant="emerald" size="sm" dot>
                 Shift Equilibrium: Stable
               </Badge>
             </div>
-            <p className="text-xs text-stone-400 mt-1">
+            <p className="text-xs text-[#607264] mt-1">
               Living system operational metrics, conversational speech synthesis, and clinical routing
             </p>
           </div>
 
           <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="px-3 py-1.5 rounded-xl bg-[#0b1712] border border-[#1b362a] text-stone-300">
-              Extraction Precision: <strong className="text-[#34d399]">99.2%</strong>
+            <span className="px-3 py-1.5 rounded-xl bg-white border border-[#e2e8e0] text-[#142019] shadow-2xs">
+              Extraction Precision: <strong className="text-[#059669]">99.2%</strong>
             </span>
-            <span className="px-3 py-1.5 rounded-xl bg-[#0b1712] border border-[#1b362a] text-stone-300">
-              Commitment SLA: <strong className="text-[#34d399]">97.4%</strong>
+            <span className="px-3 py-1.5 rounded-xl bg-white border border-[#e2e8e0] text-[#142019] shadow-2xs">
+              Commitment SLA: <strong className="text-[#059669]">97.4%</strong>
             </span>
           </div>
         </div>
@@ -123,20 +123,20 @@ export default function DashboardPage() {
               <Link
                 key={ps.name}
                 href={ps.href}
-                className="bg-[#0b1712] hover:bg-[#12281e] p-3 rounded-xl border border-[#1b362a] hover:border-[#34d399]/60 transition-all group flex items-center justify-between"
+                className="bg-white hover:bg-[#f0fdf4] p-3 rounded-xl border border-[#e2e8e0] hover:border-[#059669]/60 shadow-2xs hover:shadow-xs transition-all group flex items-center justify-between"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="h-7 w-7 rounded-lg bg-[#142e23] border border-[#244f3b] flex items-center justify-center text-[#34d399] group-hover:scale-105 transition-transform">
+                  <div className="h-7 w-7 rounded-lg bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332] group-hover:scale-105 transition-transform">
                     <Icon className="h-3.5 w-3.5" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-stone-200 group-hover:text-[#34d399] transition-colors leading-tight">
+                    <p className="text-xs font-bold text-[#142019] group-hover:text-[#059669] transition-colors leading-tight">
                       {ps.name}
                     </p>
-                    <span className="text-[10px] font-mono text-stone-500">{ps.count}</span>
+                    <span className="text-[10px] font-mono text-[#607264]">{ps.count}</span>
                   </div>
                 </div>
-                <ArrowRight className="h-3 w-3 text-stone-500 group-hover:text-[#34d399] group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-3 w-3 text-[#8fa394] group-hover:text-[#059669] group-hover:translate-x-0.5 transition-transform" />
               </Link>
             );
           })}
@@ -154,7 +154,7 @@ export default function DashboardPage() {
               changePercent={summary.callsChangePercent}
               subtitle="vs yesterday"
               icon={<PhoneCall className="h-5 w-5" />}
-              variant="cyan"
+              variant="teal"
             />
             <StatCard
               title="Fulfilled Commitments"
@@ -199,35 +199,35 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-8 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-stone-100 font-mono">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-[#1b4332] font-mono">
                 Recent Patient Telephony Stream
               </h3>
               <Link
                 href="/calls"
-                className="text-xs text-[#34d399] hover:underline font-semibold flex items-center gap-1"
+                className="text-xs text-[#059669] hover:underline font-semibold flex items-center gap-1"
               >
                 <span>View all calls</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
 
-            <div className="rounded-2xl border border-[#1b362a] bg-[#0b1712] divide-y divide-[#162e24] overflow-hidden">
+            <div className="rounded-2xl border border-[#e2e8e0] bg-white divide-y divide-[#edf2ec] shadow-sm overflow-hidden">
               {recentCalls.map((c) => (
                 <Link
                   key={c.id}
                   href={`/calls/${c.id}`}
-                  className="p-3.5 flex items-center justify-between hover:bg-[#0e2118] transition-colors group"
+                  className="p-3.5 flex items-center justify-between hover:bg-[#f7f9f6] transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-[#142e23] border border-[#23533c] flex items-center justify-center text-[#34d399] font-mono text-xs font-bold">
+                    <div className="h-9 w-9 rounded-xl bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332] font-mono text-xs font-bold">
                       {c.callNumber.slice(-4)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-stone-100 group-hover:text-[#34d399] transition-colors">
+                        <span className="text-xs font-bold text-[#142019] group-hover:text-[#059669] transition-colors">
                           {c.patient.name}
                         </span>
-                        <span className="text-[10px] text-stone-500 font-mono">{c.patient.mrn}</span>
+                        <span className="text-[10px] text-[#607264] font-mono">{c.patient.mrn}</span>
                         <Badge
                           variant={c.priority === "critical" ? "red" : c.priority === "high" ? "amber" : "teal"}
                           size="sm"
@@ -235,15 +235,15 @@ export default function DashboardPage() {
                           {c.priority}
                         </Badge>
                       </div>
-                      <p className="text-[11px] text-stone-400 mt-0.5 max-w-lg truncate">
+                      <p className="text-[11px] text-[#4a5f52] mt-0.5 max-w-lg truncate">
                         {c.intent} • {c.summary.overview}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs font-mono text-stone-400">
-                    <span className="text-stone-500">{c.duration}</span>
-                    <ArrowRight className="h-4 w-4 text-stone-600 group-hover:text-[#34d399] transition-colors" />
+                  <div className="flex items-center gap-3 text-xs font-mono text-[#607264]">
+                    <span>{c.duration}</span>
+                    <ArrowRight className="h-4 w-4 text-[#8fa394] group-hover:text-[#059669] transition-colors" />
                   </div>
                 </Link>
               ))}

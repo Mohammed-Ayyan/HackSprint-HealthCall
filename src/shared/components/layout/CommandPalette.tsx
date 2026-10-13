@@ -80,22 +80,22 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
       isOpen={isOpen}
       onClose={onClose}
       size="lg"
-      className="!p-0 overflow-hidden bg-[#091510] border-[#1b362a] shadow-2xl text-stone-200"
+      className="!p-0 overflow-hidden bg-white border-[#e2e8df] shadow-2xl text-[#142019]"
     >
       {/* Search Header Input */}
-      <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#183327] bg-[#07100c]">
-        <Search className="h-5 w-5 text-[#34d399] flex-shrink-0" />
+      <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#edf2ea] bg-[#fcfdfc]">
+        <Search className="h-5 w-5 text-[#059669] flex-shrink-0" />
         <input
           autoFocus
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search patients, doctors, employees, calls, tasks, claims..."
-          className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-500 focus:outline-none"
+          className="w-full bg-transparent text-sm text-[#142019] placeholder:text-[#94a399] focus:outline-none"
         />
         {query && (
           <button
             onClick={() => setQuery("")}
-            className="text-xs text-stone-400 hover:text-stone-200 font-mono px-2 py-0.5 rounded bg-[#132c21]"
+            className="text-xs text-[#627267] hover:text-[#142019] font-mono px-2 py-0.5 rounded bg-[#f4f7f4] cursor-pointer"
           >
             Clear
           </button>
@@ -107,36 +107,36 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         {/* Calls Section */}
         {filteredCalls.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase font-bold tracking-wider text-stone-400">
-              <PhoneCall className="h-3 w-3 text-[#34d399]" />
+            <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase font-bold tracking-wider text-[#627267]">
+              <PhoneCall className="h-3 w-3 text-[#059669]" />
               <span>Calls & Patient Intelligence</span>
             </div>
             {filteredCalls.map((c) => (
               <button
                 key={c.id}
                 onClick={() => handleSelect(`/calls/${c.id}`)}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#11241b] transition-colors text-left group cursor-pointer"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#f4f8f5] transition-colors text-left group cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-[#142e23] border border-[#23533c] flex items-center justify-center text-[#34d399] font-mono text-xs font-bold">
+                  <div className="h-8 w-8 rounded-lg bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center font-mono text-xs font-bold">
                     {c.callNumber.slice(-4)}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-stone-100 group-hover:text-[#34d399] transition-colors">
+                      <span className="text-xs font-bold text-[#142019] group-hover:text-[#1b4332] transition-colors">
                         {c.patient.name}
                       </span>
-                      <span className="text-[10px] text-stone-500 font-mono">{c.patient.mrn}</span>
-                      <Badge variant={c.priority === "critical" ? "red" : c.priority === "high" ? "amber" : "teal"} size="sm">
+                      <span className="text-[10px] text-[#627267] font-mono">{c.patient.mrn}</span>
+                      <Badge variant={c.priority === "critical" ? "rose" : c.priority === "high" ? "amber" : "teal"} size="sm">
                         {c.priority}
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-stone-400 truncate max-w-md">
+                    <p className="text-[11px] text-[#627267] truncate max-w-md">
                       {c.intent} • {c.summary.overview}
                     </p>
                   </div>
                 </div>
-                <ArrowRight className="h-4 w-4 text-stone-600 group-hover:text-[#34d399] transition-colors opacity-0 group-hover:opacity-100" />
+                <ArrowRight className="h-4 w-4 text-[#94a399] group-hover:text-[#1b4332] transition-colors opacity-0 group-hover:opacity-100" />
               </button>
             ))}
           </div>
@@ -145,35 +145,35 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         {/* Action Items Section */}
         {filteredActions.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase font-bold tracking-wider text-stone-400">
-              <KanbanSquare className="h-3 w-3 text-[#2dd4bf]" />
+            <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase font-bold tracking-wider text-[#627267]">
+              <KanbanSquare className="h-3 w-3 text-[#0d9488]" />
               <span>Operational Tasks & Commitments</span>
             </div>
             {filteredActions.map((a) => (
               <button
                 key={a.id}
                 onClick={() => handleSelect(`/actions`)}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#11241b] transition-colors text-left group cursor-pointer"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#f4f8f5] transition-colors text-left group cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-[#112423] border border-[#234c49] flex items-center justify-center text-[#2dd4bf] font-mono text-xs font-bold">
+                  <div className="h-8 w-8 rounded-lg bg-[#ccfbf1] text-[#0d9488] flex items-center justify-center font-mono text-xs font-bold">
                     TSK
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-stone-100 group-hover:text-[#2dd4bf] transition-colors">
+                      <span className="text-xs font-bold text-[#142019] group-hover:text-[#0d9488] transition-colors">
                         {a.task}
                       </span>
                       <Badge variant="teal" size="sm">
                         {a.department}
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-stone-400">
+                    <p className="text-[11px] text-[#627267]">
                       Patient: {a.patientName} • Due: {a.deadline} • Status: {a.status}
                     </p>
                   </div>
                 </div>
-                <ArrowRight className="h-4 w-4 text-stone-600 group-hover:text-[#2dd4bf] transition-colors opacity-0 group-hover:opacity-100" />
+                <ArrowRight className="h-4 w-4 text-[#94a399] group-hover:text-[#0d9488] transition-colors opacity-0 group-hover:opacity-100" />
               </button>
             ))}
           </div>
@@ -182,35 +182,35 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         {/* Insurance Claims Section */}
         {filteredClaims.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase font-bold tracking-wider text-stone-400">
-              <ShieldCheck className="h-3 w-3 text-[#f59e0b]" />
+            <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase font-bold tracking-wider text-[#627267]">
+              <ShieldCheck className="h-3 w-3 text-[#d97706]" />
               <span>Insurance Claims & Prior-Auth</span>
             </div>
             {filteredClaims.map((clm) => (
               <button
                 key={clm.id}
                 onClick={() => handleSelect(`/insurance/dashboard`)}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#11241b] transition-colors text-left group cursor-pointer"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#f4f8f5] transition-colors text-left group cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-[#18231a] border border-[#3b4b2e] flex items-center justify-center text-[#f59e0b] font-mono text-xs font-bold">
+                  <div className="h-8 w-8 rounded-lg bg-[#fef3c7] text-[#d97706] flex items-center justify-center font-mono text-xs font-bold">
                     CLM
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-stone-100 group-hover:text-[#f59e0b] transition-colors">
+                      <span className="text-xs font-bold text-[#142019] group-hover:text-[#d97706] transition-colors">
                         {clm.claimId} • {clm.patientName}
                       </span>
                       <Badge variant="amber" size="sm">
                         {clm.status}
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-stone-400">
+                    <p className="text-[11px] text-[#627267]">
                       Carrier: {clm.payerName} • Amount: {clm.amount} • Deadline: {clm.deadline}
                     </p>
                   </div>
                 </div>
-                <ArrowRight className="h-4 w-4 text-stone-600 group-hover:text-[#f59e0b] transition-colors opacity-0 group-hover:opacity-100" />
+                <ArrowRight className="h-4 w-4 text-[#94a399] group-hover:text-[#d97706] transition-colors opacity-0 group-hover:opacity-100" />
               </button>
             ))}
           </div>
@@ -219,32 +219,32 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         {/* Staff & Clinicians Section */}
         {filteredUsers.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase font-bold tracking-wider text-stone-400">
-              <User className="h-3 w-3 text-[#34d399]" />
+            <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase font-bold tracking-wider text-[#627267]">
+              <User className="h-3 w-3 text-[#059669]" />
               <span>Hospital Staff & Doctors</span>
             </div>
             {filteredUsers.map((u) => (
               <button
                 key={u.id}
                 onClick={() => handleSelect(`/profile`)}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#11241b] transition-colors text-left group cursor-pointer"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#f4f8f5] transition-colors text-left group cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <img
                     src={u.avatar}
                     alt={u.name}
-                    className="h-8 w-8 rounded-lg object-cover border border-[#1b362a]"
+                    className="h-8 w-8 rounded-lg object-cover border border-[#e2e8df]"
                   />
                   <div>
-                    <p className="text-xs font-bold text-stone-100 group-hover:text-[#34d399] transition-colors">
+                    <p className="text-xs font-bold text-[#142019] group-hover:text-[#1b4332] transition-colors">
                       {u.name}
                     </p>
-                    <p className="text-[11px] text-stone-400">
+                    <p className="text-[11px] text-[#627267]">
                       {u.role} • {u.department}
                     </p>
                   </div>
                 </div>
-                <ArrowRight className="h-4 w-4 text-stone-600 group-hover:text-[#34d399] transition-colors opacity-0 group-hover:opacity-100" />
+                <ArrowRight className="h-4 w-4 text-[#94a399] group-hover:text-[#1b4332] transition-colors opacity-0 group-hover:opacity-100" />
               </button>
             ))}
           </div>
@@ -252,19 +252,19 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
       </div>
 
       {/* Footer shortcut hints */}
-      <div className="px-4 py-2.5 bg-[#07100c] border-t border-[#183327] flex items-center justify-between text-[11px] text-stone-500 font-mono">
+      <div className="px-4 py-2.5 bg-[#f7f9f6] border-t border-[#edf2ea] flex items-center justify-between text-[11px] text-[#627267] font-mono">
         <div className="flex items-center gap-3">
           <span>
-            <kbd className="px-1.5 py-0.5 rounded bg-[#132c21] text-stone-300">↑↓</kbd> Navigate
+            <kbd className="px-1.5 py-0.5 rounded bg-white border border-[#dce8df] text-[#28382e]">↑↓</kbd> Navigate
           </span>
           <span>
-            <kbd className="px-1.5 py-0.5 rounded bg-[#132c21] text-stone-300">Enter</kbd> Select
+            <kbd className="px-1.5 py-0.5 rounded bg-white border border-[#dce8df] text-[#28382e]">Enter</kbd> Select
           </span>
           <span>
-            <kbd className="px-1.5 py-0.5 rounded bg-[#132c21] text-stone-300">ESC</kbd> Close
+            <kbd className="px-1.5 py-0.5 rounded bg-white border border-[#dce8df] text-[#28382e]">ESC</kbd> Close
           </span>
         </div>
-        <span className="text-[#34d399]">CareOps Universal Search</span>
+        <span className="text-[#059669] font-semibold">CareOps Universal Search</span>
       </div>
     </Modal>
   );

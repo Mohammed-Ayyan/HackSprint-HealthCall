@@ -22,25 +22,25 @@ export function PriorityBadge({
       label: "Critical Urgency",
       badgeVariant: "rose" as const,
       icon: <Flame className="h-3.5 w-3.5" />,
-      textClass: "text-rose-400",
+      textClass: "text-[#dc2626]",
     },
     high: {
       label: "High Priority",
       badgeVariant: "amber" as const,
       icon: <AlertCircle className="h-3.5 w-3.5" />,
-      textClass: "text-amber-400",
+      textClass: "text-[#d97706]",
     },
     medium: {
       label: "Medium Priority",
-      badgeVariant: "cyan" as const,
+      badgeVariant: "teal" as const,
       icon: <Clock className="h-3.5 w-3.5" />,
-      textClass: "text-cyan-400",
+      textClass: "text-[#0d9488]",
     },
     low: {
       label: "Standard / Low",
       badgeVariant: "default" as const,
       icon: <CheckCircle className="h-3.5 w-3.5" />,
-      textClass: "text-slate-400",
+      textClass: "text-[#607264]",
     },
   };
 

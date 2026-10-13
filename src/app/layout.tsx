@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/features/platform/auth/authContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CareOps AI | Healthcare Call Intelligence & Operations Platform",
+  title: "CareOps AI | Healthcare Operations Intelligence Platform",
   description:
-    "AI-powered healthcare call intelligence platform transforming patient conversations into structured summaries, clinical intent, priority triage, and autonomous hospital operations.",
+    "Autonomous healthcare operations intelligence platform transforming patient conversations into clinical workflows, prior-authorization, and living hospital synchronization.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -30,10 +31,10 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#080c14] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
-        {children}
+      <body className="min-h-full bg-[#f7f9f6] text-[#142019] flex flex-col font-sans selection:bg-[#10b981]/20 selection:text-[#1b4332]">
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

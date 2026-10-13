@@ -84,23 +84,23 @@ export default function ActionsPage() {
     <AppShell>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-extrabold tracking-tight text-white font-mono">
+              <h1 className="text-2xl font-extrabold tracking-tight text-[#1b4332] font-mono">
                 Operational Action Workflows
               </h1>
-              <Badge variant="cyan" size="sm">
+              <Badge variant="teal" size="sm">
                 Kanban Board
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#607264] mt-1">
               Autonomous clinical task tracking, department assignments, SLA monitoring, and escalations
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge variant="purple" size="sm">
+            <Badge variant="emerald" size="sm">
               6 Departments Connected
             </Badge>
           </div>
@@ -135,7 +135,7 @@ export default function ActionsPage() {
           size="md"
         >
           <div className="space-y-3">
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#607264]">
               Select available hospital staff member from {activeTaskForAssign?.department || "relevant"} department:
             </p>
 
@@ -144,19 +144,19 @@ export default function ActionsPage() {
                 <div
                   key={u.id}
                   onClick={() => handleAssignUser(u)}
-                  className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/40 hover:bg-slate-900 transition-all flex items-center justify-between cursor-pointer group"
+                  className="p-3 rounded-xl bg-white border border-[#e2e8e0] hover:border-[#059669]/60 hover:bg-[#f0fdf4] transition-all flex items-center justify-between cursor-pointer group shadow-2xs"
                 >
                   <div className="flex items-center gap-3">
                     <img
                       src={u.avatar}
                       alt={u.name}
-                      className="h-9 w-9 rounded-xl object-cover border border-slate-700"
+                      className="h-9 w-9 rounded-xl object-cover border border-[#c8e6c9]"
                     />
                     <div>
-                      <h4 className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors">
+                      <h4 className="text-xs font-bold text-[#142019] group-hover:text-[#059669] transition-colors">
                         {u.name}
                       </h4>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[11px] text-[#607264]">
                         {u.role} • {u.department}
                       </p>
                     </div>

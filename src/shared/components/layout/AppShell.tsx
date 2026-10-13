@@ -23,7 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#080c14] text-slate-100 font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#f7f9f6] text-[#142019] font-sans">
       {/* Sidebar */}
       <Sidebar />
 
@@ -36,7 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         />
 
         {/* Dynamic Scrollable Page Content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6">
           {children}
         </main>
       </div>

@@ -16,6 +16,7 @@ import {
   Award,
   ChevronRight,
 } from "lucide-react";
+import Link from "next/link";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/Card";
 import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
@@ -158,45 +159,45 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Solarpunk Profile Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0d1d17] via-[#0f241c] to-[#081510] p-6 border border-[#1e3c2f] shadow-lg">
-        <div className="absolute top-0 right-0 w-80 h-full bg-[radial-gradient(circle_at_top_right,rgba(52,211,153,0.12),transparent_70%)] pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#eef6f0] via-[#f4f9f5] to-[#fcfdfc] p-6 border border-[#d6e5da] shadow-sm">
+        <div className="absolute top-0 right-0 w-80 h-full bg-[radial-gradient(circle_at_top_right,rgba(5,150,105,0.08),transparent_70%)] pointer-events-none" />
         
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-5">
             <img
               src={profile.avatar}
               alt={profile.name}
-              className="h-20 w-20 rounded-2xl object-cover border-2 border-[#34d399] shadow-lg"
+              className="h-20 w-20 rounded-2xl object-cover border-2 border-[#1b4332] shadow-sm"
             />
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold text-stone-100 tracking-tight">
+                <h1 className="text-2xl font-bold text-[#142019] tracking-tight">
                   {profile.name}
                 </h1>
                 <Badge variant="teal" size="sm">
                   {profile.role}
                 </Badge>
-                <Badge variant="green" size="sm" className="font-mono">
+                <Badge variant="emerald" size="sm" className="font-mono">
                   {profile.npiOrId}
                 </Badge>
               </div>
-              <p className="text-sm text-stone-400 mt-1 flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-[#34d399]" />
-                {profile.department} • <span className="text-stone-300">{profile.facility}</span>
+              <p className="text-xs text-[#627267] mt-1 flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-[#059669]" />
+                {profile.department} • <span className="text-[#142019] font-medium">{profile.facility}</span>
               </p>
             </div>
           </div>
 
           {/* Persona quick switch buttons */}
-          <div className="bg-[#08140f] p-1.5 rounded-xl border border-[#1b382c] flex items-center gap-1 flex-wrap">
+          <div className="bg-white p-1.5 rounded-xl border border-[#dce8df] flex items-center gap-1 flex-wrap shadow-2xs">
             {Object.keys(defaultProfiles).map((role) => (
               <button
                 key={role}
                 onClick={() => setSelectedPersona(role)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   selectedPersona === role
-                    ? "bg-[#132c21] text-[#34d399] border border-[#23533c]"
-                    : "text-stone-400 hover:text-stone-200"
+                    ? "bg-[#1b4332] text-white shadow-xs"
+                    : "text-[#627267] hover:text-[#142019]"
                 }`}
               >
                 {role}
@@ -210,145 +211,145 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Profile Card (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
-          <Card className="bg-[#0b1712] border-[#1b362a]">
-            <CardHeader className="border-b border-[#1b362a] pb-4">
+          <Card className="bg-white border-[#e2e8df] shadow-sm">
+            <CardHeader className="border-b border-[#edf2ea] pb-4">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-[#11261d] border border-[#204937] flex items-center justify-center text-[#34d399]">
+                <div className="h-9 w-9 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
                   <User className="h-4 w-4" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-stone-100">Identity & Contact Verification</CardTitle>
-                  <p className="text-xs text-stone-400 mt-0.5">Verified CareOps Enterprise Identity</p>
+                  <CardTitle className="text-base text-[#142019]">Identity & Contact Verification</CardTitle>
+                  <p className="text-xs text-[#627267] mt-0.5">Verified CareOps Enterprise Identity</p>
                 </div>
               </div>
             </CardHeader>
 
-            <div className="p-5 space-y-4 text-xs">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#081510] border border-[#183327]">
-                <span className="text-stone-400 flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-[#34d399]" /> Email Address
+            <div className="p-5 space-y-3 text-xs">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fcfdfc] border border-[#e2e8df]">
+                <span className="text-[#627267] flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-[#059669]" /> Email Address
                 </span>
-                <span className="font-mono text-stone-200 font-medium">{profile.email}</span>
+                <span className="font-mono text-[#142019] font-semibold">{profile.email}</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#081510] border border-[#183327]">
-                <span className="text-stone-400 flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-[#2dd4bf]" /> Direct Phone
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fcfdfc] border border-[#e2e8df]">
+                <span className="text-[#627267] flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-[#0d9488]" /> Direct Phone
                 </span>
-                <span className="font-mono text-stone-200 font-medium">{profile.phone}</span>
+                <span className="font-mono text-[#142019] font-semibold">{profile.phone}</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#081510] border border-[#183327]">
-                <span className="text-stone-400 flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-[#f59e0b]" /> Station / Room
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fcfdfc] border border-[#e2e8df]">
+                <span className="text-[#627267] flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-[#d97706]" /> Station / Room
                 </span>
-                <span className="text-stone-200 font-medium">{profile.station}</span>
+                <span className="text-[#142019] font-semibold">{profile.station}</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#081510] border border-[#183327]">
-                <span className="text-stone-400 flex items-center gap-2">
-                  <Key className="h-4 w-4 text-stone-400" /> Identity Token
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fcfdfc] border border-[#e2e8df]">
+                <span className="text-[#627267] flex items-center gap-2">
+                  <Key className="h-4 w-4 text-[#627267]" /> Identity Token
                 </span>
-                <span className="font-mono text-[#34d399] font-medium">{profile.npiOrId}</span>
+                <span className="font-mono text-[#059669] font-bold">{profile.npiOrId}</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#081510] border border-[#183327]">
-                <span className="text-stone-400 flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-stone-400" /> Member Since
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#fcfdfc] border border-[#e2e8df]">
+                <span className="text-[#627267] flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-[#627267]" /> Member Since
                 </span>
-                <span className="text-stone-300 font-medium">{profile.joinedDate}</span>
+                <span className="text-[#142019] font-semibold">{profile.joinedDate}</span>
               </div>
             </div>
           </Card>
 
           {/* Role Direct Dashboard Navigation Link */}
-          <Card className="bg-[#0b1712] border-[#1b362a] p-5">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-3">
-              Role Dashboard Jump
+          <Card className="bg-white border-[#e2e8df] p-5 shadow-sm">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#627267] mb-3">
+              Role Dashboard Quick Jump
             </h4>
             <div className="space-y-2">
-              <a
+              <Link
                 href="/patient/dashboard"
-                className="flex items-center justify-between p-2.5 rounded-lg bg-[#081510] hover:bg-[#11291e] border border-[#183327] text-xs text-stone-300 hover:text-[#34d399] transition-all"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-[#fcfdfc] hover:bg-[#f4f8f5] border border-[#e2e8df] hover:border-[#1b4332]/40 text-xs text-[#28382e] hover:text-[#1b4332] transition-all"
               >
-                <span>Patient Portal</span>
+                <span className="font-medium">Patient Experience Portal</span>
                 <ChevronRight className="h-4 w-4" />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/doctor/dashboard"
-                className="flex items-center justify-between p-2.5 rounded-lg bg-[#081510] hover:bg-[#11291e] border border-[#183327] text-xs text-stone-300 hover:text-[#34d399] transition-all"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-[#fcfdfc] hover:bg-[#f4f8f5] border border-[#e2e8df] hover:border-[#1b4332]/40 text-xs text-[#28382e] hover:text-[#1b4332] transition-all"
               >
-                <span>Doctor Portal</span>
+                <span className="font-medium">Physician & Clinician Station</span>
                 <ChevronRight className="h-4 w-4" />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/reception/dashboard"
-                className="flex items-center justify-between p-2.5 rounded-lg bg-[#081510] hover:bg-[#11291e] border border-[#183327] text-xs text-stone-300 hover:text-[#34d399] transition-all"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-[#fcfdfc] hover:bg-[#f4f8f5] border border-[#e2e8df] hover:border-[#1b4332]/40 text-xs text-[#28382e] hover:text-[#1b4332] transition-all"
               >
-                <span>Receptionist Portal</span>
+                <span className="font-medium">Reception & Intake Gateway</span>
                 <ChevronRight className="h-4 w-4" />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/insurance/dashboard"
-                className="flex items-center justify-between p-2.5 rounded-lg bg-[#081510] hover:bg-[#11291e] border border-[#183327] text-xs text-stone-300 hover:text-[#34d399] transition-all"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-[#fcfdfc] hover:bg-[#f4f8f5] border border-[#e2e8df] hover:border-[#1b4332]/40 text-xs text-[#28382e] hover:text-[#1b4332] transition-all"
               >
-                <span>Insurance Employee Portal</span>
+                <span className="font-medium">Insurance & Prior-Auth Desk</span>
                 <ChevronRight className="h-4 w-4" />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/manager/dashboard"
-                className="flex items-center justify-between p-2.5 rounded-lg bg-[#081510] hover:bg-[#11291e] border border-[#183327] text-xs text-stone-300 hover:text-[#34d399] transition-all"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-[#fcfdfc] hover:bg-[#f4f8f5] border border-[#e2e8df] hover:border-[#1b4332]/40 text-xs text-[#28382e] hover:text-[#1b4332] transition-all"
               >
-                <span>Department Manager Portal</span>
+                <span className="font-medium">Department Operations Command</span>
                 <ChevronRight className="h-4 w-4" />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/admin/dashboard"
-                className="flex items-center justify-between p-2.5 rounded-lg bg-[#081510] hover:bg-[#11291e] border border-[#183327] text-xs text-stone-300 hover:text-[#34d399] transition-all"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-[#fcfdfc] hover:bg-[#f4f8f5] border border-[#e2e8df] hover:border-[#1b4332]/40 text-xs text-[#28382e] hover:text-[#1b4332] transition-all"
               >
-                <span>Hospital Administrator Portal</span>
+                <span className="font-medium">Hospital Executive Master Console</span>
                 <ChevronRight className="h-4 w-4" />
-              </a>
+              </Link>
             </div>
           </Card>
         </div>
 
         {/* Right Column: Activity Timeline (7 cols) */}
         <div className="lg:col-span-7">
-          <Card className="bg-[#0b1712] border-[#1b362a]">
-            <CardHeader className="border-b border-[#1b362a] pb-4">
+          <Card className="bg-white border-[#e2e8df] shadow-sm">
+            <CardHeader className="border-b border-[#edf2ea] pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-lg bg-[#11261d] border border-[#204937] flex items-center justify-center text-[#34d399]">
+                  <div className="h-9 w-9 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
                     <Activity className="h-4 w-4" />
                   </div>
                   <div>
-                    <CardTitle className="text-base text-stone-100">CareOps Activity Timeline</CardTitle>
-                    <p className="text-xs text-stone-400 mt-0.5">
+                    <CardTitle className="text-base text-[#142019]">CareOps Activity Timeline</CardTitle>
+                    <p className="text-xs text-[#627267] mt-0.5">
                       Sequential audit trail of patient calls, AI extractions, commitments, and staff routing
                     </p>
                   </div>
                 </div>
-                <Badge variant="green" size="sm">
+                <Badge variant="emerald" size="sm">
                   Live Log
                 </Badge>
               </div>
             </CardHeader>
 
             <div className="p-6">
-              <div className="relative border-l-2 border-[#1c3a2e] ml-4 space-y-8">
+              <div className="relative border-l-2 border-[#dce8df] ml-4 space-y-8">
                 {activityTimelineItems.map((item, idx) => {
                   const Icon = item.icon;
                   return (
                     <div key={idx} className="relative pl-7">
                       {/* Timeline Node Dot */}
-                      <div className="absolute -left-[17px] top-0.5 h-8 w-8 rounded-full bg-[#0c1c15] border-2 border-[#34d399] flex items-center justify-center text-[#34d399] shadow-md">
+                      <div className="absolute -left-[17px] top-0.5 h-8 w-8 rounded-full bg-white border-2 border-[#1b4332] flex items-center justify-center text-[#1b4332] shadow-xs">
                         <Icon className="h-4 w-4" />
                       </div>
 
-                      <div className="bg-[#081510] p-4 rounded-xl border border-[#183327] hover:border-[#285743] transition-all">
+                      <div className="bg-[#fcfdfc] p-4 rounded-xl border border-[#e2e8df] hover:border-[#1b4332]/40 transition-all shadow-2xs">
                         <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
-                          <span className="font-mono text-xs font-bold text-[#34d399]">
+                          <span className="font-mono text-xs font-bold text-[#059669]">
                             {item.time}
                           </span>
                           <Badge variant="teal" size="sm">
@@ -356,10 +357,10 @@ export default function ProfilePage() {
                           </Badge>
                         </div>
 
-                        <h4 className="text-sm font-bold text-stone-100">
+                        <h4 className="text-sm font-bold text-[#142019]">
                           {item.title}
                         </h4>
-                        <p className="text-xs text-stone-300 mt-1 leading-relaxed">
+                        <p className="text-xs text-[#627267] mt-1 leading-relaxed">
                           {item.description}
                         </p>
                       </div>

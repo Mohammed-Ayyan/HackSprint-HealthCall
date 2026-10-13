@@ -66,12 +66,12 @@ export function SentimentGauge({
     <Card className={className}>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-amber-950/80 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <div className="h-8 w-8 rounded-lg bg-[#fef3c7] border border-[#fde68a] flex items-center justify-center text-[#d97706]">
             <Heart className="h-4 w-4" />
           </div>
           <div>
             <CardTitle>Sentiment & Emotional Valence</CardTitle>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[#607264]">
               Acoustic pitch analysis + vocal stress and lexical tone profiling
             </p>
           </div>
@@ -89,8 +89,8 @@ export function SentimentGauge({
                 className={cn(
                   "p-2 rounded-xl text-center border flex flex-col items-center gap-1 transition-all",
                   isCurrent
-                    ? `${s.badgeBg} shadow-[0_0_15px_rgba(245,158,11,0.2)] font-bold scale-105 z-10`
-                    : "bg-slate-900/40 border-slate-800 text-slate-500 opacity-50"
+                    ? `${s.badgeBg} shadow-xs font-bold scale-105 z-10`
+                    : "bg-[#f7f9f6] border-[#e2e8e0] text-[#607264] opacity-60"
                 )}
               >
                 {s.icon}
@@ -103,19 +103,19 @@ export function SentimentGauge({
         {/* Continuous Bar Gauge */}
         <div className="space-y-1.5 pt-2">
           <div className="flex justify-between text-xs font-mono">
-            <span className="text-rose-400">Distressed (-1.0)</span>
-            <span className="text-white font-bold">
+            <span className="text-red-600 font-semibold">Distressed (-1.0)</span>
+            <span className="text-[#142019] font-bold">
               Score: {sentimentScore > 0 ? `+${sentimentScore.toFixed(2)}` : sentimentScore.toFixed(2)}
             </span>
-            <span className="text-emerald-400">Calm (+1.0)</span>
+            <span className="text-[#059669] font-semibold">Calm (+1.0)</span>
           </div>
 
-          <div className="relative h-2.5 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-            <div className="absolute inset-0 bg-gradient-to-r from-rose-600 via-amber-500 to-emerald-500 opacity-60" />
+          <div className="relative h-2.5 w-full bg-[#edf2ec] rounded-full overflow-hidden border border-[#e2e8e0]">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-amber-400 to-emerald-500 opacity-70" />
             {/* Indicator Needle */}
             <div
-              className="absolute top-0 bottom-0 w-1.5 bg-white shadow-[0_0_8px_white] rounded-full transition-all duration-300"
-              style={{ left: `calc(${normalizedPercent}% - 3px)` }}
+              className="absolute top-0 bottom-0 w-2 bg-[#142019] shadow-sm rounded-full transition-all duration-300"
+              style={{ left: `calc(${normalizedPercent}% - 4px)` }}
             />
           </div>
         </div>

@@ -32,50 +32,50 @@ export function AppointmentCalendarView({
   const getAvailabilityBadge = (status: DoctorScheduleSlot["availability"]) => {
     switch (status) {
       case "Available":
-        return <Badge variant="green">AVAILABLE</Badge>;
+        return <Badge variant="emerald">AVAILABLE</Badge>;
       case "In Surgery":
         return <Badge variant="amber">IN SURGERY</Badge>;
       case "Fully Booked":
-        return <Badge variant="red">BOOKED</Badge>;
+        return <Badge variant="rose">BOOKED</Badge>;
       default:
-        return <Badge variant="gray">ON BREAK</Badge>;
+        return <Badge variant="default">ON BREAK</Badge>;
     }
   };
 
   return (
-    <Card className="bg-[#0b1712] border-[#1b362a]">
-      <CardHeader className="border-b border-[#1b362a] pb-4">
+    <Card className="bg-white border-[#e2e8df] shadow-sm">
+      <CardHeader className="border-b border-[#edf2ea] pb-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-[#11261d] border border-[#204937] flex items-center justify-center text-[#34d399]">
+            <div className="h-9 w-9 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
               <CalendarIcon className="h-4 w-4" />
             </div>
             <div>
-              <CardTitle className="text-base text-stone-100">CareOps Dynamic Scheduling Matrix</CardTitle>
-              <p className="text-xs text-stone-400 mt-0.5">
+              <CardTitle className="text-base text-[#142019]">CareOps Dynamic Scheduling Matrix</CardTitle>
+              <p className="text-xs text-[#627267] mt-0.5">
                 Hospital-wide provider calendars, real-time operating room status, and open clinic slots
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="bg-[#081510] p-1 rounded-xl border border-[#1b382c] flex items-center gap-1">
+            <div className="bg-[#f7f9f6] p-1 rounded-xl border border-[#e2e8df] flex items-center gap-1">
               <button
                 onClick={() => setViewMode("daily")}
-                className={`px-3 py-1 text-xs rounded-lg font-medium transition-all ${
+                className={`px-3 py-1 text-xs rounded-lg font-medium transition-all cursor-pointer ${
                   viewMode === "daily"
-                    ? "bg-[#132c21] text-[#34d399] border border-[#23533d]"
-                    : "text-stone-400 hover:text-stone-200"
+                    ? "bg-white text-[#1b4332] shadow-xs font-semibold"
+                    : "text-[#627267] hover:text-[#142019]"
                 }`}
               >
                 Daily View
               </button>
               <button
                 onClick={() => setViewMode("weekly")}
-                className={`px-3 py-1 text-xs rounded-lg font-medium transition-all ${
+                className={`px-3 py-1 text-xs rounded-lg font-medium transition-all cursor-pointer ${
                   viewMode === "weekly"
-                    ? "bg-[#132c21] text-[#34d399] border border-[#23533d]"
-                    : "text-stone-400 hover:text-stone-200"
+                    ? "bg-white text-[#1b4332] shadow-xs font-semibold"
+                    : "text-[#627267] hover:text-[#142019]"
                 }`}
               >
                 Weekly View
@@ -92,14 +92,14 @@ export function AppointmentCalendarView({
               <button
                 key={day.date}
                 onClick={() => setSelectedDayIndex(idx)}
-                className={`px-3.5 py-2 rounded-xl text-left border transition-all flex-shrink-0 ${
+                className={`px-3.5 py-2 rounded-xl text-left border transition-all flex-shrink-0 cursor-pointer ${
                   isSelected
-                    ? "bg-[#142e23] border-[#295642] text-[#34d399]"
-                    : "bg-[#091510] border-[#183327] text-stone-400 hover:text-stone-200"
+                    ? "bg-[#e8f3ec] border-[#1b4332] text-[#1b4332] shadow-xs"
+                    : "bg-[#fcfdfc] border-[#e2e8df] text-[#627267] hover:text-[#142019]"
                 }`}
               >
-                <span className="block text-[11px] font-mono uppercase">{day.label}</span>
-                <span className="block text-xs font-bold text-stone-200 mt-0.5">{day.date}</span>
+                <span className="block text-[11px] font-mono uppercase font-semibold">{day.label}</span>
+                <span className="block text-xs font-bold text-[#142019] mt-0.5">{day.date}</span>
               </button>
             );
           })}
@@ -109,7 +109,7 @@ export function AppointmentCalendarView({
       <div className="p-5 space-y-6">
         {/* Clinician Availability Section */}
         <div>
-          <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
+          <h3 className="text-xs font-semibold text-[#627267] uppercase tracking-wider mb-3">
             Doctor Availability & Direct Slots ({days[selectedDayIndex].date})
           </h3>
 
@@ -117,35 +117,35 @@ export function AppointmentCalendarView({
             {doctorSchedules.map((doc) => (
               <div
                 key={doc.doctorName}
-                className="bg-[#091510] p-4 rounded-xl border border-[#1b382b] flex flex-col justify-between"
+                className="bg-[#fcfdfc] p-4 rounded-xl border border-[#e2e8df] flex flex-col justify-between shadow-2xs"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="h-8 w-8 rounded-lg bg-[#11241b] border border-[#234b37] flex items-center justify-center text-[#34d399]">
+                    <div className="h-8 w-8 rounded-lg bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
                       <Stethoscope className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-stone-200">{doc.doctorName}</p>
-                      <p className="text-xs text-stone-400">{doc.specialty}</p>
+                      <p className="text-sm font-bold text-[#142019]">{doc.doctorName}</p>
+                      <p className="text-xs text-[#627267]">{doc.specialty}</p>
                     </div>
                   </div>
                   {getAvailabilityBadge(doc.availability)}
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-[#162d22]">
-                  <p className="text-[11px] font-mono text-stone-400 mb-1.5">Open Booking Windows:</p>
+                <div className="mt-3 pt-3 border-t border-[#edf2ea]">
+                  <p className="text-[11px] font-mono text-[#627267] mb-1.5">Open Booking Windows:</p>
                   <div className="flex items-center gap-2 flex-wrap">
                     {doc.availableSlots.length > 0 ? (
                       doc.availableSlots.map((slot) => (
                         <span
                           key={slot}
-                          className="text-xs font-mono text-[#34d399] bg-[#0c2219] px-2.5 py-1 rounded-md border border-[#1d4634]"
+                          className="text-xs font-mono font-semibold text-[#1b4332] bg-[#e8f3ec] px-2.5 py-1 rounded-md border border-[#cbe2d1]"
                         >
                           {slot}
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-stone-500 italic">No slots available for this day</span>
+                      <span className="text-xs text-[#94a399] italic">No slots available for this day</span>
                     )}
                   </div>
                 </div>
@@ -155,22 +155,22 @@ export function AppointmentCalendarView({
         </div>
 
         {/* Scheduled Appointments for Selected Day */}
-        <div className="pt-4 border-t border-[#183629]">
-          <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
+        <div className="pt-4 border-t border-[#edf2ea]">
+          <h3 className="text-xs font-semibold text-[#627267] uppercase tracking-wider mb-3">
             Scheduled Sessions ({appointments.length} Blocked)
           </h3>
           <div className="space-y-2">
             {appointments.map((a) => (
               <div
                 key={a.id}
-                className="bg-[#08140f] p-3 rounded-xl border border-[#183327] flex items-center justify-between text-xs"
+                className="bg-[#fcfdfc] p-3 rounded-xl border border-[#e2e8df] flex items-center justify-between text-xs"
               >
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-[#34d399] font-bold">{a.time}</span>
-                  <span className="text-stone-200 font-medium">{a.patientName}</span>
-                  <span className="text-stone-400">• {a.doctorName}</span>
+                  <span className="font-mono text-[#059669] font-bold">{a.time}</span>
+                  <span className="text-[#142019] font-medium">{a.patientName}</span>
+                  <span className="text-[#627267]">• {a.doctorName}</span>
                 </div>
-                <Badge variant={a.status === "confirmed" ? "green" : "amber"} size="sm">
+                <Badge variant={a.status === "confirmed" ? "emerald" : "amber"} size="sm">
                   {a.status}
                 </Badge>
               </div>

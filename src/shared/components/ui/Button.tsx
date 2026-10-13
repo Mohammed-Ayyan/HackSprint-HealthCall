@@ -18,19 +18,19 @@ export function Button({
 }: ButtonProps) {
   const variantStyles = {
     primary:
-      "bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold shadow-[0_2px_12px_rgba(16,185,129,0.25)] hover:shadow-[0_4px_16px_rgba(16,185,129,0.35)] active:scale-[0.98]",
+      "bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-semibold shadow-sm hover:shadow active:scale-[0.98]",
     solar:
-      "bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-[0_2px_12px_rgba(245,158,11,0.25)] hover:shadow-[0_4px_16px_rgba(245,158,11,0.35)] active:scale-[0.98]",
+      "bg-[#d97706] hover:bg-[#b45309] text-white font-semibold shadow-sm active:scale-[0.98]",
     purple:
-      "bg-[#1e2f26] hover:bg-[#253a30] text-emerald-300 border border-emerald-500/30 active:scale-[0.98]",
+      "bg-[#0d9488] hover:bg-[#0f766e] text-white font-semibold shadow-sm active:scale-[0.98]",
     secondary:
-      "bg-[#13221b] hover:bg-[#1a2d24] text-slate-200 border border-[#223d30] shadow-sm active:scale-[0.98]",
+      "bg-[#f0f4ef] hover:bg-[#e4ece2] text-[#142019] border border-[#d8e2d6] active:scale-[0.98]",
     outline:
-      "bg-transparent hover:bg-[#13221b] text-slate-300 border border-[#244234] hover:border-emerald-500/40 active:scale-[0.98]",
+      "bg-white hover:bg-[#f7f9f6] text-[#334139] border border-[#d8e2d6] hover:border-[#1b4332] active:scale-[0.98] shadow-xs",
     ghost:
-      "bg-transparent hover:bg-[#13221b] text-slate-300 hover:text-white active:scale-[0.98]",
+      "bg-transparent hover:bg-[#f0f4ef] text-[#425247] hover:text-[#142019] active:scale-[0.98]",
     danger:
-      "bg-rose-600 hover:bg-rose-500 text-white shadow-[0_2px_10px_rgba(225,29,72,0.25)] active:scale-[0.98]",
+      "bg-[#dc2626] hover:bg-[#b91c1c] text-white shadow-sm active:scale-[0.98]",
   };
 
   const sizeStyles = {

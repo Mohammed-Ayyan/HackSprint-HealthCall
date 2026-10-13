@@ -16,17 +16,17 @@ export function DepartmentRoutingUI({ rules, className }: DepartmentRoutingUIPro
     <Card className={className}>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <div className="h-8 w-8 rounded-lg bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332]">
             <Network className="h-4 w-4" />
           </div>
           <div>
             <CardTitle>Autonomous Department Routing Pipeline</CardTitle>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[#607264]">
               Rule engine mapping conversation intents directly to hospital operational units
             </p>
           </div>
         </div>
-        <Badge variant="cyan" size="sm">
+        <Badge variant="emerald" size="sm">
           Active SLA Rules
         </Badge>
       </CardHeader>
@@ -35,23 +35,23 @@ export function DepartmentRoutingUI({ rules, className }: DepartmentRoutingUIPro
         {rules.map((rule, idx) => (
           <div
             key={idx}
-            className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 flex flex-col justify-between space-y-3"
+            className="p-3.5 rounded-xl bg-[#f7f9f6] border border-[#e2e8e0] flex flex-col justify-between space-y-3"
           >
             {/* Top Source Intent */}
-            <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between">
-              <span className="text-xs font-bold text-white">{rule.intent}</span>
-              <Badge variant="purple" size="sm">
+            <div className="p-2.5 rounded-lg bg-white border border-[#e2e8e0] flex items-center justify-between shadow-2xs">
+              <span className="text-xs font-bold text-[#142019]">{rule.intent}</span>
+              <Badge variant="teal" size="sm">
                 Intent
               </Badge>
             </div>
 
             {/* Transition Arrow */}
-            <div className="flex items-center justify-center text-slate-500">
-              <ArrowDown className="h-4 w-4 text-cyan-400" />
+            <div className="flex items-center justify-center text-[#8fa394]">
+              <ArrowDown className="h-4 w-4 text-[#059669]" />
             </div>
 
             {/* Destination Department */}
-            <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+            <div className="p-2.5 rounded-lg bg-white border border-[#e2e8e0] space-y-2 shadow-2xs">
               <div className="flex items-center justify-between">
                 <span
                   className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${getDepartmentColorClass(
@@ -63,14 +63,14 @@ export function DepartmentRoutingUI({ rules, className }: DepartmentRoutingUIPro
                 <PriorityBadge priority={rule.defaultPriority} size="sm" />
               </div>
 
-              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/80 font-mono">
+              <div className="flex items-center justify-between text-[11px] text-[#607264] pt-1 border-t border-[#edf2ec] font-mono">
                 <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3 text-cyan-400" />
+                  <Clock className="h-3 w-3 text-[#059669]" />
                   Target: {rule.slaTargetHours}h
                 </span>
                 {rule.autoAssignee && (
-                  <span className="flex items-center gap-1 text-slate-300">
-                    <UserCheck className="h-3 w-3 text-purple-400" />
+                  <span className="flex items-center gap-1 text-[#142019]">
+                    <UserCheck className="h-3 w-3 text-[#0d9488]" />
                     {rule.autoAssignee}
                   </span>
                 )}

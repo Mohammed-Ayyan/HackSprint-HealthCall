@@ -45,7 +45,7 @@ export default function CallDetailsPage({ params }: { params: Promise<{ id: stri
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#080c14] flex items-center justify-center text-slate-400 text-sm">
+        <div className="min-h-screen bg-[#f7f9f6] flex items-center justify-center text-[#607264] text-sm">
           Loading Call Intelligence Dossier...
         </div>
       }
@@ -87,8 +87,8 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
     return (
       <AppShell>
         <div className="p-12 text-center space-y-4">
-          <h2 className="text-xl font-bold text-white">Call Not Found</h2>
-          <p className="text-sm text-slate-400">The requested call dossier does not exist.</p>
+          <h2 className="text-xl font-bold text-[#1b4332]">Call Not Found</h2>
+          <p className="text-sm text-[#607264]">The requested call dossier does not exist.</p>
           <Link href="/calls">
             <Button variant="primary" size="sm">
               Return to Calls
@@ -102,7 +102,7 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
   if (loading || !call) {
     return (
       <AppShell>
-        <div className="h-96 flex items-center justify-center text-slate-400 text-sm">
+        <div className="h-96 flex items-center justify-center text-[#607264] text-sm">
           Loading Call Intelligence Dossier...
         </div>
       </AppShell>
@@ -120,74 +120,74 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
     <AppShell>
       <div className="space-y-6">
         {/* Navigation Breadcrumb & Back */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div className="flex items-center gap-3">
             <Link
               href="/calls"
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+              className="p-2 rounded-xl bg-white hover:bg-[#edf2ec] text-[#607264] hover:text-[#142019] border border-[#e2e8e0] transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
             </Link>
 
             <div>
               <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-bold text-white font-mono">
+                <h1 className="text-xl font-bold text-[#1b4332] font-mono">
                   Dossier: #{call.callNumber}
                 </h1>
                 <Badge
-                  variant={call.priority === "critical" ? "rose" : call.priority === "high" ? "amber" : "cyan"}
+                  variant={call.priority === "critical" ? "rose" : call.priority === "high" ? "amber" : "teal"}
                   size="sm"
                 >
                   {call.priority.toUpperCase()} PRIORITY
                 </Badge>
-                <Badge variant={call.status === "in-progress" ? "cyan" : "purple"} size="sm" dot>
+                <Badge variant={call.status === "in-progress" ? "teal" : "emerald"} size="sm" dot>
                   {call.status}
                 </Badge>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#607264] mt-0.5">
                 Processed via {call.agentName} • Duration: {call.duration}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-slate-400">
-              SLA Window: <strong className="text-cyan-400">{call.slaRemainingHours.toFixed(1)} hrs</strong>
+            <span className="text-xs font-mono text-[#607264]">
+              SLA Window: <strong className="text-[#059669]">{call.slaRemainingHours.toFixed(1)} hrs</strong>
             </span>
           </div>
         </div>
 
         {/* Patient Identity Strip */}
-        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+        <div className="p-4 rounded-2xl bg-white border border-[#e2e8e0] flex flex-wrap items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-300 font-bold text-lg font-mono">
+            <div className="h-12 w-12 rounded-2xl bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332] font-bold text-lg font-mono">
               {call.patient.name.split(" ").map((n) => n[0]).join("")}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-white">{call.patient.name}</h2>
-                <span className="text-xs text-slate-400 font-mono">
+                <h2 className="text-base font-bold text-[#142019]">{call.patient.name}</h2>
+                <span className="text-xs text-[#607264] font-mono">
                   ({call.patient.age}y, {call.patient.gender})
                 </span>
-                <span className="text-xs text-cyan-300 font-mono px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/20">
+                <span className="text-xs text-[#059669] font-mono px-2 py-0.5 rounded bg-[#e8f5e9] border border-[#c8e6c9]">
                   {call.patient.mrn}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
-                Phone: {call.patient.phone} • Insurance: <strong className="text-slate-200">{call.patient.insuranceProvider}</strong>
+              <p className="text-xs text-[#607264] mt-1">
+                Phone: {call.patient.phone} • Insurance: <strong className="text-[#142019]">{call.patient.insuranceProvider}</strong>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <div className="text-right">
-              <span className="text-[10px] text-slate-500 uppercase font-mono block">Primary Intent</span>
-              <span className="text-xs font-bold text-white">{call.intent}</span>
+              <span className="text-[10px] text-[#8fa394] uppercase font-mono block">Primary Intent</span>
+              <span className="text-xs font-bold text-[#142019]">{call.intent}</span>
             </div>
-            <div className="h-8 w-[1px] bg-slate-800 mx-2" />
+            <div className="h-8 w-[1px] bg-[#e2e8e0] mx-2" />
             <div className="text-right">
-              <span className="text-[10px] text-slate-500 uppercase font-mono block">Department</span>
-              <span className="text-xs font-bold text-cyan-400">{call.assignedDepartment}</span>
+              <span className="text-[10px] text-[#8fa394] uppercase font-mono block">Department</span>
+              <span className="text-xs font-bold text-[#059669]">{call.assignedDepartment}</span>
             </div>
           </div>
         </div>
@@ -244,9 +244,9 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
         {activeTab === "transcript" && (
           <div className="space-y-4">
             <Card className="p-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs text-slate-400">
-                <span className="font-semibold text-white">Full Diarized Multi-Speaker Audio Transcript</span>
-                <span className="font-mono text-cyan-400">Time-Synced Audio Anchors</span>
+              <div className="flex items-center justify-between pb-3 border-b border-[#e2e8e0] text-xs text-[#607264]">
+                <span className="font-semibold text-[#142019]">Full Diarized Multi-Speaker Audio Transcript</span>
+                <span className="font-mono text-[#059669]">Time-Synced Audio Anchors</span>
               </div>
 
               <div className="mt-4 space-y-3">
@@ -256,11 +256,11 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
                     className={cn(
                       "p-4 rounded-xl border transition-all duration-200",
                       seg.speaker === "agent"
-                        ? "bg-cyan-950/15 border-cyan-800/30 text-slate-200"
+                        ? "bg-[#f0fdf4] border-[#bbf7d0] text-[#142019]"
                         : seg.speaker === "patient"
-                        ? "bg-slate-900 border-slate-800 text-slate-100"
-                        : "bg-slate-950 border-slate-800/80 text-slate-400 italic",
-                      seg.highlighted && "ring-1 ring-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                        ? "bg-[#f7f9f6] border-[#e2e8e0] text-[#142019]"
+                        : "bg-white border-[#e2e8e0] text-[#607264] italic",
+                      seg.highlighted && "ring-1 ring-[#059669]/40 shadow-xs"
                     )}
                   >
                     <div className="flex items-center justify-between mb-1.5 text-xs">
@@ -269,21 +269,21 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
                           className={cn(
                             "font-bold",
                             seg.speaker === "agent"
-                              ? "text-cyan-400"
+                              ? "text-[#059669]"
                               : seg.speaker === "patient"
-                              ? "text-purple-400"
-                              : "text-slate-500"
+                              ? "text-[#0d9488]"
+                              : "text-[#607264]"
                           )}
                         >
                           {seg.speakerName}
                         </span>
                         {seg.sentiment && (
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-mono">
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#e8f5e9] text-[#1b4332] font-mono">
                             Tone: {seg.sentiment}
                           </span>
                         )}
                       </div>
-                      <span className="font-mono text-[11px] text-slate-500">{seg.timestamp}</span>
+                      <span className="font-mono text-[11px] text-[#8fa394]">{seg.timestamp}</span>
                     </div>
 
                     <p className="text-sm leading-relaxed">{seg.text}</p>

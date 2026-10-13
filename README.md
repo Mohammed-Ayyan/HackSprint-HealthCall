@@ -190,15 +190,19 @@ src/
 
 ---
 
-## 5. Design System: Antigravity Healthcare Aesthetics
+## 5. Design System: Solarpunk Eco-Futuristic Light Theme
 
-CareOps AI uses the **Antigravity Design System** crafted specifically for deep operational monitoring:
-- **Backgrounds**: Deep graphite and navy (`#080c14`, `#090d16`, `#0f172a`).
-- **Glassmorphism**: Multi-layered backdrop blurs (`backdrop-blur-xl`) with ultra-fine borders (`border-white/10`, `border-cyan-500/20`).
-- **Healthcare Cyan Accents**: Primary action glow (`#06b6d4`, `#22d3ee`).
-- **AI Purple Highlights**: Natural language model inference badges (`#8b5cf6`, `#a855f7`).
-- **Clinical Urgency Accents**: Amber for high warnings (`#f59e0b`), Rose/Red for emergency triage (`#ef4444`).
-- **Micro-Interactions**: Real-time pulsing status pings, audio bar animations, and tactile active-scale button presses.
+CareOps AI is built on a **Solarpunk Eco-Futuristic Light Healthcare Design System**, conveying "A sustainable future hospital ecosystem powered by intelligent technology":
+
+- **Canvas & Backgrounds**: Natural cream (`#f7f9f6`), warm off-white (`#fcfdfc`), pure surgical white (`#ffffff`).
+- **Typography & High Contrast**: Deep forest green headings (`#142019`, `#1b4332`), soft botanical sage secondary text (`#607264`, `#8ba08e`).
+- **Botanical Accents**:
+  - **Botanical Emerald (`#059669`)**: Primary health vitality, completed actions, positive status.
+  - **Healthcare Teal (`#0d9488`)**: Clinical inference, call intelligence, doctor/reception actions.
+  - **Solar Amber (`#d97706`)**: Triage attention, upcoming deadlines, SLA warning thresholds.
+  - **Terracotta Urgency (`#dc2626`)**: Critical clinical emergencies, 911 dispatch, overdue escalations.
+- **Card & Border Craft**: Crisp botanical borders (`#e2e8df`, `#dce5da`), subtle soft-diffused shadows, high legibility.
+- **Micro-Interactions**: Tactile button presses, real-time waveform bars, responsive status dots, and seamless role switches.
 
 ---
 
@@ -460,14 +464,14 @@ Hospital Administration
 
 ---
 
-## 13. Solarpunk Eco-Futuristic Design Direction
+## 13. Solarpunk Eco-Futuristic Design Philosophy
 
-CareOps AI rejects generic SaaS neon cliches and excessive blurry glassmorphism in favor of a **Solarpunk Eco-Futuristic Living System**:
+CareOps AI rejects dark cyberpunk tropes and generic SaaS flat white templates in favor of a curated **Solarpunk Eco-Futuristic Living Healthcare System**:
 
-- **Palette**: Deep forest moss charcoal (`#07100c`, `#0a1711`, `#12241b`), bioluminescent emerald (`#34d399`), river teal (`#2dd4bf`), solar amber (`#f59e0b`), terracotta urgency (`#f87171`).
-- **Surfaces**: Solid elevated panels (`.eco-panel`), natural contrast borders (`#1b362a`), tactile depth without eye-straining glows.
-- **Metaphors**: Patient Wellness Flow, Department Vitality, Operational Equilibrium.
-- **Human Centricity**: Technology is quiet and assistive; medical providers and patients remain the focal point.
+- **Palette**: Natural cream canvas (`#f7f9f6`), warm off-white containers (`#fcfdfc`), surgical white cards (`#ffffff`), botanical emerald (`#059669`), deep evergreen ink (`#142019`, `#1b4332`), sage accents (`#607264`), solar amber alerts (`#d97706`), healthcare teal (`#0d9488`).
+- **Surfaces**: Crisp layered panels (`bg-white border-[#e2e8df]`), subtle micro-borders, tactile card elevations, zero eye-straining dark glow.
+- **Metaphors**: Patient Wellness Flow, Department Vitality, Operational Equilibrium, Living Audio Waveforms.
+- **Human Centricity**: Technology is quiet, sustainable, and assistive; doctors, nurses, receptionists, insurance adjusters, managers, and patients experience an intuitive, calming, and ultra-fast workspace.
 
 ---
 

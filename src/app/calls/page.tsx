@@ -33,17 +33,17 @@ export default function CallsPage() {
     <AppShell>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-extrabold tracking-tight text-white font-mono">
+              <h1 className="text-2xl font-extrabold tracking-tight text-[#1b4332] font-mono">
                 Call Management & Intelligence
               </h1>
-              <Badge variant="cyan" size="sm">
+              <Badge variant="teal" size="sm">
                 Telephony Records
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#607264] mt-1">
               Search, filter, and inspect diarized patient phone interactions converted into hospital actions
             </p>
           </div>
@@ -62,7 +62,7 @@ export default function CallsPage() {
             value={calls.length}
             subtitle="in current cycle"
             icon={<PhoneCall className="h-5 w-5" />}
-            variant="cyan"
+            variant="teal"
           />
           <StatCard
             title="Critical Severity"
@@ -83,7 +83,7 @@ export default function CallsPage() {
             value={pendingInsurance}
             subtitle="prior-auth holds"
             icon={<ShieldCheck className="h-5 w-5" />}
-            variant="purple"
+            variant="emerald"
           />
         </div>
 

@@ -24,12 +24,12 @@ export function TaskCard({
   return (
     <div
       className={cn(
-        "rounded-2xl p-4 bg-slate-900/90 border transition-all duration-200 space-y-3 shadow-lg select-none group",
+        "rounded-2xl p-4 bg-white border transition-all duration-200 space-y-3 shadow-xs select-none group",
         task.isEscalated
-          ? "border-rose-500/50 bg-rose-950/20 shadow-[0_0_20px_rgba(239,68,68,0.15)]"
+          ? "border-red-300 bg-red-50/40 shadow-xs"
           : isUrgentSLA
-          ? "border-amber-500/40 bg-amber-950/15"
-          : "border-slate-800 hover:border-cyan-500/40 hover:bg-slate-900"
+          ? "border-amber-300 bg-amber-50/40"
+          : "border-[#e2e8e0] hover:border-[#059669]/50 hover:shadow-sm"
       )}
     >
       {/* Top Header: Department & Priority */}
@@ -46,18 +46,18 @@ export function TaskCard({
 
       {/* Task Title & Description */}
       <div>
-        <h4 className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-2">
+        <h4 className="text-xs font-bold text-[#142019] group-hover:text-[#059669] transition-colors line-clamp-2">
           {task.task}
         </h4>
-        <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+        <p className="text-[11px] text-[#607264] mt-1 line-clamp-2 leading-relaxed">
           {task.description}
         </p>
       </div>
 
       {/* Patient info */}
-      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60 font-mono">
-        <span>Patient: <strong className="text-slate-300 font-sans">{task.patientName}</strong></span>
-        <span className="text-slate-500">{task.patientMrn}</span>
+      <div className="flex items-center justify-between text-[11px] text-[#607264] pt-1 border-t border-[#edf2ec] font-mono">
+        <span>Patient: <strong className="text-[#142019] font-sans">{task.patientName}</strong></span>
+        <span className="text-[#8fa394]">{task.patientMrn}</span>
       </div>
 
       {/* SLA Countdown pill */}
@@ -65,10 +65,10 @@ export function TaskCard({
         className={cn(
           "flex items-center justify-between px-2.5 py-1.5 rounded-xl text-[11px] font-mono",
           task.sla.isBreached
-            ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+            ? "bg-red-50 text-red-700 border border-red-200"
             : isUrgentSLA
-            ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse"
-            : "bg-slate-950/80 text-cyan-300 border border-slate-800"
+            ? "bg-amber-50 text-amber-800 border border-amber-200 animate-pulse"
+            : "bg-[#f7f9f6] text-[#059669] border border-[#e2e8e0]"
         )}
       >
         <span className="flex items-center gap-1.5">
@@ -84,29 +84,29 @@ export function TaskCard({
 
       {/* Escalation Tag if applicable */}
       {task.isEscalated && (
-        <div className="p-2 rounded-lg bg-rose-500/15 border border-rose-500/30 text-[10px] text-rose-300 flex items-center gap-1.5 font-medium">
+        <div className="p-2 rounded-lg bg-red-100/70 border border-red-200 text-[10px] text-red-800 flex items-center gap-1.5 font-medium">
           <ShieldAlert className="h-3.5 w-3.5 flex-shrink-0" />
           <span>Escalated to {task.escalatedTo || "Manager"}</span>
         </div>
       )}
 
       {/* Assignee & Action Buttons */}
-      <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+      <div className="flex items-center justify-between pt-2 border-t border-[#edf2ec]">
         {task.assignedTo ? (
           <div className="flex items-center gap-2">
             <img
               src={task.assignedTo.avatar}
               alt={task.assignedTo.name}
-              className="h-6 w-6 rounded-full object-cover border border-slate-700"
+              className="h-6 w-6 rounded-full object-cover border border-[#c8e6c9]"
             />
-            <span className="text-[11px] text-slate-300 font-medium truncate max-w-[100px]">
+            <span className="text-[11px] text-[#142019] font-medium truncate max-w-[100px]">
               {task.assignedTo.name}
             </span>
           </div>
         ) : (
           <button
             onClick={() => onAssign && onAssign(task)}
-            className="flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer"
+            className="flex items-center gap-1 text-[11px] text-[#059669] hover:text-[#047857] font-semibold cursor-pointer"
           >
             <UserPlus className="h-3.5 w-3.5" />
             <span>Assign Staff</span>
@@ -119,7 +119,7 @@ export function TaskCard({
             <button
               onClick={() => onEscalate(task)}
               title="Escalate task to manager"
-              className="px-2 py-1 rounded bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 text-[10px] font-bold border border-slate-700 hover:border-rose-500/30 transition-colors cursor-pointer"
+              className="px-2 py-1 rounded bg-white hover:bg-red-50 text-[#607264] hover:text-red-700 text-[10px] font-bold border border-[#e2e8e0] hover:border-red-200 transition-colors cursor-pointer"
             >
               Escalate
             </button>
@@ -137,7 +137,7 @@ export function TaskCard({
                 onStatusChange(task.id, nextStatus);
               }}
               title="Advance to next workflow stage"
-              className="px-2 py-1 rounded bg-cyan-950/60 hover:bg-cyan-900 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 transition-colors cursor-pointer flex items-center gap-1"
+              className="px-2 py-1 rounded bg-[#e8f5e9] hover:bg-[#c8e6c9] text-[#1b4332] text-[10px] font-bold border border-[#c8e6c9] transition-colors cursor-pointer flex items-center gap-1"
             >
               <span>Advance</span>
               <ArrowRight className="h-3 w-3" />

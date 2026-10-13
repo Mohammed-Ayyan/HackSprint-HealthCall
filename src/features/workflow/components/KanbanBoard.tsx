@@ -14,11 +14,11 @@ export interface KanbanBoardProps {
   onEscalateTask?: (task: ActionItem) => void;
 }
 
-const columns: { id: TaskStatus; label: string; color: string; badgeVariant: "default" | "cyan" | "purple" | "emerald" }[] = [
-  { id: "pending", label: "Pending Triage", color: "border-slate-800", badgeVariant: "default" },
-  { id: "assigned", label: "Assigned to Staff", color: "border-purple-800/40", badgeVariant: "purple" },
-  { id: "in-progress", label: "In Active Progress", color: "border-cyan-800/40", badgeVariant: "cyan" },
-  { id: "completed", label: "Completed & Verified", color: "border-emerald-800/40", badgeVariant: "emerald" },
+const columns: { id: TaskStatus; label: string; color: string; badgeVariant: "default" | "teal" | "amber" | "emerald" }[] = [
+  { id: "pending", label: "Pending Triage", color: "border-[#e2e8e0]", badgeVariant: "default" },
+  { id: "assigned", label: "Assigned to Staff", color: "border-[#c8e6c9]", badgeVariant: "teal" },
+  { id: "in-progress", label: "In Active Progress", color: "border-[#fed7aa]", badgeVariant: "amber" },
+  { id: "completed", label: "Completed & Verified", color: "border-[#bbf7d0]", badgeVariant: "emerald" },
 ];
 
 export function KanbanBoard({
@@ -50,10 +50,10 @@ export function KanbanBoard({
   return (
     <div className="space-y-4">
       {/* Department Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-white border border-[#e2e8e0] shadow-sm">
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-cyan-400" />
-          <span className="text-xs font-semibold text-slate-300">Filter Department:</span>
+          <Filter className="h-4 w-4 text-[#059669]" />
+          <span className="text-xs font-semibold text-[#142019]">Filter Department:</span>
           <div className="flex flex-wrap gap-1.5">
             {["all", "Reception", "Insurance", "Billing", "Pharmacy", "Emergency Triage"].map((dept) => (
               <button
@@ -61,8 +61,8 @@ export function KanbanBoard({
                 onClick={() => setDepartmentFilter(dept)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                   departmentFilter === dept
-                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                    : "bg-slate-800/60 text-slate-400 hover:text-white border border-transparent"
+                    ? "bg-[#e8f5e9] text-[#1b4332] border border-[#c8e6c9] font-bold"
+                    : "bg-[#f7f9f6] text-[#607264] hover:text-[#142019] hover:bg-[#edf2ec] border border-transparent"
                 }`}
               >
                 {dept === "all" ? "All Departments" : dept}
@@ -71,8 +71,8 @@ export function KanbanBoard({
           </div>
         </div>
 
-        <div className="text-xs text-slate-400 font-mono">
-          Showing <strong className="text-cyan-300">{filteredTasks.length}</strong> operational tasks
+        <div className="text-xs text-[#607264] font-mono">
+          Showing <strong className="text-[#059669]">{filteredTasks.length}</strong> operational tasks
         </div>
       </div>
 
@@ -84,12 +84,12 @@ export function KanbanBoard({
           return (
             <div
               key={col.id}
-              className={`flex flex-col rounded-2xl bg-slate-950/60 border ${col.color} p-4 space-y-4 min-h-[500px]`}
+              className={`flex flex-col rounded-2xl bg-[#f7f9f6] border ${col.color} p-4 space-y-4 min-h-[500px] shadow-2xs`}
             >
               {/* Column Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+              <div className="flex items-center justify-between pb-3 border-b border-[#e2e8e0]">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#142019]">
                     {col.label}
                   </h3>
                   <Badge variant={col.badgeVariant} size="sm">
@@ -101,7 +101,7 @@ export function KanbanBoard({
               {/* Cards Container */}
               <div className="flex-1 space-y-3 overflow-y-auto">
                 {colTasks.length === 0 ? (
-                  <div className="h-32 flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 text-xs text-slate-600">
+                  <div className="h-32 flex flex-col items-center justify-center rounded-xl border border-dashed border-[#e2e8e0] text-xs text-[#8fa394]">
                     No items in {col.label.toLowerCase()}
                   </div>
                 ) : (

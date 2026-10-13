@@ -17,12 +17,13 @@ import {
   Stethoscope,
   UserCheck,
   ShieldCheck,
-  Sliders,
   User,
   Building2,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { Badge } from "@/shared/components/ui/Badge";
+import { useAuth } from "@/features/platform/auth/authContext";
 
 const coreNavItems = [
   { label: "Operations Command", href: "/dashboard", icon: LayoutDashboard },
@@ -49,30 +50,31 @@ const systemNavItems = [
 
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   return (
     <aside
       className={cn(
-        "w-64 flex-shrink-0 bg-[#07100c] border-r border-[#152c22] flex flex-col justify-between p-4 z-30 select-none overflow-y-auto",
+        "w-64 flex-shrink-0 bg-white border-r border-[#e2e8df] flex flex-col justify-between p-4 z-30 select-none overflow-y-auto shadow-xs",
         className
       )}
     >
       <div className="space-y-6">
-        {/* Brand Header - Solarpunk Eco-Futuristic */}
+        {/* Brand Header - Solarpunk Light */}
         <Link href="/dashboard" className="flex items-center gap-3 px-2 group">
-          <div className="h-10 w-10 rounded-xl bg-[#142e23] border border-[#2b5946] flex items-center justify-center text-[#34d399] shadow-inner group-hover:border-[#34d399] transition-all duration-300">
+          <div className="h-10 w-10 rounded-xl bg-[#1b4332] flex items-center justify-center text-white shadow-sm group-hover:bg-[#2d6a4f] transition-all duration-300">
             <Activity className="h-5 w-5 stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-base tracking-tight text-stone-100 font-mono">
+              <span className="font-bold text-base tracking-tight text-[#142019] font-mono">
                 CareOps
               </span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#132c21] text-[#34d399] font-bold border border-[#24523b]">
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#e8f5e9] text-[#1b4332] font-bold border border-[#c8e6c9]">
                 AI
               </span>
             </div>
-            <p className="text-[10px] text-stone-400 font-medium tracking-wide">
+            <p className="text-[10px] text-[#627267] font-medium tracking-wide">
               Healthcare Living System
             </p>
           </div>
@@ -81,29 +83,29 @@ export function Sidebar({ className }: { className?: string }) {
         {/* Live Call Telephony Pill */}
         <Link
           href="/calls/call-live-001"
-          className="flex items-center justify-between p-2.5 rounded-xl bg-[#0c1c15] border border-[#1e3c2f] hover:border-[#34d399]/60 transition-all group"
+          className="flex items-center justify-between p-2.5 rounded-xl bg-[#eaf7ee] border border-[#bbf0c8] hover:border-[#059669] transition-all group"
         >
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34d399] opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#34d399]" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#059669] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#059669]" />
             </span>
             <div className="text-left">
-              <p className="text-[11px] font-semibold text-stone-200 group-hover:text-stone-100 flex items-center gap-1">
+              <p className="text-[11px] font-semibold text-[#142019] group-hover:text-[#059669] flex items-center gap-1">
                 Live Speech Stream
-                <Sparkles className="h-3 w-3 text-[#34d399] inline" />
+                <Sparkles className="h-3 w-3 text-[#059669] inline" />
               </p>
-              <p className="text-[10px] text-stone-400">Rahul Sharma (03:24)</p>
+              <p className="text-[10px] text-[#627267]">Rahul Sharma (03:24)</p>
             </div>
           </div>
-          <Badge variant="teal" size="sm">
+          <Badge variant="green" size="sm">
             Triage
           </Badge>
         </Link>
 
         {/* Core Operations Console Navigation */}
         <nav className="space-y-1">
-          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[#7d8f81]">
             Operations Console
           </p>
           {coreNavItems.map((item) => {
@@ -118,15 +120,15 @@ export function Sidebar({ className }: { className?: string }) {
                 className={cn(
                   "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 group",
                   isActive
-                    ? "bg-[#132c21] text-[#34d399] border border-[#25523c]"
-                    : "text-stone-400 hover:text-stone-200 hover:bg-[#0c1813] border border-transparent"
+                    ? "bg-[#eaf5ec] text-[#1b4332] font-semibold border border-[#c2ded6] shadow-xs"
+                    : "text-[#4a584e] hover:text-[#142019] hover:bg-[#f2f6f1] border border-transparent"
                 )}
               >
                 <div className="flex items-center gap-2.5">
                   <Icon
                     className={cn(
                       "h-4 w-4 transition-colors",
-                      isActive ? "text-[#34d399]" : "text-stone-500 group-hover:text-stone-300"
+                      isActive ? "text-[#1b4332]" : "text-[#7d8f81] group-hover:text-[#142019]"
                     )}
                   />
                   <span>{item.label}</span>
@@ -136,7 +138,7 @@ export function Sidebar({ className }: { className?: string }) {
                   <span
                     className={cn(
                       "px-1.5 py-0.5 rounded-full text-[10px] font-mono",
-                      isActive ? "bg-[#183629] text-[#34d399]" : "bg-[#0f1f18] text-stone-400"
+                      isActive ? "bg-[#c2ded6] text-[#1b4332]" : "bg-[#edf2ea] text-[#627267]"
                     )}
                   >
                     {item.count}
@@ -148,8 +150,8 @@ export function Sidebar({ className }: { className?: string }) {
         </nav>
 
         {/* Role-Based Portals Navigation */}
-        <nav className="space-y-1 pt-2 border-t border-[#152c22]">
-          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+        <nav className="space-y-1 pt-2 border-t border-[#edf2ea]">
+          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[#7d8f81]">
             Role Experiences
           </p>
           {rolePortals.map((item) => {
@@ -163,15 +165,15 @@ export function Sidebar({ className }: { className?: string }) {
                 className={cn(
                   "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 group",
                   isActive
-                    ? "bg-[#132c21] text-[#34d399] border border-[#25523c]"
-                    : "text-stone-400 hover:text-stone-200 hover:bg-[#0c1813] border border-transparent"
+                    ? "bg-[#eaf5ec] text-[#1b4332] font-semibold border border-[#c2ded6] shadow-xs"
+                    : "text-[#4a584e] hover:text-[#142019] hover:bg-[#f2f6f1] border border-transparent"
                 )}
               >
                 <div className="flex items-center gap-2.5">
                   <Icon
                     className={cn(
                       "h-4 w-4 transition-colors",
-                      isActive ? "text-[#34d399]" : "text-stone-500 group-hover:text-stone-300"
+                      isActive ? "text-[#1b4332]" : "text-[#7d8f81] group-hover:text-[#142019]"
                     )}
                   />
                   <span>{item.label}</span>
@@ -182,8 +184,8 @@ export function Sidebar({ className }: { className?: string }) {
         </nav>
 
         {/* System & Profile Navigation */}
-        <nav className="space-y-1 pt-2 border-t border-[#152c22]">
-          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+        <nav className="space-y-1 pt-2 border-t border-[#edf2ea]">
+          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[#7d8f81]">
             System & Personal
           </p>
           {systemNavItems.map((item) => {
@@ -197,22 +199,22 @@ export function Sidebar({ className }: { className?: string }) {
                 className={cn(
                   "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 group",
                   isActive
-                    ? "bg-[#132c21] text-[#34d399] border border-[#25523c]"
-                    : "text-stone-400 hover:text-stone-200 hover:bg-[#0c1813] border border-transparent"
+                    ? "bg-[#eaf5ec] text-[#1b4332] font-semibold border border-[#c2ded6] shadow-xs"
+                    : "text-[#4a584e] hover:text-[#142019] hover:bg-[#f2f6f1] border border-transparent"
                 )}
               >
                 <div className="flex items-center gap-2.5">
                   <Icon
                     className={cn(
                       "h-4 w-4 transition-colors",
-                      isActive ? "text-[#34d399]" : "text-stone-500 group-hover:text-stone-300"
+                      isActive ? "text-[#1b4332]" : "text-[#7d8f81] group-hover:text-[#142019]"
                     )}
                   />
                   <span>{item.label}</span>
                 </div>
 
                 {item.alert && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#f59e0b] animate-pulse" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#d97706] animate-pulse" />
                 )}
               </Link>
             );
@@ -221,16 +223,16 @@ export function Sidebar({ className }: { className?: string }) {
       </div>
 
       {/* Bottom Footer Info */}
-      <div className="space-y-3 pt-4 border-t border-[#152c22]">
+      <div className="space-y-3 pt-4 border-t border-[#edf2ea]">
         <Link
           href="/landing"
-          className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#0c1813] hover:bg-[#12241d] border border-[#1a382c] text-xs text-stone-300 transition-colors"
+          className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#f7f9f6] hover:bg-[#eef4ec] border border-[#e2e8df] text-xs text-[#334139] transition-colors"
         >
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#34d399]" />
+            <Sparkles className="h-4 w-4 text-[#059669]" />
             <span>Living System Manifesto</span>
           </div>
-          <span className="text-[10px] text-[#34d399] bg-[#12281f] px-1.5 py-0.5 rounded border border-[#224b38]">
+          <span className="text-[10px] text-[#1b4332] bg-[#e8f5e9] px-1.5 py-0.5 rounded border border-[#c8e6c9] font-medium">
             Solarpunk
           </span>
         </Link>

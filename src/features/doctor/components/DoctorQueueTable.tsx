@@ -25,79 +25,79 @@ export function DoctorQueueTable({ patients, onStatusChange }: DoctorQueueTableP
   const getPriorityBadge = (priority: DoctorQueuePatient["priority"]) => {
     switch (priority) {
       case "urgent":
-        return <Badge variant="red">URGENT</Badge>;
+        return <Badge variant="rose">URGENT</Badge>;
       case "high":
         return <Badge variant="amber">HIGH</Badge>;
       case "medium":
         return <Badge variant="teal">MEDIUM</Badge>;
       default:
-        return <Badge variant="gray">ROUTINE</Badge>;
+        return <Badge variant="default">ROUTINE</Badge>;
     }
   };
 
   const getStatusBadge = (status: DoctorQueuePatient["status"]) => {
     switch (status) {
       case "Checked In":
-        return <Badge variant="green">CHECKED IN</Badge>;
+        return <Badge variant="emerald">CHECKED IN</Badge>;
       case "In Consultation":
         return <Badge variant="teal">IN CONSULTATION</Badge>;
       case "Pending Labs":
         return <Badge variant="amber">PENDING LABS</Badge>;
       default:
-        return <Badge variant="gray">WAITING ROOM</Badge>;
+        return <Badge variant="default">WAITING ROOM</Badge>;
     }
   };
 
   return (
     <>
-      <Card className="bg-[#0b1712] border-[#1b362a]">
-        <CardHeader className="border-b border-[#1b362a] pb-4">
+      <Card className="bg-white border-[#e2e8df] shadow-sm">
+        <CardHeader className="border-b border-[#edf2ea] pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-lg bg-[#11261d] border border-[#204937] flex items-center justify-center text-[#34d399]">
+              <div className="h-9 w-9 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
                 <Users className="h-4 w-4" />
               </div>
               <div>
-                <CardTitle className="text-base text-stone-100">Live Clinical Patient Queue</CardTitle>
-                <p className="text-xs text-stone-400 mt-0.5">
+                <CardTitle className="text-base text-[#142019]">Live Clinical Patient Queue</CardTitle>
+                <p className="text-xs text-[#627267] mt-0.5">
                   Real-time arrival sequence with AI-synthesized chief complaints and urgency triage
                 </p>
               </div>
             </div>
-            <span className="text-xs font-mono text-[#34d399] bg-[#0c2018] px-3 py-1 rounded-full border border-[#1b3b2c]">
+            <span className="text-xs font-mono font-semibold text-[#1b4332] bg-[#e8f3ec] px-3 py-1 rounded-full border border-[#d2e4d6]">
               {patients.length} In Flow
             </span>
           </div>
         </CardHeader>
 
-        <div className="divide-y divide-[#162e24]">
+        <div className="divide-y divide-[#edf2ea]">
           {patients.map((pat) => (
             <div
               key={pat.id}
-              className="p-5 hover:bg-[#0e2019]/60 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+              className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
             >
               <div className="flex items-start gap-3.5">
-                <div className="h-10 w-10 rounded-xl bg-[#132c21] border border-[#23533c] flex items-center justify-center text-[#34d399] flex-shrink-0 mt-0.5">
+                <div className="h-10 w-10 rounded-xl bg-[#f4f8f5] text-[#1b4332] border border-[#dce8df] flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="font-mono text-xs font-bold">{pat.appointmentTime.split(" ")[0]}</span>
                 </div>
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <h4 className="text-sm font-bold text-stone-100">{pat.name}</h4>
-                    <span className="text-xs font-mono text-stone-400">
+                    <h4 className="text-sm font-bold text-[#142019]">{pat.name}</h4>
+                    <span className="text-xs font-mono text-[#627267]">
                       ({pat.gender}, {pat.age}y)
                     </span>
-                    <Badge variant="gray" size="sm" className="font-mono">
+                    <Badge variant="default" size="sm" className="font-mono">
                       {pat.mrn}
                     </Badge>
                     {getPriorityBadge(pat.priority)}
                     {getStatusBadge(pat.status)}
                   </div>
-                  <p className="text-xs text-stone-300 mt-1.5 flex items-center gap-2">
-                    <span className="text-stone-400">Chief Issue:</span>
-                    <span className="text-stone-200 font-medium">{pat.issue}</span>
+                  <p className="text-xs text-[#28382e] mt-1.5 flex items-center gap-2">
+                    <span className="text-[#627267]">Chief Issue:</span>
+                    <span className="text-[#142019] font-medium">{pat.issue}</span>
                   </p>
-                  <p className="text-[11px] text-stone-400 mt-1">
-                    Location: <span className="text-[#34d399] font-medium">{pat.roomNumber}</span>
+                  <p className="text-[11px] text-[#627267] mt-1">
+                    Location: <span className="text-[#059669] font-semibold">{pat.roomNumber}</span>
                   </p>
                 </div>
               </div>
@@ -107,9 +107,9 @@ export function DoctorQueueTable({ patients, onStatusChange }: DoctorQueueTableP
                   variant="outline"
                   size="sm"
                   onClick={() => handleOpenBrief(pat)}
-                  className="border-[#214b38] text-stone-200 hover:bg-[#132d22] flex items-center gap-1.5"
+                  className="border-[#dce8df] text-[#28382e] hover:bg-[#f4f8f5] flex items-center gap-1.5"
                 >
-                  <Bot className="h-3.5 w-3.5 text-[#34d399]" />
+                  <Bot className="h-3.5 w-3.5 text-[#059669]" />
                   <span>AI Patient Brief</span>
                 </Button>
 
@@ -132,7 +132,7 @@ export function DoctorQueueTable({ patients, onStatusChange }: DoctorQueueTableP
                     onClick={() => {
                       if (onStatusChange) onStatusChange(pat.id, "Pending Labs");
                     }}
-                    className="border-[#2b4d3b] text-[#34d399]"
+                    className="border-[#059669] text-[#059669] bg-[#f0fdf4]"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     <span>Consultation Active</span>

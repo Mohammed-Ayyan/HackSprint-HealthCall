@@ -14,6 +14,7 @@ import { DepartmentManagementCard } from "@/features/admin/components/Department
 import { SystemSettingsManager } from "@/features/admin/components/SystemSettingsManager";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/Tabs";
 import { Users, Building2, Sliders, Shield } from "lucide-react";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 
 export default function AdminDashboardPage() {
   const [overview, setOverview] = useState<AdminOverviewData | null>(null);
@@ -48,56 +49,58 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded-full border-2 border-[#34d399] border-t-transparent animate-spin" />
-          <p className="text-xs font-mono text-[#34d399]">Initializing Executive Healthcare Control Matrix...</p>
+          <div className="h-8 w-8 rounded-full border-2 border-[#1b4332] border-t-transparent animate-spin" />
+          <p className="text-xs font-mono text-[#1b4332]">Initializing Executive Healthcare Control Matrix...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* 1. Admin Overview Cards */}
-      <AdminOverviewCards overview={overview} />
+    <RoleGuard allowedRoles={["Admin"]} moduleName="Hospital Executive & Universal Admin Control">
+      <div className="space-y-8 max-w-7xl mx-auto pb-12">
+        {/* 1. Admin Overview Cards */}
+        <AdminOverviewCards overview={overview} />
 
-      {/* 2. Admin Operational Tabs */}
-      <Tabs defaultValue="users" className="w-full">
-        <TabsList className="bg-[#0b1712] border border-[#1b362a] p-1 rounded-xl">
-          <TabsTrigger
-            value="users"
-            className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2"
-          >
-            <Users className="h-4 w-4" />
-            User RBAC Directory ({users.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="departments"
-            className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2"
-          >
-            <Building2 className="h-4 w-4" />
-            Hospital Departments ({departments.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="settings"
-            className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2"
-          >
-            <Sliders className="h-4 w-4" />
-            System & Routing Rules ({rules.length})
-          </TabsTrigger>
-        </TabsList>
+        {/* 2. Admin Operational Tabs */}
+        <Tabs defaultValue="users" className="w-full">
+          <TabsList className="bg-[#edf2ea] border border-[#d8e2d6] p-1 rounded-xl">
+            <TabsTrigger
+              value="users"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <Users className="h-4 w-4" />
+              User RBAC Directory ({users.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="departments"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <Building2 className="h-4 w-4" />
+              Hospital Departments ({departments.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="settings"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <Sliders className="h-4 w-4" />
+              System & Routing Rules ({rules.length})
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="users" className="mt-6">
-          <UserManagementTable initialUsers={users} />
-        </TabsContent>
+          <TabsContent value="users" className="mt-6">
+            <UserManagementTable initialUsers={users} />
+          </TabsContent>
 
-        <TabsContent value="departments" className="mt-6">
-          <DepartmentManagementCard departments={departments} />
-        </TabsContent>
+          <TabsContent value="departments" className="mt-6">
+            <DepartmentManagementCard departments={departments} />
+          </TabsContent>
 
-        <TabsContent value="settings" className="mt-6">
-          <SystemSettingsManager initialRules={rules} />
-        </TabsContent>
-      </Tabs>
-    </div>
+          <TabsContent value="settings" className="mt-6">
+            <SystemSettingsManager initialRules={rules} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </RoleGuard>
   );
 }

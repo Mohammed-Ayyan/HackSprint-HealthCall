@@ -16,6 +16,7 @@ import { CommunicationHistoryList } from "@/features/patient/components/Communic
 import { PatientNotificationsList } from "@/features/patient/components/PatientNotificationsList";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/Tabs";
 import { HeartPulse, Calendar, FileText, PhoneCall, Bell } from "lucide-react";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 
 export default function PatientDashboardPage() {
   const [overview, setOverview] = useState<PatientOverviewData | null>(null);
@@ -53,55 +54,69 @@ export default function PatientDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded-full border-2 border-[#34d399] border-t-transparent animate-spin" />
-          <p className="text-xs font-mono text-[#34d399]">Connecting to Patient Care Network...</p>
+          <div className="h-8 w-8 rounded-full border-2 border-[#1b4332] border-t-transparent animate-spin" />
+          <p className="text-xs font-mono text-[#1b4332]">Connecting to Patient Care Network...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* 1. Overview Cards (Greeting, Next Appointment, Insurance Status, Pending Actions) */}
-      <PatientOverviewCards overview={overview} nextAppointment={appointments[0]} />
+    <RoleGuard allowedRoles={["Patient", "Admin"]} moduleName="Patient Care Experience Portal">
+      <div className="space-y-8 max-w-7xl mx-auto pb-12">
+        {/* 1. Overview Cards (Greeting, Next Appointment, Insurance Status, Pending Actions) */}
+        <PatientOverviewCards overview={overview} nextAppointment={appointments[0]} />
 
-      {/* 2. Interactive Navigation Tabs for Patient Portal */}
-      <Tabs defaultValue="appointments" className="w-full">
-        <TabsList className="bg-[#0b1712] border border-[#1b362a] p-1 rounded-xl">
-          <TabsTrigger value="appointments" className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Appointments
-          </TabsTrigger>
-          <TabsTrigger value="requests" className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Care Requests ({requests.length})
-          </TabsTrigger>
-          <TabsTrigger value="communications" className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2">
-            <PhoneCall className="h-4 w-4" />
-            Call History & AI Summaries
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="data-[state=active]:bg-[#132c21] data-[state=active]:text-[#34d399] flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            Updates & Alerts
-          </TabsTrigger>
-        </TabsList>
+        {/* 2. Interactive Navigation Tabs for Patient Portal */}
+        <Tabs defaultValue="appointments" className="w-full">
+          <TabsList className="bg-[#edf2ea] border border-[#d8e2d6] p-1 rounded-xl">
+            <TabsTrigger
+              value="appointments"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <Calendar className="h-4 w-4" />
+              Appointments
+            </TabsTrigger>
+            <TabsTrigger
+              value="requests"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <FileText className="h-4 w-4" />
+              Care Requests ({requests.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="communications"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <PhoneCall className="h-4 w-4" />
+              Call History & AI Summaries
+            </TabsTrigger>
+            <TabsTrigger
+              value="notifications"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1b4332] data-[state=active]:shadow-sm flex items-center gap-2 text-xs font-semibold"
+            >
+              <Bell className="h-4 w-4" />
+              Updates & Alerts
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="appointments" className="mt-6">
-          <AppointmentManager initialAppointments={appointments} />
-        </TabsContent>
+          <TabsContent value="appointments" className="mt-6">
+            <AppointmentManager initialAppointments={appointments} />
+          </TabsContent>
 
-        <TabsContent value="requests" className="mt-6">
-          <PatientRequestsTable requests={requests} />
-        </TabsContent>
+          <TabsContent value="requests" className="mt-6">
+            <PatientRequestsTable requests={requests} />
+          </TabsContent>
 
-        <TabsContent value="communications" className="mt-6">
-          <CommunicationHistoryList records={communications} />
-        </TabsContent>
+          <TabsContent value="communications" className="mt-6">
+            <CommunicationHistoryList records={communications} />
+          </TabsContent>
 
-        <TabsContent value="notifications" className="mt-6">
-          <PatientNotificationsList notifications={notifications} />
-        </TabsContent>
-      </Tabs>
-    </div>
+          <TabsContent value="notifications" className="mt-6">
+            <PatientNotificationsList notifications={notifications} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </RoleGuard>
   );
 }

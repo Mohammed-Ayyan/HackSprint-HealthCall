@@ -88,15 +88,15 @@ export function AppointmentManager({
   };
 
   return (
-    <Card className={className}>
-      <CardHeader>
+    <Card className={`bg-white border-[#e2e8df] shadow-sm ${className || ""}`}>
+      <CardHeader className="border-b border-[#edf2ea] pb-4">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-lg bg-[#0e2a1e] border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <div className="h-9 w-9 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
             <Calendar className="h-4 w-4" />
           </div>
           <div>
-            <CardTitle>Appointment Schedule & Consultations</CardTitle>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <CardTitle className="text-base text-[#142019]">Appointment Schedule & Consultations</CardTitle>
+            <p className="text-xs text-[#627267] mt-0.5">
               Review confirmed doctor visits, post-op reviews, and request new consultations
             </p>
           </div>
@@ -112,16 +112,16 @@ export function AppointmentManager({
         </Button>
       </CardHeader>
 
-      <div className="mt-4 space-y-3">
+      <div className="p-5 space-y-3">
         {appointments.map((apt) => (
           <div
             key={apt.id}
-            className="p-4 rounded-xl bg-[#09140f] border border-[#183126] hover:border-emerald-500/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            className="p-4 rounded-xl bg-[#fcfdfc] border border-[#e2e8df] hover:border-[#1b4332]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs"
           >
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm text-white">{apt.doctorName}</span>
-                <span className="text-xs text-slate-400">• {apt.doctorSpecialty}</span>
+                <span className="font-bold text-sm text-[#142019]">{apt.doctorName}</span>
+                <span className="text-xs text-[#627267]">• {apt.doctorSpecialty}</span>
                 <Badge
                   variant={
                     apt.status === "confirmed"
@@ -130,7 +130,7 @@ export function AppointmentManager({
                       ? "amber"
                       : apt.status === "cancelled"
                       ? "rose"
-                      : "cyan"
+                      : "teal"
                   }
                   size="sm"
                   dot={apt.status === "confirmed"}
@@ -139,23 +139,23 @@ export function AppointmentManager({
                 </Badge>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-300">
-                <span className="flex items-center gap-1.5 text-emerald-300">
-                  <Calendar className="h-3.5 w-3.5 text-emerald-400" />
+              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-[#4a5a50]">
+                <span className="flex items-center gap-1.5 text-[#059669]">
+                  <Calendar className="h-3.5 w-3.5" />
                   Date: <strong className="font-bold">{apt.date}</strong>
                 </span>
-                <span className="flex items-center gap-1.5 text-amber-300">
-                  <Clock className="h-3.5 w-3.5 text-amber-400" />
+                <span className="flex items-center gap-1.5 text-[#d97706]">
+                  <Clock className="h-3.5 w-3.5" />
                   Time: <strong className="font-bold">{apt.time}</strong>
                 </span>
-                <span className="flex items-center gap-1.5 text-slate-400">
-                  <MapPin className="h-3.5 w-3.5 text-slate-500" />
+                <span className="flex items-center gap-1.5 text-[#627267]">
+                  <MapPin className="h-3.5 w-3.5 text-[#94a399]" />
                   {apt.location}
                 </span>
               </div>
 
               {apt.instructions && (
-                <p className="text-[11px] text-slate-400 pt-1 italic">
+                <p className="text-[11px] text-[#627267] pt-1 italic">
                   Note: {apt.instructions}
                 </p>
               )}
@@ -169,14 +169,14 @@ export function AppointmentManager({
                     setSelectedAptId(apt.id);
                     setIsRescheduleModalOpen(true);
                   }}
-                  className="px-2.5 py-1.5 rounded-lg bg-[#12231b] hover:bg-[#1a3328] text-slate-300 hover:text-emerald-300 border border-[#1e382d] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-2.5 py-1.5 rounded-lg bg-[#f4f8f5] hover:bg-[#e8f0e8] text-[#1b4332] border border-[#d6e2d7] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1"
                 >
                   <RefreshCw className="h-3 w-3" />
                   <span>Reschedule</span>
                 </button>
                 <button
                   onClick={() => handleCancel(apt.id)}
-                  className="px-2.5 py-1.5 rounded-lg bg-[#1a1214] hover:bg-[#2a1619] text-rose-300 hover:text-rose-200 border border-rose-900/40 text-xs font-medium transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-2.5 py-1.5 rounded-lg bg-[#fff5f5] hover:bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1"
                 >
                   <XCircle className="h-3 w-3" />
                   <span>Cancel</span>
@@ -234,7 +234,7 @@ export function AppointmentManager({
             ]}
           />
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-[#183126]">
+          <div className="flex justify-end gap-2 pt-3 border-t border-[#edf2ea]">
             <Button
               type="button"
               variant="outline"
@@ -275,7 +275,7 @@ export function AppointmentManager({
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-[#183126]">
+          <div className="flex justify-end gap-2 pt-3 border-t border-[#edf2ea]">
             <Button
               type="button"
               variant="outline"

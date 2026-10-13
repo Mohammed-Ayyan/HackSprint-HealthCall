@@ -15,17 +15,17 @@ export function SLATrackerCard({ tasks, className }: SLATrackerCardProps) {
     <Card className={className}>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <div className="h-8 w-8 rounded-lg bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332]">
             <Clock className="h-4 w-4" />
           </div>
           <div>
             <CardTitle>Operational SLA Tracking Engine</CardTitle>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[#607264]">
               Real-time countdown deadlines and compliance breach monitors
             </p>
           </div>
         </div>
-        <Badge variant="cyan" size="sm">
+        <Badge variant="emerald" size="sm">
           97.4% Target Compliance
         </Badge>
       </CardHeader>
@@ -41,31 +41,31 @@ export function SLATrackerCard({ tasks, className }: SLATrackerCardProps) {
               className={cn(
                 "p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition-colors",
                 isBreached
-                  ? "bg-rose-950/20 border-rose-500/40"
+                  ? "bg-red-50/80 border-red-200"
                   : isWarning
-                  ? "bg-amber-950/20 border-amber-500/30"
-                  : "bg-slate-900/60 border-slate-800/80"
+                  ? "bg-amber-50/80 border-amber-200"
+                  : "bg-[#f7f9f6] border-[#e2e8e0]"
               )}
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-white">{task.task}</span>
+                  <span className="font-bold text-[#142019]">{task.task}</span>
                   <Badge variant="outline" size="sm">
                     {task.department}
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-400">
-                  Patient: {task.patientName} • Deadline: <strong className="text-slate-300">{task.deadline}</strong>
+                <p className="text-[11px] text-[#607264]">
+                  Patient: {task.patientName} • Deadline: <strong className="text-[#142019]">{task.deadline}</strong>
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="text-right font-mono">
-                  <p className="text-[10px] text-slate-500 uppercase">Remaining Time</p>
+                  <p className="text-[10px] text-[#8fa394] uppercase">Remaining Time</p>
                   <p
                     className={cn(
                       "text-xs font-bold",
-                      isBreached ? "text-rose-400" : isWarning ? "text-amber-400" : "text-cyan-400"
+                      isBreached ? "text-red-700" : isWarning ? "text-amber-800" : "text-[#059669]"
                     )}
                   >
                     {task.sla.remainingHours > 0
