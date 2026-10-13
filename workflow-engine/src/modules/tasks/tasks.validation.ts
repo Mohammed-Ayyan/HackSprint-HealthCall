@@ -240,3 +240,56 @@ export const listTasksQuerySchema = z
     isOverdue:
       data.isOverdue !== undefined ? data.isOverdue : data.is_overdue,
   }));
+
+export const escalateTaskSchema = z
+  .object({
+    reason: z.string().trim().min(1, "reason cannot be empty"),
+    employeeId: z.string().uuid("Invalid employeeId format. Must be a valid UUID.").optional(),
+    employee_id: z.string().uuid("Invalid employee_id format. Must be a valid UUID.").optional(),
+  })
+  .transform((data) => {
+    const employeeId = data.employeeId || data.employee_id;
+    if (!employeeId) {
+      throw new z.ZodError([
+        {
+          code: z.ZodIssueCode.custom,
+          path: ["employeeId"],
+          message: "employeeId is required and must be a valid UUID",
+        },
+      ]);
+    }
+    return {
+      reason: data.reason.trim(),
+      employeeId,
+    };
+  });
+
+const isValidEscalationLevel = (val: unknown): boolean => {
+  if (val === undefined || val === null || val === "") return true;
+  const s = String(val).trim().toUpperCase();
+  return ["1", "2", "MANAGER", "ADMINISTRATOR", "LEVEL_1", "LEVEL_2", "LEVEL1", "LEVEL2"].includes(s);
+};
+
+export const listEscalatedTasksQuerySchema = z
+  .object({
+    escalationLevel: z
+      .union([z.string(), z.number()])
+      .optional()
+      .refine(isValidEscalationLevel, {
+        message: "escalationLevel must be 1 (MANAGER) or 2 (ADMINISTRATOR)",
+      }),
+    escalation_level: z
+      .union([z.string(), z.number()])
+      .optional()
+      .refine(isValidEscalationLevel, {
+        message: "escalation_level must be 1 (MANAGER) or 2 (ADMINISTRATOR)",
+      }),
+  })
+  .transform((data) => ({
+    escalationLevel:
+      data.escalationLevel !== undefined
+        ? data.escalationLevel
+        : data.escalation_level !== undefined
+        ? data.escalation_level
+        : undefined,
+  }));

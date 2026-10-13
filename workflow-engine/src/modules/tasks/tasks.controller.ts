@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { taskService, TaskService } from "./tasks.service";
+import { escalationService } from "../escalation/escalation.service";
 import {
   CreateTaskDTO,
   UpdateTaskStatusDTO,
@@ -156,6 +157,53 @@ export class TaskController {
       res.status(200).json({
         success: true,
         data: notes,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  escalateTask = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const id = req.params.id as string;
+      const { reason, employeeId } = req.body as {
+        reason: string;
+        employeeId: string;
+      };
+      const task = await escalationService.manualEscalate(
+        id,
+        reason,
+        employeeId
+      );
+      res.status(200).json({
+        success: true,
+        message: `Task escalation level successfully updated to '${task.escalationLevel}'`,
+        data: task,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  listEscalatedTasks = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const query = req.query as { escalationLevel?: string | number };
+      const result = await escalationService.getEscalatedTasks(
+        query.escalationLevel
+      );
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        grouped: result.grouped,
+        meta: result.meta,
       });
     } catch (error) {
       next(error);

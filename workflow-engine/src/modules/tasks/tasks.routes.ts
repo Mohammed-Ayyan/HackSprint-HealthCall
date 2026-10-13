@@ -9,6 +9,8 @@ import {
   createTaskNoteSchema,
   listTasksQuerySchema,
   taskIdParamSchema,
+  escalateTaskSchema,
+  listEscalatedTasksQuerySchema,
 } from "./tasks.validation";
 
 const router = Router();
@@ -27,11 +29,28 @@ router.get(
   taskController.listTasks
 );
 
+// GET /api/v1/tasks/escalated - Query escalated tasks (mounted before /:id)
+router.get(
+  "/escalated",
+  validateRequest({ query: listEscalatedTasksQuerySchema }),
+  taskController.listEscalatedTasks
+);
+
 // GET /api/v1/tasks/:id - Retrieve single task details
 router.get(
   "/:id",
   validateRequest({ params: taskIdParamSchema }),
   taskController.getTaskById
+);
+
+// POST /api/v1/tasks/:id/escalate - Manually trigger task escalation
+router.post(
+  "/:id/escalate",
+  validateRequest({
+    params: taskIdParamSchema,
+    body: escalateTaskSchema,
+  }),
+  taskController.escalateTask
 );
 
 // PATCH /api/v1/tasks/:id/status - Update task status with state machine governance
