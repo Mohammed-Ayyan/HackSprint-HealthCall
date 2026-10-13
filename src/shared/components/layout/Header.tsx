@@ -13,6 +13,7 @@ import {
   Check,
   ExternalLink,
   LogOut,
+  Menu,
 } from "lucide-react";
 import { UserRole } from "@/shared/types/user";
 import { useAuth } from "@/features/platform/auth/authContext";
@@ -24,11 +25,16 @@ import { NotificationDropdown } from "@/features/platform/components/Notificatio
 export interface HeaderProps {
   onOpenSearch: () => void;
   onOpenSimulator: () => void;
+  onToggleMobileMenu?: () => void;
 }
 
-export function Header({ onOpenSearch, onOpenSimulator }: HeaderProps) {
+export function Header({
+  onOpenSearch,
+  onOpenSimulator,
+  onToggleMobileMenu,
+}: HeaderProps) {
   const router = useRouter();
-  const { user, role, switchRole, logout } = useAuth();
+  const { user, role, switchRole, logout, isHydrated } = useAuth();
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(mockNotificationsService.getUnreadCount());
@@ -57,9 +63,18 @@ export function Header({ onOpenSearch, onOpenSimulator }: HeaderProps) {
   };
 
   return (
-    <header className="h-16 border-b border-[#e2e8df] bg-white/95 px-6 flex items-center justify-between z-20 sticky top-0 shadow-2xs backdrop-blur-md">
-      {/* Left Search Bar Trigger */}
-      <div className="flex items-center gap-4 flex-1 max-w-md">
+    <header className="h-16 border-b border-[#e2e8df] bg-white/95 px-4 sm:px-6 flex items-center justify-between z-20 sticky top-0 shadow-2xs backdrop-blur-md">
+      {/* Left Search Bar & Mobile Menu Trigger */}
+      <div className="flex items-center gap-2 sm:gap-4 flex-1 max-w-md">
+        {onToggleMobileMenu && (
+          <button
+            onClick={onToggleMobileMenu}
+            className="lg:hidden p-2 rounded-xl bg-[#f7f9f6] border border-[#e2e8df] text-[#425247] hover:text-[#142019] transition-colors cursor-pointer"
+            aria-label="Toggle navigation drawer"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+        )}
         <button
           onClick={onOpenSearch}
           className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#f7f9f6] border border-[#e2e8df] hover:border-[#059669] text-[#627267] hover:text-[#142019] text-xs transition-all shadow-2xs group cursor-pointer"
@@ -115,23 +130,36 @@ export function Header({ onOpenSearch, onOpenSimulator }: HeaderProps) {
           <button
             onClick={() => setIsRoleMenuOpen(!isRoleMenuOpen)}
             className="flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl bg-[#f7f9f6] border border-[#e2e8df] hover:border-[#059669] transition-all cursor-pointer group shadow-2xs"
+            aria-label="User role switcher"
           >
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="h-7 w-7 rounded-lg object-cover border border-[#d8e2d6] group-hover:border-[#059669] transition-colors"
-            />
-            <div className="text-left hidden md:block">
-              <p className="text-xs font-semibold text-[#142019] leading-tight">
-                {user.name}
-              </p>
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] text-[#059669] font-semibold">
-                  {user.role}
-                </span>
-                <span className="text-[10px] text-[#7d8f81]">• {user.department}</span>
-              </div>
-            </div>
+            {!isHydrated ? (
+              <>
+                <div className="h-7 w-7 rounded-lg bg-[#e2e8df] animate-pulse" />
+                <div className="text-left hidden md:flex flex-col gap-1">
+                  <div className="h-3 w-20 bg-[#e2e8df] rounded animate-pulse" />
+                  <div className="h-2 w-14 bg-[#e2e8df] rounded animate-pulse" />
+                </div>
+              </>
+            ) : (
+              <>
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="h-7 w-7 rounded-lg object-cover border border-[#d8e2d6] group-hover:border-[#059669] transition-colors"
+                />
+                <div className="text-left hidden md:block">
+                  <p className="text-xs font-semibold text-[#142019] leading-tight">
+                    {user.name}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] text-[#059669] font-semibold">
+                      {user.role}
+                    </span>
+                    <span className="text-[10px] text-[#7d8f81]">• {user.department}</span>
+                  </div>
+                </div>
+              </>
+            )}
             <ChevronDown className="h-3.5 w-3.5 text-[#7d8f81] group-hover:text-[#142019] transition-transform" />
           </button>
 

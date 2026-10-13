@@ -6,7 +6,7 @@ export interface InsuranceOverviewData {
   rejectedClaimsCount: number;
   urgentCasesCount: number;
 }
-
+ 
 export type ClaimTimelineStage = "Submitted" | "Reviewed" | "Updated" | "Completed";
 
 export interface InsuranceClaim {

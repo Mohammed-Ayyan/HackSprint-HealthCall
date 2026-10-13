@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Users, Shield, UserCheck, Key, Lock } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
+import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { UserManagementTable } from "@/features/platform/components/UserManagementTable";
 import { mockUserService } from "@/features/platform/mockUserService";
 import { User } from "@/shared/types/user";
@@ -26,7 +27,8 @@ export default function UsersPage() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <RoleGuard allowedRoles={["Admin", "Manager"]} moduleName="Staff & RBAC Governance">
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#e2e8e0]">
           <div>
@@ -74,6 +76,7 @@ export default function UsersPage() {
         {/* User Table with Add/Edit/Delete */}
         {!loading && <UserManagementTable initialUsers={users} />}
       </div>
+      </RoleGuard>
     </AppShell>
   );
 }

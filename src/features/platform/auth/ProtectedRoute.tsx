@@ -10,15 +10,15 @@ export interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, isHydrated } = useAuth();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    if (isHydrated && !loading && !isAuthenticated) {
       router.push("/auth/login");
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, loading, isHydrated, router]);
 
-  if (loading || !isAuthenticated) {
+  if (!isHydrated || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f7f9f6]">
         <div className="flex flex-col items-center gap-3">
@@ -27,6 +27,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         </div>
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   return <>{children}</>;
