@@ -51,6 +51,7 @@ app.get("/api/v1/health", (req, res) => {
 // 4. Mount Feature Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", require("./users/user.routes"));
+app.use("/api/v1/patients", require("./patients/patient.routes"));
 
 // 5. Fallback & Error Handling
 app.use(notFoundHandler);

@@ -131,9 +131,27 @@ let requestsStore = [...mockPatientRequests];
  * Patient Service (API-Ready Layer)
  * Future replacement point: GET /api/patient/appointments, POST /api/patient/requests
  */
+import { apiPatientService } from "./apiPatientService";
+
 export const patientService = {
   async getOverview(): Promise<PatientOverviewData> {
-    await new Promise((r) => setTimeout(r, 40));
+    try {
+      const profile = await apiPatientService.getMyProfile();
+      if (profile) {
+        return {
+          ...mockPatientOverview,
+          patientName: profile.name || mockPatientOverview.patientName,
+          mrn: profile.mrn || mockPatientOverview.mrn,
+          assignedPCP: profile.assignedDoctorName
+            ? `${profile.assignedDoctorName} (${profile.department || "Clinical Care"})`
+            : mockPatientOverview.assignedPCP,
+          insuranceProvider: profile.insuranceProvider || mockPatientOverview.insuranceProvider,
+          insuranceStatus: (profile.insuranceStatus as any) || mockPatientOverview.insuranceStatus,
+        };
+      }
+    } catch {
+      // Graceful fallback to mock data
+    }
     return mockPatientOverview;
   },
 
