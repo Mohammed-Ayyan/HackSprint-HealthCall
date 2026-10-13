@@ -12,6 +12,14 @@ interface AuthContextType {
   loading: boolean;
   isHydrated: boolean;
   login: (creds: LoginCredentials) => Promise<AuthResponse>;
+  register: (params: {
+    name: string;
+    email: string;
+    password: string;
+    role: UserRole;
+    department?: string;
+    phone?: string;
+  }) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   switchRole: (role: UserRole) => User;
 }
@@ -56,6 +64,25 @@ export function AuthProvider({
     }
   };
 
+  const register = async (params: {
+    name: string;
+    email: string;
+    password: string;
+    role: UserRole;
+    department?: string;
+    phone?: string;
+  }): Promise<AuthResponse> => {
+    setLoading(true);
+    try {
+      const res = await authService.register(params);
+      setUser(res.user);
+      setIsAuthenticated(true);
+      return res;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async (): Promise<void> => {
     setLoading(true);
     try {
@@ -85,6 +112,7 @@ export function AuthProvider({
         loading,
         isHydrated,
         login,
+        register,
         logout,
         switchRole,
       }}

@@ -135,22 +135,7 @@ export const apiAuthService = {
         redirectTo: getRoleDashboard(feRole),
       };
     } catch (err: any) {
-      console.warn("Backend unavailable, falling back to local session:", err.message);
-      const feRole = params.role;
-      const fallbackUser: User = {
-        ...MOCK_USERS[feRole],
-        name: params.name,
-        email: params.email,
-      };
-      const fallbackToken = `mock-jwt-token-${Date.now()}`;
-      saveSession(fallbackUser, fallbackToken);
-      return {
-        success: true,
-        role: feRole,
-        user: fallbackUser,
-        token: fallbackToken,
-        redirectTo: getRoleDashboard(feRole),
-      };
+      throw new Error(err.message || "Registration failed");
     }
   },
 
@@ -158,61 +143,45 @@ export const apiAuthService = {
    * Real Backend Login: POST /api/v1/auth/login
    */
   async login(creds: LoginCredentials): Promise<AuthResponse> {
-    try {
-      const response = await fetch(`${BACKEND_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: creds.email,
-          password: creds.password || "password123",
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        const feRole = mapBackendRoleToFrontend(data.user.role);
-        const user: User = {
-          id: data.user.id,
-          name: data.user.name,
-          email: data.user.email,
-          role: feRole,
-          department: data.user.department || "General Hospital",
-          status: "active",
-          avatar: data.user.avatar || MOCK_USERS[feRole]?.avatar || "",
-          phone: data.user.phone || "",
-          lastActive: "Now",
-        };
-
-        saveSession(user, data.token);
-
-        return {
-          success: true,
-          role: feRole,
-          user,
-          token: data.token,
-          redirectTo: getRoleDashboard(feRole),
-        };
-      }
-    } catch (err: any) {
-      console.warn("Backend API not reachable, using offline preset session:", err.message);
+    if (!creds.email || !creds.password) {
+      throw new Error("Please enter both email and password.");
     }
 
-    // Seamless fallback to role demo preset if backend not reachable
-    const feRole = creds.role || "Doctor";
-    const template = MOCK_USERS[feRole] || MOCK_USERS.Admin;
+    const response = await fetch(`${BACKEND_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: creds.email.trim(),
+        password: creds.password,
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.success || !data.user) {
+      throw new Error(data.message || "Invalid email or password");
+    }
+
+    const feRole = mapBackendRoleToFrontend(data.user.role);
     const user: User = {
-      ...template,
-      email: creds.email || template.email,
+      id: data.user.id || data.user._id,
+      name: data.user.name,
+      email: data.user.email,
+      role: feRole,
+      department: data.user.department || "General Hospital",
+      status: "active",
+      avatar: data.user.avatar || "",
+      phone: data.user.phone || "",
+      lastActive: "Now",
     };
 
-    const token = `careops-jwt-${Date.now()}`;
-    saveSession(user, token);
+    saveSession(user, data.token);
+
     return {
       success: true,
       role: feRole,
       user,
-      token,
+      token: data.token,
       redirectTo: getRoleDashboard(feRole),
     };
   },

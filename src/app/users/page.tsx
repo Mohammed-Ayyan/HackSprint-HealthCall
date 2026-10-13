@@ -5,7 +5,7 @@ import { Users, Shield, UserCheck, Key, Lock } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
 import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { UserManagementTable } from "@/features/platform/components/UserManagementTable";
-import { mockUserService } from "@/features/platform/mockUserService";
+import { apiUserService } from "@/features/platform/users/apiUserService";
 import { User } from "@/shared/types/user";
 import { Badge } from "@/shared/components/ui/Badge";
 import { Card } from "@/shared/components/ui/Card";
@@ -20,7 +20,7 @@ export default function UsersPage() {
 
   const loadUsers = async () => {
     setLoading(true);
-    const list = await mockUserService.getUsers();
+    const list = await apiUserService.getUsers();
     setUsers(list);
     setLoading(false);
   };

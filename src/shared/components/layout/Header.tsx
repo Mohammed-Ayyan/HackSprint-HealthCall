@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { UserRole } from "@/shared/types/user";
 import { useAuth } from "@/features/platform/auth/authContext";
+import { getRoleDashboard } from "@/features/platform/auth/rolePermissions";
 import { mockNotificationsService } from "@/features/platform/mockNotificationsService";
 import { Button } from "@/shared/components/ui/Button";
 import { Badge } from "@/shared/components/ui/Badge";
@@ -34,27 +35,10 @@ export function Header({
   onToggleMobileMenu,
 }: HeaderProps) {
   const router = useRouter();
-  const { user, role, switchRole, logout, isHydrated } = useAuth();
+  const { user, role, logout, isHydrated } = useAuth();
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(mockNotificationsService.getUnreadCount());
-
-  const availableRoles: { name: UserRole; dashboardUrl: string }[] = [
-    { name: "Patient", dashboardUrl: "/patient/dashboard" },
-    { name: "Doctor", dashboardUrl: "/doctor/dashboard" },
-    { name: "Receptionist", dashboardUrl: "/reception/dashboard" },
-    { name: "Insurance Employee", dashboardUrl: "/insurance/dashboard" },
-    { name: "Manager", dashboardUrl: "/manager/dashboard" },
-    { name: "Admin", dashboardUrl: "/admin/dashboard" },
-  ];
-
-  const handleRoleChange = (targetRole: UserRole, targetUrl?: string) => {
-    switchRole(targetRole);
-    setIsRoleMenuOpen(false);
-    if (targetUrl) {
-      router.push(targetUrl);
-    }
-  };
 
   const handleLogout = async () => {
     setIsRoleMenuOpen(false);
@@ -166,52 +150,52 @@ export function Header({
           {isRoleMenuOpen && (
             <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#e2e8df] shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 text-[#142019]">
               <div className="px-2.5 py-2 border-b border-[#edf2ea]">
-                <p className="text-[10px] uppercase font-bold text-[#7d8f81] tracking-wider">
-                  Active Persona & Role
+                <p className="text-[10px] uppercase font-bold text-[#059669] tracking-wider flex items-center gap-1">
+                  <UserCheck className="h-3 w-3" />
+                  Verified Database Session
                 </p>
                 <p className="text-xs font-bold text-[#142019] mt-0.5">
-                  {user.name} ({role})
+                  {user.name}
                 </p>
                 <p className="text-[11px] text-[#627267] truncate">
-                  Dept: {user.department}
+                  {user.email}
                 </p>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#e8f5e9] text-[#1b4332] font-semibold border border-[#c8e6c9]">
+                    {user.role}
+                  </span>
+                  {user.department && (
+                    <span className="text-[10px] text-[#627267] truncate">• {user.department}</span>
+                  )}
+                </div>
               </div>
 
               <div className="py-1 space-y-0.5">
-                <p className="px-2 pt-1 text-[10px] uppercase font-bold text-[#7d8f81] tracking-wider">
-                  Switch Persona (Quick Demo)
-                </p>
-                {availableRoles.map((r) => (
-                  <button
-                    key={r.name}
-                    onClick={() => handleRoleChange(r.name, r.dashboardUrl)}
-                    className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#334139] hover:text-[#142019] hover:bg-[#edf5ee] transition-colors cursor-pointer group"
-                  >
-                    <span className={r.name === role ? "text-[#1b4332] font-bold" : ""}>
-                      {r.name}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {r.name === role && <Check className="h-3.5 w-3.5 text-[#059669]" />}
-                      <ExternalLink className="h-3 w-3 text-[#94a390] opacity-0 group-hover:opacity-100" />
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              <div className="pt-2 border-t border-[#edf2ea] space-y-1">
+                <Link
+                  href={getRoleDashboard(role)}
+                  onClick={() => setIsRoleMenuOpen(false)}
+                  className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#334139] hover:text-[#142019] hover:bg-[#edf5ee] transition-colors group"
+                >
+                  <span>My Assigned Portal</span>
+                  <ExternalLink className="h-3 w-3 text-[#94a390] group-hover:text-[#142019]" />
+                </Link>
                 <Link
                   href="/profile"
                   onClick={() => setIsRoleMenuOpen(false)}
-                  className="block px-2.5 py-1 text-[11px] text-[#334139] hover:text-[#059669] font-medium"
+                  className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#334139] hover:text-[#142019] hover:bg-[#edf5ee] transition-colors group"
                 >
-                  My Profile & Activity Timeline →
+                  <span>Profile & Security Credentials</span>
+                  <ExternalLink className="h-3 w-3 text-[#94a390] group-hover:text-[#142019]" />
                 </Link>
+              </div>
+
+              <div className="pt-2 border-t border-[#edf2ea] space-y-1">
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-between px-2.5 py-1 text-[11px] text-[#dc2626] hover:bg-[#fef2f2] rounded-md transition-colors font-medium text-left cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-1.5 text-xs text-[#dc2626] hover:bg-[#fef2f2] rounded-lg transition-colors font-medium text-left cursor-pointer"
                 >
                   <span>Sign Out</span>
-                  <LogOut className="h-3 w-3" />
+                  <LogOut className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>

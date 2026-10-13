@@ -19,7 +19,7 @@ async function seed() {
   // 1. Seed or update Users
   const usersToSeed = [
     {
-      name: "Admin User",
+      name: "Dr. Evelyn Vance",
       email: "admin@metrohealth.eco",
       password: "password123",
       role: USER_ROLES.ADMIN,
@@ -40,6 +40,20 @@ async function seed() {
       department: "Central Intake & Scheduling",
     },
     {
+      name: "Marcus Sterling",
+      email: "marcus.s@metrohealth.eco",
+      password: "password123",
+      role: USER_ROLES.INSURANCE_EMPLOYEE,
+      department: "RCM & Prior-Authorization Division",
+    },
+    {
+      name: "Dr. Eleanor Vance",
+      email: "eleanor.v@metrohealth.eco",
+      password: "password123",
+      role: USER_ROLES.DEPARTMENT_MANAGER,
+      department: "Surgical Recovery & Operations Management",
+    },
+    {
       name: "Rahul Sharma",
       email: "rahul.sharma@email.com",
       password: "password123",
@@ -57,7 +71,12 @@ async function seed() {
       await existing.save();
       console.log(`Created user: ${u.email} (${u.role})`);
     } else {
-      console.log(`User already exists: ${u.email}`);
+      existing.name = u.name;
+      existing.role = u.role;
+      existing.department = u.department;
+      existing.password = u.password;
+      await existing.save();
+      console.log(`Updated user: ${u.email} (${u.role})`);
     }
     seededUsers[u.role] = existing;
   }

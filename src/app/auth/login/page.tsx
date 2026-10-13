@@ -93,8 +93,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState("dr.rahul@metrohealth.eco");
-  const [password, setPassword] = useState("••••••••••••");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("Doctor");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -119,25 +119,17 @@ export default function LoginPage() {
         setErrorMsg("Failed to authenticate with current credentials.");
       }
     } catch (err: unknown) {
-      setErrorMsg("An error occurred during authentication.");
+      setErrorMsg(err instanceof Error ? err.message : "Invalid email or password.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleQuickPreset = async (targetRole: UserRole, userEmail: string) => {
-    setLoading(true);
+  const handleQuickPreset = (targetRole: UserRole, userEmail: string) => {
     setErrorMsg(null);
     setRole(targetRole);
     setEmail(userEmail);
-    try {
-      const res = await login({ email: userEmail, password: "demo-password", role: targetRole });
-      if (res.success && res.redirectTo) {
-        router.push(res.redirectTo);
-      }
-    } finally {
-      setLoading(false);
-    }
+    setPassword("password123");
   };
 
   return (
