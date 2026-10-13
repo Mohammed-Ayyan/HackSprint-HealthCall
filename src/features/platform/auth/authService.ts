@@ -141,66 +141,85 @@ export const authService = {
   },
 
   async login(creds: LoginCredentials): Promise<AuthResponse> {
-    // Attempt real backend authentication first if available
-    try {
-      const response = await fetch(`${BACKEND_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: creds.email,
-          password: creds.password || "password123",
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success && data.user) {
-        const mappedRole: UserRole =
-          creds.role || (data.user.role === "DOCTOR" ? "Doctor" : "Admin");
-        const user: User = {
-          id: data.user.id || data.user._id,
-          name: data.user.name,
-          email: data.user.email,
-          role: mappedRole,
-          department: data.user.department || "General Hospital",
-          status: "active",
-          avatar: data.user.avatar || MOCK_USERS[mappedRole]?.avatar || "",
-          phone: data.user.phone || "",
-          lastActive: "Now",
-        };
-
-        saveSession(user, data.token);
-
-        return {
-          success: true,
-          role: mappedRole,
-          user,
-          token: data.token,
-          redirectTo: getRoleDashboard(mappedRole),
-        };
-      }
-    } catch {
-      // Backend not running, fall back gracefully to template user
+    if (!creds.email || !creds.password) {
+      throw new Error("Please enter both email and password.");
     }
 
-    // Resolve matching template user based on selected role
-    const templateUser = MOCK_USERS[creds.role] || MOCK_USERS.Admin;
+    const response = await fetch(`${BACKEND_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: creds.email.trim(),
+        password: creds.password,
+      }),
+    });
 
-    const loggedInUser: User = {
-      ...templateUser,
-      email: creds.email || templateUser.email,
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.success || !data.user) {
+      throw new Error(data.message || "Invalid email or password");
+    }
+
+    const { mapBackendRoleToFrontend } = await import("./apiAuthService");
+    const feRole = mapBackendRoleToFrontend(data.user.role);
+
+    const user: User = {
+      id: data.user.id || data.user._id,
+      name: data.user.name,
+      email: data.user.email,
+      role: feRole,
+      department: data.user.department || "General Hospital",
+      status: "active",
+      avatar: data.user.avatar || "",
+      phone: data.user.phone || "",
+      lastActive: "Now",
     };
 
-    const token = `careops-jwt-${Date.now()}`;
-    saveSession(loggedInUser, token);
+    saveSession(user, data.token);
 
     return {
       success: true,
-      role: loggedInUser.role,
-      user: loggedInUser,
-      token,
-      redirectTo: getRoleDashboard(loggedInUser.role),
+      role: feRole,
+      user,
+      token: data.token,
+      redirectTo: getRoleDashboard(feRole),
     };
+  },
+
+  async fetchCurrentUser(): Promise<User | null> {
+    const token = getClientToken();
+    if (!token) return getClientSession();
+
+    try {
+      const response = await fetch(`${BACKEND_BASE_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok && (data.id || data._id)) {
+        const { mapBackendRoleToFrontend } = await import("./apiAuthService");
+        const feRole = mapBackendRoleToFrontend(data.role);
+        const user: User = {
+          id: data.id || data._id,
+          name: data.name,
+          email: data.email,
+          role: feRole,
+          department: data.department || "",
+          status: "active",
+          avatar: data.avatar || "",
+          phone: data.phone || "",
+          lastActive: "Now",
+        };
+        saveSession(user, token);
+        return user;
+      }
+    } catch {
+      // Ignore network errors
+    }
+
+    return getClientSession();
   },
 
   async logout(): Promise<void> {
@@ -221,8 +240,8 @@ export const authService = {
   },
 
   switchRole(role: UserRole): User {
-    const user = MOCK_USERS[role] || MOCK_USERS.Admin;
-    saveSession(user);
-    return user;
+    const current = getClientSession();
+    if (current) return current;
+    return MOCK_USERS.Admin;
   },
 };

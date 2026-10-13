@@ -118,19 +118,20 @@ export function RoleGuard({
             </Button>
           </Link>
 
-          <Button
-            variant="primary"
-            size="md"
-            onClick={() => handleSimulateSwitch(targetRole)}
-            className="w-full sm:w-auto gap-2"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            <span>Switch to {targetRole}</span>
-          </Button>
+          <Link href="/auth/login" className="w-full sm:w-auto">
+            <Button
+              variant="primary"
+              size="md"
+              className="w-full gap-2"
+            >
+              <span>Sign In with {targetRole}</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
+          </Link>
         </div>
 
         <p className="text-[11px] text-[#627267] pt-2">
-          Tip: You can also switch personas anytime via the top navigation avatar menu.
+          Authentication & Role-Based Access Control enforced by CareOps Security Matrix.
         </p>
       </Card>
     </div>

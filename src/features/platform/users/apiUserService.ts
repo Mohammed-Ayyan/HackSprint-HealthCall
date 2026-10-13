@@ -7,18 +7,13 @@
 
 import { User, UserRole } from "@/shared/types/user";
 import { mapBackendRoleToFrontend, mapFrontendRoleToBackend } from "../auth/apiAuthService";
-import { mockUsersList } from "../mockAuthService";
+import { getClientToken } from "../auth/sessionStore";
 
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
-const TOKEN_KEY = "careops_jwt_token";
-
-let localFallbackUsers: User[] = [...mockUsersList];
-
 function getAuthToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return getClientToken();
 }
 
 function normalizeUserFromApi(apiUser: any): User {
@@ -54,38 +49,39 @@ export const apiUserService = {
   }): Promise<User[]> {
     const token = getAuthToken();
 
-    if (token) {
-      try {
-        const queryParams = new URLSearchParams();
-        if (filters?.role) queryParams.append("role", filters.role);
-        if (filters?.department) queryParams.append("department", filters.department);
-        if (filters?.status) queryParams.append("status", filters.status);
-        if (filters?.search) queryParams.append("search", filters.search);
-
-        const url = `${BACKEND_BASE_URL}/users${
-          queryParams.toString() ? `?${queryParams.toString()}` : ""
-        }`;
-
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && Array.isArray(data.users)) {
-            return data.users.map(normalizeUserFromApi);
-          }
-        }
-      } catch (err: any) {
-        console.warn("Backend user service unreachable, using fallback list:", err.message);
-      }
+    if (!token) {
+      return [];
     }
 
-    // Offline / demo fallback
-    return [...localFallbackUsers];
+    try {
+      const queryParams = new URLSearchParams();
+      if (filters?.role) queryParams.append("role", filters.role);
+      if (filters?.department) queryParams.append("department", filters.department);
+      if (filters?.status) queryParams.append("status", filters.status);
+      if (filters?.search) queryParams.append("search", filters.search);
+
+      const url = `${BACKEND_BASE_URL}/users${
+        queryParams.toString() ? `?${queryParams.toString()}` : ""
+      }`;
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.users)) {
+          return data.users.map(normalizeUserFromApi);
+        }
+      }
+    } catch (err: any) {
+      console.error("[apiUserService] Backend user service request failed:", err.message);
+    }
+
+    return [];
   },
 
   /**
@@ -94,28 +90,26 @@ export const apiUserService = {
    */
   async getUserById(id: string): Promise<User | null> {
     const token = getAuthToken();
+    if (!token) return null;
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/users/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    try {
+      const res = await fetch(`${BACKEND_BASE_URL}/users/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.user) {
-            return normalizeUserFromApi(data.user);
-          }
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          return normalizeUserFromApi(data.user);
         }
-      } catch (err: any) {
-        console.warn("Backend user service unreachable:", err.message);
       }
+    } catch (err: any) {
+      console.error(`[apiUserService] Failed to get user ${id}:`, err.message);
     }
 
-    const found = localFallbackUsers.find((u) => u.id === id);
-    return found || null;
+    return null;
   },
 
   /**
@@ -133,64 +127,35 @@ export const apiUserService = {
     status?: string;
   }): Promise<User> {
     const token = getAuthToken();
+    if (!token) throw new Error("Authentication token required to create users.");
 
-    if (token) {
-      try {
-        const payload = {
-          name: newUser.name,
-          email: newUser.email,
-          password: newUser.password || "HospitalAdmin123!",
-          role: mapFrontendRoleToBackend(newUser.role),
-          department: newUser.department || "General",
-          phone: newUser.phone || "",
-          avatar: newUser.avatar || "",
-          status: newUser.status || "ACTIVE",
-        };
-
-        const res = await fetch(`${BACKEND_BASE_URL}/users`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.user) {
-            const normalized = normalizeUserFromApi(data.user);
-            localFallbackUsers.unshift(normalized);
-            return normalized;
-          }
-        } else {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.message || "Failed to create user on backend");
-        }
-      } catch (err: any) {
-        console.warn("Backend user creation failed, applying fallback:", err.message);
-      }
-    }
-
-    // Local fallback
-    const fallbackUser: User = {
-      id: `usr-${Date.now()}`,
+    const payload = {
       name: newUser.name,
       email: newUser.email,
-      role: newUser.role,
+      password: newUser.password || "password123",
+      role: mapFrontendRoleToBackend(newUser.role),
       department: newUser.department || "General",
-      status: "active",
-      avatar:
-        newUser.avatar ||
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
       phone: newUser.phone || "",
-      assignedTasksCount: 0,
-      completedTasksCount: 0,
-      avgResolutionMinutes: 0,
-      lastActive: "Just now",
+      avatar: newUser.avatar || "",
+      status: newUser.status || "ACTIVE",
     };
-    localFallbackUsers.unshift(fallbackUser);
-    return fallbackUser;
+
+    const res = await fetch(`${BACKEND_BASE_URL}/users`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data.success || !data.user) {
+      throw new Error(data.message || "Failed to create user on backend.");
+    }
+
+    return normalizeUserFromApi(data.user);
   },
 
   // Backwards-compatible alias for existing frontend callers
@@ -204,42 +169,29 @@ export const apiUserService = {
    */
   async updateUser(id: string, updates: Partial<User>): Promise<User | null> {
     const token = getAuthToken();
+    if (!token) throw new Error("Authentication token required to update user.");
 
-    if (token) {
-      try {
-        const payload: any = { ...updates };
-        if (updates.role) {
-          payload.role = mapFrontendRoleToBackend(updates.role as UserRole);
-        }
-
-        const res = await fetch(`${BACKEND_BASE_URL}/users/${id}`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.user) {
-            const normalized = normalizeUserFromApi(data.user);
-            const idx = localFallbackUsers.findIndex((u) => u.id === id);
-            if (idx !== -1) localFallbackUsers[idx] = normalized;
-            return normalized;
-          }
-        }
-      } catch (err: any) {
-        console.warn("Backend user update failed:", err.message);
-      }
+    const payload: any = { ...updates };
+    if (updates.role) {
+      payload.role = mapFrontendRoleToBackend(updates.role as UserRole);
     }
 
-    // Local fallback
-    const index = localFallbackUsers.findIndex((u) => u.id === id);
-    if (index === -1) return null;
-    localFallbackUsers[index] = { ...localFallbackUsers[index], ...updates };
-    return localFallbackUsers[index];
+    const res = await fetch(`${BACKEND_BASE_URL}/users/${id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data.success || !data.user) {
+      throw new Error(data.message || "Failed to update user on backend.");
+    }
+
+    return normalizeUserFromApi(data.user);
   },
 
   /**
@@ -248,30 +200,24 @@ export const apiUserService = {
    */
   async changeStatus(id: string, status: "ACTIVE" | "INACTIVE" | "SUSPENDED"): Promise<User | null> {
     const token = getAuthToken();
+    if (!token) throw new Error("Authentication token required to change user status.");
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/users/${id}/status`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status }),
-        });
+    const res = await fetch(`${BACKEND_BASE_URL}/users/${id}/status`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.user) {
-            return normalizeUserFromApi(data.user);
-          }
-        }
-      } catch (err: any) {
-        console.warn("Backend user status update failed:", err.message);
-      }
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data.success || !data.user) {
+      throw new Error(data.message || "Failed to update user status.");
     }
 
-    return this.updateUser(id, { status: status.toLowerCase() as any });
+    return normalizeUserFromApi(data.user);
   },
 
   /**
@@ -280,30 +226,21 @@ export const apiUserService = {
    */
   async deleteUser(id: string): Promise<boolean> {
     const token = getAuthToken();
+    if (!token) throw new Error("Authentication token required to delete user.");
 
-    if (token) {
-      try {
-        const res = await fetch(`${BACKEND_BASE_URL}/users/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    const res = await fetch(`${BACKEND_BASE_URL}/users/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success) {
-            localFallbackUsers = localFallbackUsers.filter((u) => u.id !== id);
-            return true;
-          }
-        }
-      } catch (err: any) {
-        console.warn("Backend user deletion failed:", err.message);
-      }
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Failed to delete user on backend.");
     }
 
-    const initialLen = localFallbackUsers.length;
-    localFallbackUsers = localFallbackUsers.filter((u) => u.id !== id);
-    return localFallbackUsers.length < initialLen;
+    return true;
   },
 };

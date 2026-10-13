@@ -230,7 +230,7 @@ export const receptionService = {
   async getPatientDirectory(): Promise<DirectoryPatient[]> {
     try {
       const apiPatients = await apiPatientService.getPatients();
-      if (apiPatients && apiPatients.length > 0) {
+      if (apiPatients) {
         return apiPatients.map((p) => ({
           id: p.id,
           mrn: p.mrn,
@@ -238,50 +238,38 @@ export const receptionService = {
           contact: p.phone,
           email: p.email,
           dob: p.dateOfBirth || "1990-01-01",
-          insuranceProvider: p.insuranceProvider || "BlueCross Premier PPO",
+          insuranceProvider: p.insuranceProvider || "MetroHealth Care Plan",
           lastVisit: "Recent Consultation",
           totalAppointments: 1,
         }));
       }
-    } catch {
-      // Graceful fallback to local directory store
+    } catch (err: any) {
+      console.error("[receptionService] Failed to fetch patient directory from backend:", err.message);
     }
-    return [...directoryStore];
+    return [];
   },
 
   async createPatient(
     data: Omit<DirectoryPatient, "id" | "totalAppointments">
   ): Promise<DirectoryPatient> {
-    try {
-      const created = await apiPatientService.createPatient({
-        name: data.name,
-        email: data.email,
-        phone: data.contact,
-        dateOfBirth: data.dob,
-        insuranceProvider: data.insuranceProvider,
-      });
-      const dirPat: DirectoryPatient = {
-        id: created.id,
-        mrn: created.mrn,
-        name: created.name,
-        contact: created.phone,
-        email: created.email,
-        dob: created.dateOfBirth || data.dob,
-        insuranceProvider: created.insuranceProvider || data.insuranceProvider,
-        lastVisit: data.lastVisit || "Today (Intake)",
-        totalAppointments: 1,
-      };
-      directoryStore.unshift(dirPat);
-      return dirPat;
-    } catch {
-      const newPat: DirectoryPatient = {
-        ...data,
-        id: `dp-${Date.now()}`,
-        totalAppointments: 1,
-      };
-      directoryStore.unshift(newPat);
-      return newPat;
-    }
+    const created = await apiPatientService.createPatient({
+      name: data.name,
+      email: data.email,
+      phone: data.contact,
+      dateOfBirth: data.dob,
+      insuranceProvider: data.insuranceProvider,
+    });
+    return {
+      id: created.id,
+      mrn: created.mrn,
+      name: created.name,
+      contact: created.phone,
+      email: created.email,
+      dob: created.dateOfBirth || data.dob,
+      insuranceProvider: created.insuranceProvider || data.insuranceProvider,
+      lastVisit: data.lastVisit || "Today (Intake)",
+      totalAppointments: 1,
+    };
   },
 
   async getDoctorSchedules(): Promise<DoctorScheduleSlot[]> {

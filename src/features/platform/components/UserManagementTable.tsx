@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { User, UserRole } from "@/shared/types/user";
 import { DepartmentName } from "@/shared/types/action";
-import { mockUserService } from "@/features/platform/mockUserService";
+import { apiUserService } from "@/features/platform/users/apiUserService";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/Card";
 import { Button } from "@/shared/components/ui/Button";
 import { Badge } from "@/shared/components/ui/Badge";
@@ -20,6 +20,10 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+
+  React.useEffect(() => {
+    setUsers(initialUsers);
+  }, [initialUsers]);
 
   // Form states
   const [name, setName] = useState("");
@@ -53,7 +57,7 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
     if (!name || !email) return;
 
     if (editingUser) {
-      const updated = await mockUserService.updateUser(editingUser.id, {
+      const updated = await apiUserService.updateUser(editingUser.id, {
         name,
         email,
         role,
@@ -64,14 +68,15 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
         setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
       }
     } else {
-      const created = await mockUserService.addUser({
+      const created = await apiUserService.createUser({
         name,
         email,
         role,
         department,
-        status: "active",
+        status: "ACTIVE",
         avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
         phone,
+        password: "password123",
       });
       setUsers((prev) => [created, ...prev]);
     }
@@ -80,7 +85,7 @@ export function UserManagementTable({ initialUsers, className }: UserManagementT
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to remove this staff user?")) {
-      await mockUserService.deleteUser(id);
+      await apiUserService.deleteUser(id);
       setUsers((prev) => prev.filter((u) => u.id !== id));
     }
   };

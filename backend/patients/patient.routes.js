@@ -39,7 +39,7 @@ router.get(
 // API 4: GET MY PROFILE (PATIENT, ADMIN)
 // Mounted BEFORE /:id to prevent Express from treating "me" as an :id parameter
 router.get(
-  "/me",
+  ["/me", "/profile/me"],
   requireRole(USER_ROLES.PATIENT, USER_ROLES.ADMIN),
   patientController.getMyProfile
 );
