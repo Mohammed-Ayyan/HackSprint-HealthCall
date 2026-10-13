@@ -46,8 +46,38 @@ function normalizeRole(roleInput) {
   return null;
 }
 
+const USER_STATUS = Object.freeze({
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
+  SUSPENDED: "SUSPENDED",
+});
+
+const VALID_STATUSES = Object.freeze(Object.values(USER_STATUS));
+
+/**
+ * Normalizes input status strings from frontend or API payloads
+ * to the canonical USER_STATUS enum value.
+ * Supports: "active" -> "ACTIVE", "inactive" -> "INACTIVE", "suspended" -> "SUSPENDED"
+ * 
+ * @param {string} statusInput 
+ * @returns {string|null} Canonical USER_STATUS value or null if invalid
+ */
+function normalizeStatus(statusInput) {
+  if (!statusInput || typeof statusInput !== "string") return null;
+
+  const upper = statusInput.trim().toUpperCase();
+  if (VALID_STATUSES.includes(upper)) {
+    return upper;
+  }
+
+  return null;
+}
+
 module.exports = {
   USER_ROLES,
   VALID_ROLES,
   normalizeRole,
+  USER_STATUS,
+  VALID_STATUSES,
+  normalizeStatus,
 };
