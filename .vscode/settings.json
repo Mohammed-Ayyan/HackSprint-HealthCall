@@ -1,0 +1,13 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/ai-engine/.venv/Scripts/python.exe",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/ai-engine"
+  ],
+  "python.autoComplete.extraPaths": [
+    "${workspaceFolder}/ai-engine"
+  ],
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "ai-engine"
+  ]
+}
