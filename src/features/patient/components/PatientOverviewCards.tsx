@@ -56,8 +56,8 @@ export function PatientOverviewCards({ overview, nextAppointment }: PatientOverv
             <div className="h-10 w-10 rounded-xl bg-[#e8f3ec] text-[#1b4332] flex items-center justify-center">
               <Calendar className="h-5 w-5" />
             </div>
-            <Badge variant={nextAppointment?.status === "confirmed" ? "emerald" : "amber"}>
-              {nextAppointment?.status ? nextAppointment.status.toUpperCase() : "SCHEDULED"}
+            <Badge variant={nextAppointment ? (nextAppointment.status === "confirmed" ? "emerald" : "amber") : "default"}>
+              {nextAppointment?.status ? nextAppointment.status.toUpperCase() : "NONE"}
             </Badge>
           </div>
           
@@ -77,13 +77,8 @@ export function PatientOverviewCards({ overview, nextAppointment }: PatientOverv
               </div>
             ) : (
               <div className="mt-2">
-                <p className="text-sm font-semibold text-[#142019]">Dr. Rahul</p>
-                <p className="text-xs text-[#627267]">Post-Op Wound Check</p>
-                <div className="mt-3 flex items-center gap-4 text-xs font-mono text-[#1b4332] bg-[#f4f8f5] px-3 py-2 rounded-lg border border-[#dce8df]">
-                  <span>15 October</span>
-                  <span>•</span>
-                  <span>10:30 AM</span>
-                </div>
+                <p className="text-sm font-semibold text-[#627267]">No upcoming appointments</p>
+                <p className="text-xs text-[#627267]">Book a consultation slot below</p>
               </div>
             )}
           </div>

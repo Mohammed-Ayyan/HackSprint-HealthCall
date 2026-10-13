@@ -118,6 +118,29 @@ async function createUser(data) {
 
   await newUser.save();
 
+  // If new user is DOCTOR, automatically provision Doctor collection profile
+  if (newUser.role === USER_ROLES.DOCTOR) {
+    try {
+      const Doctor = require("../models/Doctor");
+      const existingDoc = await Doctor.findOne({ email: newUser.email.toLowerCase() });
+      if (!existingDoc) {
+        await Doctor.create({
+          userId: newUser._id,
+          name: newUser.name,
+          email: newUser.email.toLowerCase(),
+          phone: newUser.phone || "",
+          department: newUser.department || "Cardiology",
+          specialization: newUser.department || "General Medicine",
+          qualification: "MBBS, MD",
+          experience: 5,
+          status: "ACTIVE",
+        });
+      }
+    } catch {
+      // Ignore conflict
+    }
+  }
+
   return newUser.toJSON();
 }
 

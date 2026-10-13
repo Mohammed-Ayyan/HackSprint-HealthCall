@@ -1,557 +1,328 @@
-# CareOps AI — Healthcare Call Intelligence & Operations Platform
+# CareOps AI
 
-> **Autonomous Clinical Telephony Processing, NLU Intent Classification, and Departmental Workflow Dispatch**
+> **AI-powered healthcare operations intelligence platform that converts conversations into actionable workflows.**
 
-CareOps AI transforms chaotic patient phone calls into structured, verified hospital actions in real time. Designed as an operational intelligence console for hospital command centers, nursing supervisors, and departmental leads, CareOps AI ensures zero dropped follow-ups, instantaneous prior-authorization initiation, and continuous SLA enforcement.
-
----
-
-## 1. Project Overview
-
-Hospitals receive thousands of patient calls daily regarding post-op complications, prescription renewals, billing disputes, and insurance hurdles. In legacy healthcare systems, these conversations are transcribed manually or lost in disconnected voicemail queues.
-
-**CareOps AI** introduces a real-time, deterministic intelligence pipeline:
-
-```
-Patient Call
-     ↓
-Dual-Channel Speech Processing (Whisper-v3 Diarization)
-     ↓
-AI Conversation Understanding (NLU Clinical Parser)
-     ↓
-Summary + Intent Detection + Sentiment Scoring + Priority Classification
-     ↓
-Action & Commitment Extraction (Transcript-Grounded)
-     ↓
-Autonomous Department Routing (Reception, Insurance, Billing, Pharmacy, Triage)
-     ↓
-Task Tracking & SLA Countdown Engine (4-Column Kanban)
-     ↓
-Hospital Operations Intelligence Dashboard & Compliance Ledger
-```
+CareOps AI transforms chaotic, unstructured clinical phone calls and healthcare communications into structured, verified hospital actions in real time. Designed for hospital command centers, physicians, intake staff, and operational administrators, CareOps AI guarantees zero dropped patient commitments, immediate triage, automated appointment scheduling, and continuous SLA compliance.
 
 ---
 
-## 2. Frontend Architecture
+## Problem Statement
 
-The platform is engineered around a **Clean Feature-Based Architecture** built for Phase 1 mock demonstration and seamless Phase 2 backend replacement without modifying any UI components.
+Modern healthcare facilities handle thousands of inbound phone calls, triage inquiries, and post-discharge consultations every day:
+
+1. **Critical Information Trapped in Voice Audio**: Vital clinical details (such as post-operative fever, medication intolerances, or wound drainage) are buried inside lengthy voice conversations.
+2. **Manual Documentation Bottlenecks**: Healthcare workers spend hours manually transcribing calls, leading to documentation backlogs, clinician burnout, and delayed care delivery.
+3. **Dropped Commitments & Missed SLAs**: Verbal promises made over the phone (*"We will check with the doctor and call you back by noon"*) are frequently forgotten or lost in disconnected voicemail queues.
+4. **Disjointed Departmental Handoffs**: Front desk intake, insurance prior-authorization desks, nursing triage, and clinical staff operate in silos without a centralized, synchronized operational ledger.
+
+---
+
+## Solution
+
+CareOps AI introduces an autonomous, real-time intelligence and workflow pipeline that captures and parses healthcare conversations into deterministic hospital outcomes:
+
+- **Structured Clinical Summaries**: Auto-generates concise, medically grounded conversation summaries highlighting patient concerns and acute symptoms.
+- **Transcript-Anchored Action Items**: Extracts explicit commitments and tasks verified against verbatim timestamps in patient speech.
+- **Autonomous Department Routing**: Automatically classifies intents and dispatches tasks to the appropriate hospital division (Front Desk, Cardiology, Surgical Recovery, Prior-Auth).
+- **End-to-End Workflow & SLA Management**: Synchronizes patient bookings, physician queues, and real-time operational metrics across an authenticated MongoDB backend.
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           UI Layer (App Router)                         │
-│   /landing • /dashboard • /calls • /calls/[id] • /actions • /analytics  │
-└────────────────────────────────────┬────────────────────────────────────┘
-                                     │
-┌────────────────────────────────────▼────────────────────────────────────┐
-│                    Shared UI & Antigravity Design System                 │
-│      Button, Card, Badge, Modal, Tabs, LiveWaveform, AudioPlayer, Stat   │
-└────────────────────────────────────┬────────────────────────────────────┘
-                                     │
-┌────────────────────────────────────▼────────────────────────────────────┐
-│                       Feature Modules & State                           │
-│  src/features/ai-intelligence   src/features/workflow   src/features/platform │
-└────────────────────────────────────┬────────────────────────────────────┘
-                                     │
-┌────────────────────────────────────▼────────────────────────────────────┐
-│                   Mock Service Layer (API Contract Compliant)           │
-│   mockCallService.ts • mockCallsService.ts • mockTasksService.ts        │
-│   mockAuthService.ts • mockUserService.ts  • mockAnalyticsService.ts    │
-└────────────────────────────────────┬────────────────────────────────────┘
-                                     │ (Phase 2 Clean Replacement Point)
-┌────────────────────────────────────▼────────────────────────────────────┐
-│                      Future Production Backend APIs                     │
-│               FastAPI / Go Telephony / Epic FHIR / PostgreSQL           │
-└─────────────────────────────────────────────────────────────────────────┘
+Healthcare Conversation (Telephony / Patient Input)
+                     ↓
+Dual-Channel Audio & NLU Intent Classification
+                     ↓
+Structured Clinical Extraction (Symptoms, Commitments, Urgency)
+                     ↓
+Autonomous Department Dispatch (Reception • Doctor • Insurance • Manager)
+                     ↓
+Real-Time MongoDB Synchronization & Live Clinical Dashboards
 ```
 
 ---
 
-## 3. Feature List
+## Key Features
 
-### Module 1: AI Intelligence Frontend
-- **Live Call Telephony Monitor**: Real-time dual-channel audio waveforms, live speaking status, and encrypted recording indicators.
-- **Interactive Call Simulator**: Sandbox modal allowing judges to trigger an inbound telephony stream and watch diarization, clinical intent detection, and task generation live.
-- **Synchronized Audio Scrubber**: Interactive player with speed adjustments (1x, 1.25x, 1.5x) and timestamped scrubbers.
-- **Clinical Summary & Structured Points**: Auto-generated concise summaries, clinical flags, and prior-auth status.
-- **Multi-Label Intent Detection**: Classifies across *Appointment Request*, *Insurance Query*, *Complaint*, *Billing Issue*, *Medicine Refill*, and *Emergency Concern*.
-- **Vocal Stress & Sentiment Gauge**: Real-time valence spectrum from *Angry* to *Positive* with normalized score (-1.0 to +1.0).
-- **Grounded Evidence Viewer**: Cryptographically anchors every extracted action to exact verbatim quotes from the patient conversation.
-- **Verbal Commitment Tracker**: Monitors promises made to patients (e.g., *"We will call you back by 10:00 AM"*) with owner tracking and fulfillment checkboxes.
+### 1. Frontend Implementation
+- **Solarpunk Healthcare Design System**: Modern, eco-futuristic UI engineered with Tailwind CSS, custom glassmorphism tokens, and responsive layout primitives.
+- **Multi-Role Tailored Dashboards**: Specialized views for every hospital stakeholder with route guards and role-specific workflows.
+- **Patient Experience Portal**: Self-service portal where verified patients inspect their EHR medical records, schedule consultations with real database physicians, view doctor recommendations, and receive real-time appointment alerts.
+- **Doctor / Clinician Station**: Live clinical queue populated directly from MongoDB appointments, displaying assigned patient rosters, AI-synthesized chief complaints, triage urgency, and consultation trackers.
+- **Reception & Intake Gateway**: Centralized front-desk intake ledger, doctor availability schedules, patient registration modals, and telephony action queues.
+- **Insurance & Prior-Auth Desk**: Revenue cycle management view featuring prior-authorization ticket tracking, EDI clearinghouse status, and carrier compliance metrics.
+- **Department Operations Manager Console**: Department-level oversight displaying active staff counts, team workload distribution, capacity metrics, and SLA escalation incident response.
+- **Hospital Executive Master Console (Admin)**: Full governance suite with user provisioning, doctor profile creation, status toggling (Active/Suspended), and patient census analytics.
 
-### Module 2: Workflow Frontend
-- **Call Management System**: Search, filter by priority/department/status, sort, and pagination.
-- **Kanban Board**: 4-column swimlane (*Pending Triage*, *Assigned to Staff*, *In Active Progress*, *Completed & Verified*).
-- **Live SLA Countdown Engine**: Real-time remaining hours countdown with warning thresholds and breach alerts.
-- **Manager Escalation Watchlist**: Immediate surfacing of overdue tasks with 1-click supervisor escalation.
-- **Autonomous Department Routing**: Visual matrix illustrating intent-to-department rules with target SLAs and auto-assignees.
-- **Staff Assignment Modal**: 1-click assignment of personnel to active tasks with workload balances.
+### 2. Backend & Core Services (Node.js + Express + MongoDB)
+- **Enterprise Authentication & JWT Engine**: Secure bcrypt password hashing, token validation, session persistence, and unified `/api/v1/auth/me` identity resolution.
+- **Role-Based Access Control (RBAC)**: Strict server-side route guards enforcing granular permissions across 6 distinct hospital roles.
+- **User Management System**: Complete administrative CRUD suite with role-scoping, department filters, and automatic doctor profile provisioning.
+- **Patient Management System**: Patient record creation with auto-generated MRN identifiers, contact details, assigned primary care physicians, and secure self-service access.
+- **Doctor Management & Scheduling**: Physician directory querying, specialization filtering, availability slot scheduling, and patient roster assignments.
+- **Live Appointment Engine**: End-to-end appointment lifecycle management (create, view, reschedule, cancel) connecting patients, physicians, and receptionists through MongoDB.
 
-### Module 3: Platform Frontend
-- **Role-Based Persona Switcher**: Instant switching between *Admin*, *Doctor*, *Receptionist*, *Insurance Employee*, and *Manager*.
-- **Staff Access Governance Table**: Full CRUD user management with role assignment and capacity analytics.
-- **Notification Center**: Filterable inbox for *Critical Calls*, *Escalations*, *Deadline Warnings*, and *New Tasks*.
-- **Recharts Analytics Suite**:
-  - Telephony Volume vs. Action Velocity (Area Chart)
-  - Clinical Intent Distribution (Donut Chart)
-  - Department Workload Capacities (Bar Chart)
-  - Resolution Time vs. Target SLA (Comparison Bar Chart)
-- **Global Command Palette (`Ctrl+K`)**: Omnisearch across Patients, Calls, Tasks, Departments, and Staff.
-- **Certified Reporting**: Instant CSV dataset generation and audit-ready PDF dossiers.
-- **Immutable Audit Timeline**: Chronological event ledger from SIP call arrival to resolution.
+### 3. Integrated & Planned Modules
+- **AI Telephony Intelligence**: Dual-channel waveform visualization, diarization scrubbing, and conversational intent detection.
+- **Workflow & SLA Automation Engine**: 4-column Kanban tracking, countdown timers, and automated priority escalations.
+- **Operations Analytics Suite**: Recharts-powered trend analysis for call volumes, department throughput, and SLA compliance.
+- **Notification & Dispatch System**: Real-time multi-channel alerts for critical clinical events, unread physician orders, and overdue tasks.
 
 ---
 
-## 4. Folder Structure
+## User Roles & Permissions Matrix
 
-```
-src/
-├── app/
-│   ├── actions/page.tsx             # Kanban workflow & SLA management
-│   ├── analytics/page.tsx           # Recharts operations analytics
-│   ├── auth/
-│   │   ├── login/page.tsx           # Role-based preset login
-│   │   └── signup/page.tsx          # Staff onboarding
-│   ├── calls/
-│   │   ├── [id]/page.tsx            # Deep call intelligence dossier
-│   │   └── page.tsx                 # Searchable calls table
-│   ├── dashboard/page.tsx           # Executive operations console
-│   ├── landing/page.tsx             # Product story & live demo showcase
-│   ├── notifications/page.tsx       # Triage alerts inbox
-│   ├── settings/page.tsx            # Platform thresholds & EHR bridges
-│   ├── users/page.tsx               # Staff & RBAC governance
-│   ├── globals.css                  # Antigravity Tailwind 4 styling
-│   ├── layout.tsx                   # Root HTML shell & metadata
-│   └── page.tsx                     # Landing root entry
-├── features/
-│   ├── ai-intelligence/
-│   │   ├── components/
-│   │   │   ├── ActionExtractor.tsx
-│   │   │   ├── AISummaryCard.tsx
-│   │   │   ├── CommitmentTracker.tsx
-│   │   │   ├── EvidenceViewer.tsx
-│   │   │   ├── IntentDetector.tsx
-│   │   │   ├── LiveCallMonitor.tsx
-│   │   │   ├── LiveCallSimulatorModal.tsx
-│   │   │   ├── PriorityBadge.tsx
-│   │   │   └── SentimentGauge.tsx
-│   │   └── mockCallService.ts       # AI service abstraction
-│   ├── platform/
-│   │   ├── components/
-│   │   │   ├── AnalyticsCharts.tsx
-│   │   │   ├── AuditTimeline.tsx
-│   │   │   ├── NotificationDropdown.tsx
-│   │   │   ├── ReportsExporter.tsx
-│   │   │   └── UserManagementTable.tsx
-│   │   ├── mockAnalyticsService.ts
-│   │   ├── mockAuditService.ts
-│   │   ├── mockAuthService.ts
-│   │   ├── mockNotificationsService.ts
-│   │   └── mockUserService.ts
-│   └── workflow/
-│       ├── components/
-│       │   ├── CallTable.tsx
-│       │   ├── DepartmentRoutingUI.tsx
-│       │   ├── EscalationBanner.tsx
-│       │   ├── KanbanBoard.tsx
-│       │   ├── SLATrackerCard.tsx
-│       │   └── TaskCard.tsx
-│       ├── mockCallsService.ts
-│       └── mockTasksService.ts
-└── shared/
-    ├── components/
-    │   ├── common/
-    │   │   ├── AudioPlayer.tsx
-    │   │   ├── LiveWaveform.tsx
-    │   │   └── StatCard.tsx
-    │   ├── layout/
-    │   │   ├── AppShell.tsx
-    │   │   ├── CommandPalette.tsx
-    │   │   ├── Header.tsx
-    │   │   └── Sidebar.tsx
-    │   └── ui/
-    │       ├── Badge.tsx
-    │       ├── Button.tsx
-    │       ├── Card.tsx
-    │       ├── Input.tsx
-    │       ├── Modal.tsx
-    │       └── Tabs.tsx
-    ├── types/
-    │   ├── action.ts
-    │   ├── analytics.ts
-    │   ├── audit.ts
-    │   ├── call.ts
-    │   ├── notification.ts
-    │   └── user.ts
-    └── utils/
-        ├── cn.ts
-        ├── export.ts
-        └── formatters.ts
-```
+The CareOps AI platform enforces a strict, hierarchical Role-Based Access Control (RBAC) model across all API routes and UI views:
 
----
-
-## 5. Design System: Solarpunk Eco-Futuristic Light Theme
-
-CareOps AI is built on a **Solarpunk Eco-Futuristic Light Healthcare Design System**, conveying "A sustainable future hospital ecosystem powered by intelligent technology":
-
-- **Canvas & Backgrounds**: Natural cream (`#f7f9f6`), warm off-white (`#fcfdfc`), pure surgical white (`#ffffff`).
-- **Typography & High Contrast**: Deep forest green headings (`#142019`, `#1b4332`), soft botanical sage secondary text (`#607264`, `#8ba08e`).
-- **Botanical Accents**:
-  - **Botanical Emerald (`#059669`)**: Primary health vitality, completed actions, positive status.
-  - **Healthcare Teal (`#0d9488`)**: Clinical inference, call intelligence, doctor/reception actions.
-  - **Solar Amber (`#d97706`)**: Triage attention, upcoming deadlines, SLA warning thresholds.
-  - **Terracotta Urgency (`#dc2626`)**: Critical clinical emergencies, 911 dispatch, overdue escalations.
-- **Card & Border Craft**: Crisp botanical borders (`#e2e8df`, `#dce5da`), subtle soft-diffused shadows, high legibility.
-- **Micro-Interactions**: Tactile button presses, real-time waveform bars, responsive status dots, and seamless role switches.
-
----
-
-## 6. Component Documentation
-
-| Component | Module | Description |
+| Role | Primary Purpose | Authorized Modules & Permissions |
 |---|---|---|
-| `LiveCallMonitor` | AI Intelligence | In-flight active telephony monitor with live audio bars and streaming transcript |
-| `LiveCallSimulatorModal` | AI Intelligence | Interactive sandbox simulating live inbound patient speech and real-time task generation |
-| `AudioPlayer` | Shared Common | Interactive audio scrubber with waveform visualization, rate toggle (1x-1.5x), and timestamps |
-| `AISummaryCard` | AI Intelligence | Structured NLU summary, key bullet points, and clinical flags |
-| `IntentDetector` | AI Intelligence | 6-way clinical intent classifier with primary and secondary confidence ratings |
-| `SentimentGauge` | AI Intelligence | Acoustic and lexical emotional valence meter (-1.0 to +1.0) |
-| `CommitmentTracker` | AI Intelligence | Audit log of verbal promises delivered to patient with fulfillment toggles |
-| `EvidenceViewer` | AI Intelligence | Side-by-side explainability grounding AI actions directly to transcript text |
-| `KanbanBoard` | Workflow | 4-column operational swimlane for hospital action items |
-| `TaskCard` | Workflow | Rich task card with department pills, assignee avatars, SLA countdowns, and escalation controls |
-| `CallTable` | Workflow | Searchable, filterable, paginated enterprise data grid of all hospital calls |
-| `DepartmentRoutingUI` | Workflow | Visual flow showing intent-to-department routing rules and target SLAs |
-| `SLATrackerCard` | Workflow | Live countdown deadline monitor highlighting breached and warning tasks |
-| `EscalationBanner` | Workflow | High-priority supervisor banner for overdue or high-risk tasks |
-| `AnalyticsCharts` | Platform | Recharts data visualizations for call volumes, intent breakdown, workloads, and SLAs |
-| `ReportsExporter` | Platform | Export utilities for Call, Department, and Performance reports (CSV & PDF) |
-| `UserManagementTable` | Platform | Full CRUD table for hospital personnel, roles, and department queues |
-| `CommandPalette` | Shared Layout | Omnisearch dialog (`Ctrl+K`) searching patients, calls, tasks, departments, and staff |
+| **Patient** | Patient Care Experience | Access own profile (`/api/v1/patients/me`), browse physician directory (`/api/v1/doctors`), book and manage personal appointments (`/api/v1/appointments`), view clinical instructions. Blocked from other patients' records and administrative portals. |
+| **Doctor** | Clinical Care & Consultations | View assigned patient queues, inspect clinical summaries, update patient medical notes, manage availability schedule (`/api/v1/doctors/me`), attend booked consultations. Blocked from modifying user credentials or department settings. |
+| **Receptionist** | Front Desk Intake & Scheduling | Universal patient directory search, register new patients, manage global appointment calendars, reschedule/cancel slots, triage incoming phone action items. Blocked from clinical EHR write access. |
+| **Insurance Employee** | RCM & Prior-Authorization | Access patient insurance demographics, adjudicate prior-authorization claims, manage carrier audit requirements, update reimbursement workflows. Blocked from altering clinical staff or medical notes. |
+| **Department Manager** | Operational & SLA Oversight | Inspect department-specific staff workloads, reassign tasks, manage SLA escalation incidents, oversee throughput efficiency for their assigned division. Blocked from system-wide administration. |
+| **Hospital Administrator** | Full System Governance | Global system privileges: create/suspend users, provision physician and receptionist accounts, manage hospital rules, access universal audit logs, view hospital-wide census and analytics. |
 
 ---
 
-## 7. Mock Service Explanation
+## Technology Stack
 
-To guarantee decoupled development, all feature data is served through asynchronous mock services that mirror HTTP network latency and return type-safe domain models:
-
-- `mockCallService.ts`: Serves live active call sessions, streaming simulations, and NLU intelligence.
-- `mockCallsService.ts`: Manages multi-scenario call catalogs (insurance delay, post-op fever, duplicate billing, medication renewal, acute emergency).
-- `mockTasksService.ts`: Implements stateful task lifecycle updates (`updateTaskStatus`), assignments (`assignTask`), and escalations (`escalateTask`).
-- `mockAuthService.ts`: Provides user session state with 1-click role persona switching.
-- `mockUserService.ts`: Manages staff roster with add, edit, and delete handlers.
-- `mockNotificationsService.ts`: Stores real-time triage alerts with unread counter management.
-- `mockAnalyticsService.ts`: Generates metrics, volume trends, and SLA compliance data.
-- `mockAuditService.ts`: Supplies immutable audit trail events for every call.
-
----
-
-## 8. API Contract Documentation
-
-The frontend types defined in `src/shared/types/` serve as the binding contract for backend engineers:
-
-### Call Model
-```typescript
-interface Call {
-  id: string;
-  callNumber: string;
-  patient: {
-    id: string;
-    name: string;
-    age: number;
-    gender: string;
-    phone: string;
-    mrn: string;
-    insuranceProvider: string;
-  };
-  duration: string;
-  durationSeconds: number;
-  timestamp: string;
-  status: "in-progress" | "analyzed" | "triaged" | "archived";
-  priority: "critical" | "high" | "medium" | "low";
-  intent: "Appointment Request" | "Insurance Query" | "Complaint" | "Billing Issue" | "Medicine Refill" | "Emergency Concern";
-  secondaryIntents?: string[];
-  sentiment: "positive" | "neutral" | "concerned" | "frustrated" | "angry";
-  sentimentScore: number; // -1.0 to +1.0
-  summary: {
-    overview: string;
-    keyPoints: string[];
-    clinicalFlags: string[];
-    insurancePending: boolean;
-    confidenceScore: number;
-  };
-  transcript: {
-    id: string;
-    speaker: "agent" | "patient" | "system";
-    speakerName: string;
-    text: string;
-    timestamp: string;
-    offsetSeconds: number;
-    sentiment?: string;
-    highlighted?: boolean;
-  }[];
-  actions: ActionExtraction[];
-  commitments: Commitment[];
-  assignedDepartment: string;
-  agentName: string;
-  slaRemainingHours: number;
-}
-```
-
-### Action Item Model
-```typescript
-interface ActionItem {
-  id: string;
-  callId: string;
-  patientName: string;
-  patientMrn: string;
-  task: string;
-  description: string;
-  department: "Reception" | "Insurance" | "Customer Support" | "Billing" | "Pharmacy" | "Emergency Triage" | "Clinical Team";
-  priority: "critical" | "high" | "medium" | "low";
-  deadline: string;
-  status: "pending" | "assigned" | "in-progress" | "completed";
-  assignedTo?: {
-    id: string;
-    name: string;
-    avatar: string;
-    role: string;
-  };
-  evidenceQuote: string;
-  sla: {
-    totalHours: number;
-    remainingHours: number;
-    deadlineTimestamp: string;
-    isBreached: boolean;
-    isWarning: boolean;
-  };
-  isEscalated: boolean;
-  escalatedTo?: string;
-  escalationReason?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-```
-
----
-
-## 9. Backend Integration Guide
-
-Three backend developers can take ownership of individual modules without conflicting:
-
-### Backend Developer 1: AI Intelligence
-- **Endpoints to implement**:
-  - `GET /api/v1/ai/live-call`
-  - `WS /api/v1/ai/stream-call/{call_id}` (WebSocket for diarized audio transcript chunks)
-  - `GET /api/v1/ai/intelligence/{call_id}`
-- **Service file to swap**: `src/features/ai-intelligence/mockCallService.ts`
-
-### Backend Developer 2: Workflow & Operations
-- **Endpoints to implement**:
-  - `GET /api/v1/calls` (with query filters `search`, `priority`, `department`, `status`, `intent`, `page`)
-  - `GET /api/v1/calls/{id}`
-  - `GET /api/v1/tasks` (with Kanban filter params)
-  - `PATCH /api/v1/tasks/{id}/status`
-  - `POST /api/v1/tasks/{id}/assign`
-  - `POST /api/v1/tasks/{id}/escalate`
-- **Service files to swap**:
-  - `src/features/workflow/mockCallsService.ts`
-  - `src/features/workflow/mockTasksService.ts`
-
-### Backend Developer 3: Platform & Administration
-- **Endpoints to implement**:
-  - `GET /api/v1/platform/users`
-  - `POST /api/v1/platform/users`
-  - `PATCH /api/v1/platform/users/{id}`
-  - `DELETE /api/v1/platform/users/{id}`
-  - `GET /api/v1/platform/notifications`
-  - `PATCH /api/v1/platform/notifications/{id}/read`
-  - `GET /api/v1/platform/analytics/summary`
-  - `GET /api/v1/platform/analytics/trends`
-- **Service files to swap**:
-  - `src/features/platform/mockAuthService.ts`
-  - `src/features/platform/mockUserService.ts`
-  - `src/features/platform/mockNotificationsService.ts`
-  - `src/features/platform/mockAnalyticsService.ts`
-  - `src/features/platform/mockAuditService.ts`
-
----
-
-## 10. Instructions for Replacing Mock Services with Real APIs
-
-Replacing a mock service requires **zero modifications to components or pages**.
-
-### Example: Replacing `mockCallsService.ts`
-
-1. Create `src/features/workflow/apiCallsService.ts`:
-
-```typescript
-import { Call } from "@/shared/types/call";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.careops.ai/v1";
-
-export const apiCallsService = {
-  async getCalls(filters?: Record<string, string>): Promise<Call[]> {
-    const params = new URLSearchParams(filters);
-    const res = await fetch(`${API_BASE_URL}/calls?${params.toString()}`);
-    if (!res.ok) throw new Error("Failed to fetch calls");
-    return res.json();
-  },
-
-  async getCallById(id: string): Promise<Call> {
-    const res = await fetch(`${API_BASE_URL}/calls/${id}`);
-    if (!res.ok) throw new Error("Failed to fetch call details");
-    return res.json();
-  },
-};
-```
-
-2. In components, update the import alias or re-export:
-
-```typescript
-// in src/features/workflow/index.ts
-export { apiCallsService as callsService } from "./apiCallsService";
-```
-
-All UI components continue consuming the identical TypeScript contract.
-
----
-
-## 11. Complete Healthcare Operations Operating System
-
-CareOps AI connects the entire hospital human ecosystem:
-
-```
-Patients
-   ↓
-Healthcare Employees
-   ↓
-Doctors
-   ↓
-Departments
-   ↓
-Insurance Teams
-   ↓
-Hospital Administration
-```
-
-### 11.1 Dedicated User Roles & Portals
-
-| Role | Route | Purpose | Key Features |
+| Layer | Technology | Version / Tooling | Purpose |
 |---|---|---|---|
-| **Patient** | `/patient/dashboard` | Request tracking & communications | Upcoming appointment cards, insurance status tracker, request resolution ledger, telephony transcript summaries, unread hospital alerts |
-| **Doctor** | `/doctor/dashboard` | Clinical triage & patient encounters | Live patient queue, AI clinical briefs (previous conversation, pending issue, required action), follow-up creation & dispatch |
-| **Receptionist** | `/reception/dashboard` | Front-desk scheduling & intake | Appointment queue (pending/confirmed/cancelled), AI call action execution, patient registry & search, multi-provider calendar matrix |
-| **Insurance Employee** | `/insurance/dashboard` | Prior-authorization & RCM | Claims ledger with SLA deadlines, AI claim conversation extract, 4-stage lifecycle timeline (`Submitted` → `Reviewed` → `Updated` → `Completed`) |
-| **Department Manager** | `/manager/dashboard` | Workload balancing & SLA incident command | Team capacity matrix, employee efficiency ratings, escalation command with reassignment & priority elevation |
-| **Hospital Administrator** | `/admin/dashboard` | Executive governance & compliance | Total call volume & AI accuracy metrics, user RBAC provisioning, 5-department vitality oversight, system routing rules |
+| **Frontend Framework** | **Next.js** | 16.4.0 (App Router) | Server-side rendering, streaming layout shell, dynamic routing |
+| **UI Library** | **React** | 19.3.0 | Component rendering, state hooks, concurrent features |
+| **Language** | **TypeScript** | 5.7+ | Strict static typing across all domain models and API contracts |
+| **Styling** | **Tailwind CSS** | v4 | Modern styling tokens, responsive grids, eco-futuristic theme |
+| **Icons & Motion** | **Lucide React / Framer Motion** | Latest | Clinical iconography, micro-interactions, animated state transitions |
+| **Charts** | **Recharts** | 3.10+ | Operational charts (Area, Donut, Bar) for hospital telemetry |
+| **Backend Runtime** | **Node.js** | v20+ / v22+ | Non-blocking asynchronous server runtime |
+| **API Framework** | **Express.js** | 4.21+ | RESTful API routing, controller architecture, middleware pipeline |
+| **Database** | **MongoDB** | 6.0+ / 7.0+ | Document-oriented NoSQL database for flexible healthcare records |
+| **ODM / Modeling** | **Mongoose** | 8.8+ | Schema validation, relationship references, indexes, middleware hooks |
+| **Authentication** | **JWT & bcryptjs** | Latest | JSON Web Token issuance/verification, salt-based password hashing |
+| **Workflow Engine** | **Prisma ORM + PostgreSQL** | 5.22+ | Relational telephony call event logs and SLA state tracking |
+| **Testing** | **Node.js Test Runner / Supertest** | Built-in | 74 automated unit & integration test suites (100% passing) |
 
 ---
 
-## 12. Role Permissions Matrix
+## System Architecture Overview
 
-| Feature / Domain | Patient | Doctor | Receptionist | Insurance Employee | Dept Manager | Hospital Admin |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Personal Profile & Timeline** | View | View | View | View | View | View |
-| **View Own Medical Care Briefs** | View | Full | View | Read-Only | Full | Full |
-| **Book / Reschedule Appointments** | Request | Full | Full | - | Manage | Full |
-| **AI Call Diarization & Audio Player** | Transcript | Full | Full | - | Full | Full |
-| **Execute Front-Desk Call Actions** | - | - | Full | - | Supervise | Full |
-| **Manage Prior-Auth & Claims** | Status | Co-Sign | Status | Full | Supervise | Full |
-| **Assign / Reassign Staff Tasks** | - | Tasks | Intake | - | Full | Full |
-| **Manage RBAC Users & Roles** | - | - | - | - | - | Full |
-| **Configure AI & Routing Rules** | - | - | - | - | - | Full |
+CareOps AI is architected as a clean, decoupled multi-tier healthcare platform:
 
----
-
-## 13. Solarpunk Eco-Futuristic Design Philosophy
-
-CareOps AI rejects dark cyberpunk tropes and generic SaaS flat white templates in favor of a curated **Solarpunk Eco-Futuristic Living Healthcare System**:
-
-- **Palette**: Natural cream canvas (`#f7f9f6`), warm off-white containers (`#fcfdfc`), surgical white cards (`#ffffff`), botanical emerald (`#059669`), deep evergreen ink (`#142019`, `#1b4332`), sage accents (`#607264`), solar amber alerts (`#d97706`), healthcare teal (`#0d9488`).
-- **Surfaces**: Crisp layered panels (`bg-white border-[#e2e8df]`), subtle micro-borders, tactile card elevations, zero eye-straining dark glow.
-- **Metaphors**: Patient Wellness Flow, Department Vitality, Operational Equilibrium, Living Audio Waveforms.
-- **Human Centricity**: Technology is quiet, sustainable, and assistive; doctors, nurses, receptionists, insurance adjusters, managers, and patients experience an intuitive, calming, and ultra-fast workspace.
-
----
-
-## 14. Backend Integration Roadmap & Module API Specifications
-
-### Patient Portal Module (`/patient`)
-- `GET /api/patient/overview`: Returns `PatientOverviewData` (MRN, primary PCP, insurance status, active counts).
-- `GET /api/patient/appointments`: Returns array of `PatientAppointment`.
-- `POST /api/patient/appointments`: Books appointment slot. Payload: `{ doctorName, date, time, type, instructions }`.
-- `PUT /api/patient/appointments/:id/reschedule`: Updates appointment slot. Payload: `{ date, time }`.
-- `DELETE /api/patient/appointments/:id`: Cancels appointment.
-- `GET /api/patient/requests`: Returns telephony-extracted care requests.
-- `GET /api/patient/communications`: Returns past telephony call records, summaries, and commitments.
-
-### Doctor Portal Module (`/doctor`)
-- `GET /api/doctor/overview`: Returns clinician queue counts, today's schedule, and next patient time.
-- `GET /api/doctor/queue`: Returns arrival queue with embedded `aiBrief` (`previousConversation`, `pendingIssue`, `requiredAction`).
-- `PUT /api/doctor/queue/:id/status`: Updates patient consultation status (`Checked In`, `In Consultation`, `Pending Labs`).
-- `GET /api/doctor/followups`: Returns scheduled clinician follow-ups.
-- `POST /api/doctor/followups`: Schedules follow-up protocol and assigns nursing triage team.
-
-### Receptionist Portal Module (`/reception`)
-- `GET /api/reception/overview`: Intake desk counters and pending tasks.
-- `GET /api/reception/appointments`: Full intake appointment queue with status filters.
-- `PUT /api/reception/appointments/:id/status`: Confirms or cancels appointments.
-- `GET /api/reception/call-actions`: AI-generated front-desk tasks extracted from calls.
-- `PUT /api/reception/call-actions/:id/complete`: Marks call action resolved.
-- `GET /api/reception/patients`: Universal patient directory lookup.
-- `POST /api/reception/patients`: Registers new patient MRN and demographics.
-- `GET /api/reception/schedules`: Multi-provider daily/weekly availability slots.
-
-### Insurance Employee Module (`/insurance`)
-- `GET /api/insurance/overview`: Payer queue counters (Pending, Approved, Rejected, Urgent).
-- `GET /api/insurance/claims`: Claims table with amounts, deadlines, and current stage.
-- `PUT /api/insurance/claims/:id/stage`: Advances claim along lifecycle (`Submitted` → `Reviewed` → `Updated` → `Completed`).
-- `PUT /api/insurance/claims/:id/verify`: Submits electronic verification or appeals.
-
-### Department Manager Module (`/manager`)
-- `GET /api/manager/overview`: Total employees, active/completed tasks, overdue SLA counts, vitality score.
-- `GET /api/manager/workloads`: Real-time capacity utilization and efficiency ratings per employee.
-- `GET /api/manager/escalations`: Overdue commitments and SLA incidents.
-- `PUT /api/manager/escalations/:id/reassign`: Reassigns incident and updates urgency tier.
-- `PUT /api/manager/escalations/:id/resolve`: Clears escalation from incident command.
-
-### Hospital Administrator Module (`/admin`)
-- `GET /api/admin/overview`: Hospital-wide analytics, call throughput, and AI accuracy metrics.
-- `GET /api/admin/users`: Universal staff RBAC directory.
-- `POST /api/admin/users`: Provisions new account with role-specific policy bundles.
-- `PUT /api/admin/users/:id/toggle-status`: Activates or deactivates user accounts.
-- `GET /api/admin/departments`: 5 hospital divisions with staffing, workload, and commitments.
-- `GET /api/admin/rules`: Routing thresholds, AI confidence scores, and SLA notification rules.
-- `PUT /api/admin/rules/:id/toggle`: Activates or pauses hospital operating rules.
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        CLIENT / BROWSER TIER                           │
+│     Next.js 16 App Router • Role-Guarded Solarpunk UI Components      │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ HTTP / REST (JWT in Headers / Cookies)
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        API & ROUTING GATEWAY                           │
+│        CORS Policy • Token Auth Middleware • Role Authorization        │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                       BACKEND SERVICE LAYER                            │
+│   AuthService • UserService • PatientService • AppointmentService      │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ Mongoose ODM Queries
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        DATA PERSISTENCE TIER                           │
+│            MongoDB Enterprise Database (Database: careops)             │
+│    Collections: users • doctors • patients • appointments              │
+└────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 15. Getting Started
+## Project Structure
+
+```
+HackSprint-HealthCall/
+├── backend/                             # Core Healthcare Express Backend (Port 5000)
+│   ├── appointments/                   # Appointments business logic, routes & controllers
+│   ├── auth/                           # Authentication controllers, service, routes
+│   ├── config/                         # DB connector, role constants, environment vars
+│   ├── constants/                      # Application constants and role mappings
+│   ├── doctors/                        # Doctor roster controllers & services
+│   ├── middleware/                     # JWT verification, RBAC guards, error handler
+│   ├── models/                         # Mongoose Models: User, Doctor, Patient, Appointment
+│   ├── patients/                       # Patient management logic & endpoints
+│   ├── tests/                          # 74 automated unit & integration tests
+│   ├── users/                          # User governance controllers & endpoints
+│   ├── app.js                          # Express app configuration & route mounting
+│   ├── server.js                       # HTTP server entry point
+│   └── package.json                    # Backend dependencies & test scripts
+├── src/                                # Next.js Frontend Application (Port 3000)
+│   ├── app/                            # Next.js App Router Pages
+│   │   ├── admin/dashboard/            # Hospital Executive Master Console
+│   │   ├── auth/login/                 # Role-based login gateway
+│   │   ├── auth/signup/                # Patient and staff registration
+│   │   ├── doctor/dashboard/           # Physician clinical queue
+│   │   ├── insurance/dashboard/        # RCM & Prior-Authorization desk
+│   │   ├── manager/dashboard/          # Department operations command
+│   │   ├── patient/dashboard/          # Patient experience portal
+│   │   ├── profile/                    # Dynamic authenticated user profile
+│   │   ├── reception/dashboard/        # Front-desk intake & scheduling
+│   │   ├── landing/                    # Product landing page & demo
+│   │   └── layout.tsx                  # Global HTML shell & context providers
+│   ├── features/                       # Modular Feature Components & Services
+│   │   ├── admin/                      # Admin overview cards, user table, rules
+│   │   ├── doctor/                     # Doctor queue table, patient brief modal
+│   │   ├── insurance/                  # Claims ledger, timeline visualizer
+│   │   ├── manager/                    # Workload balancer, escalation incidents
+│   │   ├── patient/                    # Appointment manager, requests, notifications
+│   │   ├── platform/                   # Global authContext, sessionStore, api clients
+│   │   │   ├── appointments/           # apiAppointmentService.ts
+│   │   │   ├── auth/                   # authService.ts, RoleGuard.tsx
+│   │   │   ├── doctors/                # apiDoctorService.ts
+│   │   │   ├── patients/               # apiPatientService.ts
+│   │   │   └── users/                  # apiUserService.ts
+│   │   └── reception/                  # Appointment queue, patient directory
+│   ├── shared/                         # Reusable UI Primitives
+│   │   ├── components/layout/          # AppShell.tsx, Header, Sidebar, Navigation
+│   │   ├── components/ui/              # Badge, Button, Card, Input, Modal, Tabs
+│   │   └── utils/                      # Classname merge helpers (cn.ts)
+│   └── utils/supabase/                 # Supabase client helpers & session middleware
+├── workflow-engine/                     # Telephony Event & SLA Routing Engine (Port 4000)
+│   ├── prisma/                         # PostgreSQL Schema (schema.prisma) & migrations
+│   ├── src/                            # Express / Prisma telephony endpoints
+│   └── scripts/start-db.js             # Embedded PostgreSQL local launcher
+├── REAL_DATA_INTEGRATION_REPORT.md     # Production data migration audit report
+├── ARCHITECTURE.md                     # Deep visual architecture & Mermaid diagrams
+├── package.json                        # Root frontend dependencies & scripts
+└── tsconfig.json                       # Path aliases (@/* -> src/*)
+```
+
+---
+
+## API Overview
+
+All backend endpoints are prefixed with `/api/v1` and follow standard HTTP semantics:
+
+### 1. Authentication (`/api/v1/auth`)
+| Route | Method | Access | Description |
+|---|---|---|---|
+| `/api/v1/auth/register` | `POST` | Public | Registers a new user account with bcrypt hashing and returns a JWT token. |
+| `/api/v1/auth/login` | `POST` | Public | Validates credentials against MongoDB and returns an authenticated JWT. |
+| `/api/v1/auth/me` | `GET` | Authenticated | Returns current authenticated user details and active session status. |
+| `/api/v1/auth/logout` | `POST` | Authenticated | Invalidates the active session cookie/token on the client. |
+
+### 2. User Management (`/api/v1/users`)
+| Route | Method | Access | Description |
+|---|---|---|---|
+| `/api/v1/users` | `GET` | Admin, Manager | Lists hospital users with optional role, department, status, and search filters. |
+| `/api/v1/users` | `POST` | Admin | Provisions a new staff account. Auto-provisions a `Doctor` document if role is `DOCTOR`. |
+| `/api/v1/users/:id` | `GET` | Admin, Manager | Fetches detailed metadata for a single user (scoped by department for managers). |
+| `/api/v1/users/:id` | `PATCH` | Admin | Updates user name, role, department, or phone. |
+| `/api/v1/users/:id/status`| `PATCH` | Admin | Toggles user status between `ACTIVE` and `SUSPENDED`. |
+| `/api/v1/users/:id` | `DELETE`| Admin | Performs soft deletion by marking user status as `INACTIVE`. |
+
+### 3. Patient Management (`/api/v1/patients`)
+| Route | Method | Access | Description |
+|---|---|---|---|
+| `/api/v1/patients` | `GET` | Staff | Retrieves patient directory records with pagination and search. |
+| `/api/v1/patients` | `POST` | Admin, Reception | Registers a new patient with MRN generation and linked User account. |
+| `/api/v1/patients/me` | `GET` | Patient | Returns the logged-in patient's personal EHR record and assigned doctor. |
+| `/api/v1/patients/:id`| `GET` | Staff, Self | Retrieves full demographic and clinical summary for a patient. |
+| `/api/v1/patients/:id`| `PATCH` | Staff, Self | Updates contact info (or clinical notes if physician/admin). |
+| `/api/v1/patients/:id`| `DELETE`| Admin | Soft-deletes a patient record. |
+
+### 4. Doctor Management (`/api/v1/doctors`)
+| Route | Method | Access | Description |
+|---|---|---|---|
+| `/api/v1/doctors` | `GET` | Authenticated | Lists all active doctors with specialization and department metadata. |
+| `/api/v1/doctors/me` | `GET` | Doctor | Fetches the logged-in clinician's profile and assigned patient roster. |
+| `/api/v1/doctors/me/availability` | `PATCH` | Doctor | Updates doctor availability hours and weekly consultation slots. |
+| `/api/v1/doctors/:id/assign-patient` | `POST` | Admin, Doctor | Assigns a patient to the doctor's active clinical care roster. |
+
+### 5. Appointments Engine (`/api/v1/appointments`)
+| Route | Method | Access | Description |
+|---|---|---|---|
+| `/api/v1/appointments` | `GET` | Authenticated | Scoped retrieval: Patients see their bookings; Doctors see their queue; Staff see all. |
+| `/api/v1/appointments` | `POST` | Patient, Staff | Books a new appointment, creates MongoDB document, links patient and doctor. |
+| `/api/v1/appointments/:id` | `PATCH` | Authenticated | Reschedules an appointment date/time or updates appointment status. |
+| `/api/v1/appointments/:id` | `DELETE`| Authenticated | Cancels an appointment and updates the doctor's queue in real time. |
+
+---
+
+## Security Architecture
+
+1. **Cryptographic Authentication**: Passwords hashed using `bcryptjs` with auto-generated salts prior to database storage.
+2. **Stateless JWT Authorization**: Secure JSON Web Tokens with strict expiry (`7d`), signed using environment secrets and delivered in `Authorization: Bearer <token>` headers and cookies.
+3. **Multi-Layered RBAC Middleware**: Every protected endpoint passes through `verifyToken` and `requireRole(...)` guards before invoking controllers.
+4. **Data Privacy & Tenancy Isolation**:
+   - Patients can only access their own EHR record (`/api/v1/patients/me`). Requests to other patient IDs are blocked with `403 Forbidden`.
+   - Doctors can only view their own patient queue and assigned clinical records.
+   - Department Managers are scoped exclusively to staff within their own hospital division.
+5. **Defensive Input Validation**: Server-side request sanitization guards against MongoDB operator injection and unescaped payloads.
+
+---
+
+## Getting Started & Local Setup
 
 ### Prerequisites
-- Node.js 18+ (tested on Node v20/v26)
-- npm 9+
+- **Node.js**: v20.x or v22.x
+- **MongoDB**: Local MongoDB instance running on `mongodb://127.0.0.1:27017`
 
-### Installation & Run
-
+### 1. Clone & Install
 ```bash
-# Install dependencies
+git clone https://github.com/Mohammed-Ayyan/HackSprint-HealthCall.git
+cd HackSprint-HealthCall
+
+# Install frontend dependencies
 npm install
 
-# Run development server with Turbopack
-npm run dev
+# Install backend dependencies
+cd backend
+npm install
+cd ..
 ```
 
-- Open [http://localhost:3000](http://localhost:3000) for the CareOps AI Living System experience.
-- Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard) for the Healthcare Command Center.
-- Open [http://localhost:3000/patient/dashboard](http://localhost:3000/patient/dashboard) for the Patient Portal.
-- Open [http://localhost:3000/doctor/dashboard](http://localhost:3000/doctor/dashboard) for the Doctor Portal.
-- Open [http://localhost:3000/reception/dashboard](http://localhost:3000/reception/dashboard) for the Reception Desk.
-- Open [http://localhost:3000/insurance/dashboard](http://localhost:3000/insurance/dashboard) for the Insurance & RCM Hub.
-- Open [http://localhost:3000/manager/dashboard](http://localhost:3000/manager/dashboard) for the Department Manager Portal.
-- Open [http://localhost:3000/admin/dashboard](http://localhost:3000/admin/dashboard) for the Hospital Administrator Console.
-- Open [http://localhost:3000/profile](http://localhost:3000/profile) for User Profile & Activity Timeline.
-- Press `Ctrl + K` anywhere in the app to access Omnisearch.
-- Click **"Simulate Inbound Call"** in the top navigation to trigger live streaming diarization.
+### 2. Environment Variables
+Create `backend/.env`:
+```env
+PORT=5000
+NODE_ENV=development
+DATABASE_URL=mongodb://127.0.0.1:27017/careops
+JWT_SECRET=careops_production_grade_jwt_secret_token_2026
+JWT_EXPIRES_IN=7d
+FRONTEND_URL=http://localhost:3000
+```
 
+Create root `.env.local`:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+NEXT_PUBLIC_SUPABASE_URL=https://uzvvhgvwlrznjqqjwthr.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_nUwXjbeGv_gmhiEc78kN6w_-rsQsHQP
+```
+
+### 3. Run the Platform
+In Terminal 1 (Backend):
+```bash
+cd backend
+node server.js
+# Output: [CareOps DB] Connected to MongoDB: 127.0.0.1/careops (Port 5000)
+```
+
+In Terminal 2 (Frontend):
+```bash
+npm run dev
+# Output: Ready on http://localhost:3000
+```
+
+### 4. Run Automated Tests
+```bash
+cd backend
+npm test
+# Result: 74 passing tests across Auth, Users, Patients, Doctors, and Appointments
+```
+
+---
+
+## Future Roadmap
+
+1. **AI Telephony Streaming (Q1 2027)**: WebRTC/SIP trunk ingestion for automated two-channel patient call transcription via Whisper-v3.
+2. **Clinical Entity Recognition**: Fine-tuned BioBERT / ClinicalNLP pipeline to extract ICD-10 diagnosis codes and CPT procedural codes from speech.
+3. **Autonomous Prior-Authorization Bridges**: Direct HL7 / FHIR integration to dispatch extracted surgical requests straight to major insurance clearinghouses.
+4. **Predictive Hospital Load Analytics**: Time-series forecasting for emergency intake surges and clinician capacity balancing.

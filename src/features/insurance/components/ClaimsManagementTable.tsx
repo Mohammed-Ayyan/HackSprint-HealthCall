@@ -68,7 +68,12 @@ export function ClaimsManagementTable({
       </CardHeader>
 
       <div className="divide-y divide-[#edf2ea]">
-        {claims.map((claim) => {
+        {claims.length === 0 ? (
+          <div className="p-8 text-center text-xs text-[#627267]">
+            No claims or prior-authorizations currently available.
+          </div>
+        ) : (
+          claims.map((claim) => {
           const isSelected = claim.id === selectedClaimId;
           return (
             <div
@@ -124,7 +129,7 @@ export function ClaimsManagementTable({
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
     </Card>
   );

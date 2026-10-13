@@ -13,7 +13,7 @@ export interface AdminUser {
   id: string;
   name: string;
   email: string;
-  role: "Doctor" | "Receptionist" | "Insurance Employee" | "Department Manager" | "Hospital Administrator" | "Patient";
+  role: "Doctor" | "Receptionist" | "Insurance Employee" | "Department Manager" | "Hospital Administrator" | "Patient" | "Manager" | "Admin";
   department: string;
   status: "Active" | "Deactivated" | "Pending Verification";
   lastLogin: string;

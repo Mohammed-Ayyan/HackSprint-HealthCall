@@ -71,7 +71,12 @@ export function DoctorQueueTable({ patients, onStatusChange }: DoctorQueueTableP
         </CardHeader>
 
         <div className="divide-y divide-[#edf2ea]">
-          {patients.map((pat) => (
+          {patients.length === 0 ? (
+            <div className="p-8 text-center text-xs text-[#627267]">
+              No scheduled patients in queue today.
+            </div>
+          ) : (
+            patients.map((pat) => (
             <div
               key={pat.id}
               className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
@@ -140,7 +145,8 @@ export function DoctorQueueTable({ patients, onStatusChange }: DoctorQueueTableP
                 )}
               </div>
             </div>
-          ))}
+          ))
+        )}
         </div>
       </Card>
       

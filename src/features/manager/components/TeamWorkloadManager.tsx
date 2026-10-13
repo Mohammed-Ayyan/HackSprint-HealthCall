@@ -46,7 +46,12 @@ export function TeamWorkloadManager({ workloads }: TeamWorkloadManagerProps) {
       </CardHeader>
 
       <div className="divide-y divide-[#edf2ea]">
-        {workloads.map((emp) => (
+        {workloads.length === 0 ? (
+          <div className="p-8 text-center text-xs text-[#627267]">
+            No team members currently registered.
+          </div>
+        ) : (
+          workloads.map((emp) => (
           <div
             key={emp.id}
             className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -109,7 +114,8 @@ export function TeamWorkloadManager({ workloads }: TeamWorkloadManagerProps) {
               </div>
             </div>
           </div>
-        ))}
+        ))
+      )}
       </div>
     </Card>
   );

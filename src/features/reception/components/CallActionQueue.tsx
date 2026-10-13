@@ -42,7 +42,12 @@ export function CallActionQueue({ initialCallActions }: CallActionQueueProps) {
       </CardHeader>
 
       <div className="divide-y divide-[#edf2ea]">
-        {callActions.map((task) => (
+        {callActions.length === 0 ? (
+          <div className="p-8 text-center text-xs text-[#627267]">
+            No pending telephony call action items.
+          </div>
+        ) : (
+          callActions.map((task) => (
           <div
             key={task.id}
             className="p-5 hover:bg-[#fbfdfb] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -122,8 +127,9 @@ export function CallActionQueue({ initialCallActions }: CallActionQueueProps) {
               )}
             </div>
           </div>
-        ))}
-      </div>
+        ))
+      )}
+    </div>
     </Card>
   );
 }

@@ -46,7 +46,12 @@ export function PatientNotificationsList({ notifications }: PatientNotifications
       </CardHeader>
 
       <div className="p-4 space-y-3">
-        {notifications.map((notif) => (
+        {notifications.length === 0 ? (
+          <div className="p-6 text-center text-xs text-[#627267]">
+            No unread alerts or notifications.
+          </div>
+        ) : (
+          notifications.map((notif) => (
           <div
             key={notif.id}
             className={`p-3.5 rounded-xl border transition-all flex items-start gap-3 ${
@@ -68,7 +73,8 @@ export function PatientNotificationsList({ notifications }: PatientNotifications
               <p className="text-xs text-[#627267] mt-1">{notif.message}</p>
             </div>
           </div>
-        ))}
+        ))
+      )}
       </div>
     </Card>
   );

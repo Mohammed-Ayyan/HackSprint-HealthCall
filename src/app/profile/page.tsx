@@ -23,154 +23,53 @@ import { Button } from "@/shared/components/ui/Button";
 import { AppShell } from "@/shared/components/layout/AppShell";
 import { useAuth } from "@/features/platform/auth/authContext";
 
-interface UserProfile {
-  name: string;
-  role: string;
-  department: string;
-  email: string;
-  phone: string;
-  npiOrId: string;
-  facility: string;
-  station: string;
-  avatar: string;
-  joinedDate: string;
-}
-
-const defaultProfiles: Record<string, UserProfile> = {
-  Doctor: {
-    name: "Dr. Rahul",
-    role: "Doctor / Surgical Director",
-    department: "Post-Surgical General & Acute Recovery",
-    email: "dr.rahul@metrohealth.eco",
-    phone: "+1 (555) 749-2101",
-    npiOrId: "NPI-994820194",
-    facility: "Pavilion 3, Suite 410",
-    station: "Clinical Room 412",
-    avatar: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80",
-    joinedDate: "January 2022",
-  },
-  Patient: {
-    name: "Rahul Sharma",
-    role: "Patient",
-    department: "Patient Access & Care Experience",
-    email: "rahul.sharma@email.com",
-    phone: "+1 (555) 349-8812",
-    npiOrId: "MRN-884920",
-    facility: "Metro Health Living System",
-    station: "Outpatient Care",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    joinedDate: "October 2026",
-  },
-  Receptionist: {
-    name: "Clara Oswald",
-    role: "Receptionist / Front Desk Lead",
-    department: "Central Patient Ingestion & Scheduling",
-    email: "clara.o@metrohealth.eco",
-    phone: "+1 (555) 482-9912",
-    npiOrId: "EMP-44210",
-    facility: "Central Pavilion",
-    station: "Intake Station A",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-    joinedDate: "March 2023",
-  },
-  Insurance: {
-    name: "Marcus Sterling",
-    role: "Senior Insurance Coordinator",
-    department: "RCM & Prior-Authorization Division",
-    email: "marcus.s@metrohealth.eco",
-    phone: "+1 (555) 881-3329",
-    npiOrId: "EMP-77192",
-    facility: "Administrative Annex 2",
-    station: "Payer EDI Terminal 4",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    joinedDate: "July 2021",
-  },
-  Manager: {
-    name: "Dr. Eleanor Vance",
-    role: "Department Manager",
-    department: "Surgical Recovery & Operations Management",
-    email: "eleanor.v@metrohealth.eco",
-    phone: "+1 (555) 993-4411",
-    npiOrId: "EMP-10024",
-    facility: "Operations Center",
-    station: "Suite 500",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-    joinedDate: "September 2020",
-  },
-  Admin: {
-    name: "Dr. Evelyn Vance",
-    role: "Hospital Administrator",
-    department: "Executive Healthcare Administration",
-    email: "admin@metrohealth.eco",
-    phone: "+1 (555) 001-9988",
-    npiOrId: "EXEC-001",
-    facility: "Hospital Command Nexus",
-    station: "Executive Boardroom",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
-    joinedDate: "January 2019",
-  },
-};
-
 const activityTimelineItems = [
   {
-    time: "10:30 AM",
-    title: "Patient called hospital",
-    category: "Telephony Inbound",
-    description: "Inbound voice call initiated by Rahul Sharma reporting 100.8°F fever and prior-auth inquiry.",
+    time: "Live Session",
+    title: "Secure Session Verified",
+    category: "Identity & RBAC",
+    description: "Multi-factor JWT authenticated with verified role-based access permissions.",
+    icon: Shield,
+    highlight: "auth",
+  },
+  {
+    time: "Real-time",
+    title: "CareOps Clinical Data Sync",
+    category: "MongoDB Cluster",
+    description: "User profile synchronized with live enterprise database collections.",
+    icon: Activity,
+    highlight: "sync",
+  },
+  {
+    time: "Automated",
+    title: "CareOps Telephony Integration",
+    category: "Speech AI",
+    description: "Speech recognition and appointment dispatch gateway ready.",
     icon: Phone,
     highlight: "telephony",
-  },
-  {
-    time: "10:31 AM",
-    title: "AI analyzed conversation",
-    category: "CareOps NLP",
-    description: "Whisper-v3 transcribed audio. CareOps Clinical Speech Engine extracted symptoms, commitments, and urgency.",
-    icon: Bot,
-    highlight: "ai",
-  },
-  {
-    time: "10:32 AM",
-    title: "Insurance task created",
-    category: "Workflow Automation",
-    description: "Prior-authorization validation ticket #CLM-992014-BC auto-generated for BlueCross expedited submission.",
-    icon: Shield,
-    highlight: "task",
-  },
-  {
-    time: "10:35 AM",
-    title: "Assigned to insurance employee",
-    category: "RCM Routing",
-    description: "Ticket routed to Marcus Sterling with 4-hour SLA due to high post-surgical priority.",
-    icon: CheckCircle2,
-    highlight: "assigned",
-  },
-  {
-    time: "10:40 AM",
-    title: "Consultation slot booked with Dr. Rahul",
-    category: "Reception Dispatch",
-    description: "Front desk lead confirmed slot for Wednesday, 15 October at 10:30 AM in Pavilion 3.",
-    icon: Calendar,
-    highlight: "clinical",
   },
 ];
 
 export default function ProfilePage() {
   const { user, isHydrated } = useAuth();
-  const roleKey = user.role === "Insurance Employee" ? "Insurance" : user.role;
-  const [selectedPersona, setSelectedPersona] = useState<string>("Admin");
 
-  React.useEffect(() => {
-    if (isHydrated) {
-      setSelectedPersona(roleKey);
-    }
-  }, [roleKey, isHydrated]);
-
-  const profile = defaultProfiles[selectedPersona] || defaultProfiles.Admin;
+  const profile = {
+    name: user?.name || "Active CareOps User",
+    role: user?.role || "Staff Member",
+    department: user?.department || "CareOps Clinical Operations",
+    email: user?.email || "Not provided",
+    phone: user?.phone || "+1 (555) 000-0000",
+    npiOrId: user?.id ? `UID-${user.id.slice(-6).toUpperCase()}` : "NPI-PENDING",
+    facility: "Metro Health Living System",
+    station: user?.department ? `${user.department} Station` : "Command Station",
+    avatar: user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    joinedDate: "Active Member",
+  };
 
   return (
     <AppShell>
       <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* Solarpunk Profile Hero */}
+      {/* Profile Hero */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#eef6f0] via-[#f4f9f5] to-[#fcfdfc] p-6 border border-[#d6e5da] shadow-sm">
         <div className="absolute top-0 right-0 w-80 h-full bg-[radial-gradient(circle_at_top_right,rgba(5,150,105,0.08),transparent_70%)] pointer-events-none" />
         
@@ -200,21 +99,10 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Persona quick switch buttons */}
-          <div className="bg-white p-1.5 rounded-xl border border-[#dce8df] flex items-center gap-1 flex-wrap shadow-2xs">
-            {Object.keys(defaultProfiles).map((role) => (
-              <button
-                key={role}
-                onClick={() => setSelectedPersona(role)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  selectedPersona === role
-                    ? "bg-[#1b4332] text-white shadow-xs"
-                    : "text-[#627267] hover:text-[#142019]"
-                }`}
-              >
-                {role}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" size="sm" className="bg-white/80">
+              Verified Session
+            </Badge>
           </div>
         </div>
       </div>
