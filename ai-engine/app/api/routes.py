@@ -6,9 +6,23 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
 from app.core.config import settings
 from app.models.schemas import (
     HealthResponse,
+    TranscriptAnalysisRequest,
+    TranscriptAnalysisResponse,
     TranscriptProcessRequest,
+    TranscriptProcessingResponse,
     TranscriptValidationResponse,
     TranscriptionResponse,
+)
+from app.services.intelligence_service import (
+    InferenceError,
+    InferenceTimeoutError,
+    MalformedModelOutputError,
+    ModelUnavailableError,
+    intelligence_service,
+)
+from app.services.transcript_processing_service import (
+    TranscriptProcessingError,
+    transcript_processing_service,
 )
 from app.services.transcription_service import (
     AudioFileTooLargeError,
@@ -126,4 +140,135 @@ async def transcribe_audio_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred during audio transcription.",
+        ) from exc
+
+
+# ============================================================================
+# Phase 3: Transcript Processing Engine
+# ============================================================================
+
+@router.post(
+    "/process-transcript",
+    response_model=TranscriptProcessingResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Process Healthcare Transcript",
+    description=(
+        "Accepts a raw healthcare call transcript and returns a normalized, "
+        "sentence-segmented, and metadata-enriched representation suitable for "
+        "downstream AI analysis (Phase 4+). "
+        "Does NOT perform intent classification, summarisation, sentiment analysis, "
+        "priority classification, action extraction, or PII masking."
+    ),
+)
+async def process_transcript_endpoint(
+    payload: TranscriptProcessRequest,
+) -> TranscriptProcessingResponse:
+    """Normalize and segment a healthcare call transcript.
+
+    The request uses the same schema as the Phase 1 validation endpoint so that
+    the Phase 2 transcription result can be forwarded without client-side changes.
+
+    Privacy: only statistical metadata (length, language, sentence count) is
+    logged.  The transcript content is never written to application logs.
+
+    Integration with Phase 2::
+
+        # After calling POST /api/v1/transcribe, pass its output here:
+        POST /api/v1/process-transcript
+        {
+            "transcript": "<value of transcription.transcript>",
+            "language":   "<value of transcription.language>"
+        }
+    """
+    logger.info(
+        "Transcript processing request: lang=%s, length=%d, call_id=%s",
+        payload.language,
+        len(payload.transcript),
+        payload.call_id or "unspecified",
+    )
+
+    try:
+        return transcript_processing_service.process(
+            transcript=payload.transcript,
+            language=payload.language,
+        )
+    except TranscriptProcessingError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Unexpected error during transcript processing.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during transcript processing.",
+        ) from exc
+
+
+# ============================================================================
+# Phase 4: Core AI Intelligence Engine
+# ============================================================================
+
+@router.post(
+    "/analyze-transcript",
+    response_model=TranscriptAnalysisResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Analyze Healthcare Transcript",
+    description=(
+        "Analyzes a healthcare call transcript to extract Intent Classification, "
+        "Factual Summarization (negation-preserving), Sentiment Classification, "
+        "and Operational Priority (with conservative clinical emergency guardrails). "
+        "Processed strictly locally with zero external API transmission."
+    ),
+)
+async def analyze_transcript_endpoint(
+    payload: TranscriptAnalysisRequest,
+) -> TranscriptAnalysisResponse:
+    """Analyze a healthcare call transcript using local AI intelligence.
+
+    Privacy: Only statistical metadata (language, length, call_id) is logged.
+    The transcript content is never written to application logs to protect PHI.
+    """
+    logger.info(
+        "Transcript analysis request: lang=%s, length=%d, call_id=%s",
+        payload.language,
+        len(payload.transcript),
+        payload.call_id or "unspecified",
+    )
+
+    try:
+        return intelligence_service.analyze(
+            transcript=payload.transcript,
+            language=payload.language,
+            call_id=payload.call_id,
+        )
+    except ModelUnavailableError as exc:
+        logger.error("Local LLM runtime unavailable during transcript analysis: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+    except InferenceTimeoutError as exc:
+        logger.error("Inference timed out during transcript analysis: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail=str(exc),
+        ) from exc
+    except MalformedModelOutputError as exc:
+        logger.error("Malformed LLM output during transcript analysis: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
+    except InferenceError as exc:
+        logger.error("Inference error during transcript analysis: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Unexpected error during transcript intelligence analysis.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during transcript analysis.",
         ) from exc

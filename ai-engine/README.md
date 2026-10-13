@@ -1,7 +1,7 @@
 # CareOps AI — Intelligence Engine Backend
 
 > **Autonomous Clinical Telephony Processing, NLU Intent Classification, and Actionable Intelligence Engine**  
-> **Phase 2: Local Audio Transcription Engine**
+> **Phase 4: Core AI Intelligence Engine** *(Phase 1, Phase 2 & Phase 3 Complete)*
 
 ---
 
@@ -16,9 +16,15 @@ Audio recording
     ↓
 Speech-to-text transcription (Faster Whisper)       [PHASE 2 - COMPLETED]
     ↓
-Transcript processing & Diarization                 [PHASE 3 - PLANNED]
+Transcript Processing Engine                        [PHASE 3 - COMPLETED]
+  - Conservative whitespace normalization
+  - Sentence segmentation with offsets
+  - Deterministic metadata (char/word/sentence counts)
     ↓
-Intent classification, Summary, Sentiment, Priority [PHASE 4 - PLANNED]
+Intent classification, Summary, Sentiment, Priority [PHASE 4 - COMPLETED]
+  - Local Ollama runtime (Llama 3 8B)
+  - Conservative emergency escalation safety rules
+  - Single-pass structured JSON inference
     ↓
 Action extraction & Department routing              [PHASE 5 - PLANNED]
     ↓
@@ -73,29 +79,31 @@ ai-engine/
 ├── .env.example              # Safe template environment variables
 ├── .env                      # Local environment configuration
 ├── .gitignore                # Python, virtualenv, and cache ignores
-├── requirements.txt          # Phase 2 dependencies (fastapi, faster-whisper, av<19, etc.)
+├── requirements.txt          # Phase 2 & 3 dependencies (fastapi, faster-whisper, av<19, etc.)
 ├── README.md                 # Backend documentation and testing guide
 ├── app/
 │   ├── __init__.py           # Application package marker
 │   ├── main.py               # FastAPI entry point, CORS, and exception handlers
 │   ├── api/
 │   │   ├── __init__.py       # API package marker
-│   │   └── routes.py         # /health, /transcript/validate, and /transcribe endpoints
+│   │   └── routes.py         # /health, /transcript/validate, /transcribe, /process-transcript
 │   ├── core/
 │   │   ├── __init__.py       # Core package marker
 │   │   └── config.py         # Centralized Pydantic settings & Whisper configuration
 │   ├── models/
 │   │   ├── __init__.py       # Models package marker
-│   │   └── schemas.py        # Pydantic models for transcript validation, transcription, and errors
+│   │   └── schemas.py        # Pydantic models (Phase 1–3) + future AI intelligence stubs
 │   └── services/
 │       ├── __init__.py       # Services package marker
-│       └── transcription_service.py # Faster Whisper engine, validation, and PyAV decoding
+│       ├── transcription_service.py          # Faster Whisper engine, validation, PyAV decoding
+│       └── transcript_processing_service.py  # Phase 3: normalization, segmentation, metadata
 └── tests/
-    ├── __init__.py           # Tests package marker
-    ├── conftest.py           # Pytest TestClient fixture & path setup
-    ├── test_health.py        # Health-check endpoint tests
-    ├── test_validation.py    # Transcript text validation tests
-    └── test_transcription.py # Phase 2 audio upload, validation, cleanup, and live model tests
+    ├── __init__.py                      # Tests package marker
+    ├── conftest.py                      # Pytest TestClient fixture & path setup
+    ├── test_health.py                   # Health-check endpoint tests
+    ├── test_validation.py               # Transcript text validation tests
+    ├── test_transcription.py            # Phase 2 audio upload, cleanup, and live model tests
+    └── test_transcript_processing.py   # Phase 3 processing engine tests (48 tests)
 ```
 
 ---
@@ -154,7 +162,110 @@ Interactive API documentation will be available at:
 
 ---
 
-## 6. Audio Upload & Transcription API
+## 6. Phase 3: Transcript Processing Engine
+
+### Objective
+
+Phase 3 accepts a plain-text transcript (from Phase 2 or submitted directly by a client) and prepares a normalized, segmented, and metadata-enriched representation suitable for downstream AI intelligence features (Phase 4+).
+
+### What IS implemented in Phase 3:
+
+- **Conservative Text Normalization** (`normalize_transcript`):  
+  Strips leading/trailing whitespace, collapses internal runs of spaces and tabs, normalizes CRLF endings, and collapses excessive blank lines.  
+  **Does NOT** change word meanings, remove negation words (`not`, `never`, `without`, `denies`), translate, transliterate, or perform PII masking.
+
+- **Sentence Segmentation** (`segment_sentences`):  
+  Splits on `.`, `!`, `?`, Hindi danda (`।`), double danda (`॥`). Handles common abbreviations (`Dr.`, `Mr.`, `mg`, etc.) to avoid false splits.
+
+- **Deterministic Metadata**:  
+  Unicode code-point character count, whitespace-token word count, sentence count, empty flag, and wall-clock processing time.
+
+- **Evidence Traceability**:  
+  `original_transcript` is preserved unmodified. Sentence `start_char`/`end_char` offsets reference `normalized_transcript`.
+
+- **Privacy**:  
+  Only counts (not content) are logged. No transcript text is written to logs.
+
+### What is explicitly NOT implemented in Phase 3:
+- ❌ Intent classification (Phase 4)
+- ❌ Summary generation (Phase 4)
+- ❌ Sentiment analysis (Phase 4)
+- ❌ Priority classification (Phase 4)
+- ❌ Action extraction (Phase 5)
+- ❌ Staff commitment detection (Phase 6)
+- ❌ Semantic evidence verification (Phase 6)
+- ❌ Full PII / PHI masking (Phase 7)
+- ❌ Speaker diarization (speaker labels are not assigned in Phase 3)
+
+---
+
+## 7. Transcript Processing API
+
+### Endpoint: `POST /api/v1/process-transcript`
+
+Accepts `application/json`.
+
+#### Request fields:
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `transcript` | string | ✅ | Raw transcript text. Non-empty after stripping. Max 50,000 chars. |
+| `language` | string | ✗ | Language code: `en` (default), `hi`, `kn`. |
+| `call_id` | string | ✗ | Optional session identifier. |
+
+#### Example Request:
+```json
+{
+  "transcript": "Hello, I need to book an appointment for tomorrow. Certainly, I will schedule it for you.",
+  "language": "en"
+}
+```
+
+#### Example Response (HTTP 200 OK):
+```json
+{
+  "success": true,
+  "language": "en",
+  "original_transcript": "Hello, I need to book an appointment for tomorrow. Certainly, I will schedule it for you.",
+  "normalized_transcript": "Hello, I need to book an appointment for tomorrow. Certainly, I will schedule it for you.",
+  "sentences": [
+    {
+      "index": 0,
+      "text": "Hello, I need to book an appointment for tomorrow.",
+      "start_char": 0,
+      "end_char": 50
+    },
+    {
+      "index": 1,
+      "text": "Certainly, I will schedule it for you.",
+      "start_char": 51,
+      "end_char": 89
+    }
+  ],
+  "metadata": {
+    "character_count": 89,
+    "word_count": 16,
+    "sentence_count": 2,
+    "is_empty": false,
+    "processing_time_seconds": 0.0003
+  }
+}
+```
+
+> **Note**: Values above are illustrative. The engine always calculates from actual input.
+
+#### Integration with Phase 2 (`POST /api/v1/transcribe`):
+Pass the `transcript` and `language` fields from a transcription response directly:
+```json
+{
+  "transcript": "<value of transcription.transcript>",
+  "language": "<value of transcription.language>"
+}
+```
+No audio re-upload is required.
+
+---
+
+## 8. Audio Upload & Transcription API
 
 ### Endpoint: `POST /api/v1/transcribe`
 
@@ -188,7 +299,6 @@ Accepts `multipart/form-data`:
 }
 ```
 
----
 
 ## 7. How to Test the Transcription Endpoint
 
@@ -218,7 +328,90 @@ curl -X POST "http://127.0.0.1:8000/api/v1/transcribe" \
 
 ---
 
-## 8. Automated Test Suite
+## 9. Phase 4: Core AI Intelligence Engine API
+
+### Endpoint: `POST /api/v1/analyze-transcript`
+
+Processes raw or pre-processed healthcare call transcripts and extracts structured intelligence using a locally hosted Ollama inference engine (`llama3:latest` 8B parameter model) paired with deterministic conservative clinical safety guardrails.
+
+Accepts `application/json`.
+
+#### Request Fields:
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `transcript` | string | ✅ | Healthcare call transcript. Non-empty after stripping. Max 50,000 characters. |
+| `language` | string | ✗ | Language code: `en` (default), `hi`, `kn`. |
+| `call_id` | string | ✗ | Optional unique identifier for the call session. |
+
+#### Example Request:
+```json
+{
+  "transcript": "I have been charged twice for my appointment. Please ask billing to investigate.",
+  "language": "en",
+  "call_id": "call-101"
+}
+```
+
+#### Example Response (HTTP 200 OK):
+```json
+{
+  "success": true,
+  "language": "en",
+  "intent": {
+    "label": "Billing Issue",
+    "evidence": "I have been charged twice for my appointment."
+  },
+  "summary": "The patient reports a duplicate appointment charge and requests a billing investigation.",
+  "sentiment": {
+    "label": "Neutral",
+    "explanation": "The patient's tone is objective and matter-of-fact, without expressing emotions or frustration."
+  },
+  "priority": {
+    "level": "MEDIUM",
+    "reason": "The issue is time-sensitive, but not life-threatening or urgent, and can be addressed through standard billing procedures."
+  },
+  "metadata": {
+    "model_name": "llama3:latest",
+    "processing_time_seconds": 1.25,
+    "emergency_escalated": false
+  }
+}
+```
+
+### Core Capabilities
+
+#### A. Intent Classification
+Categorizes call intent into one of 9 recognized categories with direct supporting transcript evidence:
+- **Appointment Request**: Booking a new or regular consultation without prior visit context.
+- **Follow-up Request**: Post-procedure/post-discharge check-ins, reporting post-visit symptoms, or scheduled follow-ups.
+- **Insurance Query**: Pre-authorization questions, coverage verification, claim inquiries.
+- **Billing Issue**: Disputed charges, incorrect invoices, duplicate payments, financial questions.
+- **Complaint**: Service grievances regarding staff conduct, wait times, or facility issues.
+- **Medicine Refill**: Prescription renewal or pharmacy refill requests.
+- **Emergency Concern**: Acute or potentially life-threatening medical symptoms.
+- **General Inquiry**: Hospital directions, visiting hours, non-clinical facility questions.
+- **Unknown**: Insufficient or ambiguous transcripts.
+
+#### B. Healthcare-Call Summarization
+- Generates concise 1–3 sentence summaries based strictly on the transcript.
+- Preserves central reason for call, key requests, and staff commitments.
+- **Strictly preserves medical negation** (`"no fever"`, `"denies chest pain"`, `"did not take medication"`).
+- Does **not** invent medical diagnoses or clinical recommendations.
+
+#### C. Sentiment Classification
+- Labels patient emotional tone: `Satisfied`, `Neutral`, `Confused`, `Frustrated`, `Angry`, or `Uncertain`.
+- Evaluates linguistic cues; distinguishes emotional frustration from call reason (e.g., a patient upset about a bill has a `Billing Issue` intent with `Frustrated` sentiment, rather than an automatic `Complaint`).
+- Does not confuse medical conditions with patient sentiment.
+
+#### D. Priority Classification & Conservative Safety Guardrails
+- Assigns operational triage priority: `CRITICAL`, `HIGH`, `MEDIUM`, or `LOW`.
+- **Mandatory Safety Rule**: Any transcript mentioning life-threatening symptoms (chest pain, respiratory distress, stroke, anaphylaxis, severe bleeding) or acute post-operative complications (fever >= 100.4°F with surgical redness) is **conservatively escalated** to `CRITICAL` or `HIGH` for urgent human clinical review.
+- Language models cannot silently downgrade mandatory emergency escalations.
+- Prototype disclaimer: Designed for administrative and operational triage support, not clinical triage or medical diagnosis.
+
+---
+
+## 10. Automated Test Suite
 
 Run the full automated test suite using `pytest`:
 
@@ -226,33 +419,56 @@ Run the full automated test suite using `pytest`:
 pytest -v
 ```
 
-### Test Coverage (27 Tests, 100% Passing):
-1. **Health Check Tests**:
-   - `test_health_check_returns_200`
-   - `test_health_check_response_structure`
-   - `test_root_endpoint_returns_200`
-   - `test_health_check_still_works`
-2. **Audio Upload Validation Tests**:
-   - `test_missing_audio_file_rejected` (HTTP 422)
-   - `test_empty_upload_rejected` (HTTP 400)
-   - `test_unsupported_audio_extension_rejected` (HTTP 400)
-   - `test_oversized_upload_rejected` (HTTP 413)
-   - `test_unsupported_language_hint_rejected` (HTTP 422)
-   - `test_corrupted_audio_handled_safely` (HTTP 400)
-3. **Transcription & Lifecycle Tests**:
-   - `test_successful_transcription_response_schema` (Validates contract)
-   - `test_temporary_files_are_cleaned_up` (Confirms immediate temp file deletion)
-   - `test_model_initialization_failure_handling` (HTTP 503)
-   - `test_automatic_language_detection` (Auto-detects when hint is omitted)
-   - `test_real_faster_whisper_transcription_live` (Live model transcription integration test)
-4. **Transcript Text Validation Tests**:
-   - 12 tests covering length, stripping, non-string, and multilingual text validation (`en`, `hi`, `kn`).
+### Test Coverage (108 Tests, 100% Passing):
+
+| File | Count | Coverage |
+|------|-------|----------|
+| `test_health.py` | 3 | Health check endpoints |
+| `test_validation.py` | 12 | Phase 1 transcript validation & constraints |
+| `test_transcription.py` | 12 | Phase 2 Faster Whisper audio transcription & container validation |
+| `test_transcript_processing.py` | 45 | Phase 3 normalization, sentence segmentation & metadata engine |
+| `test_intelligence.py` | 36 | Phase 4 Core AI: 9 intents, summarization, sentiment, priority, safety guardrails, bounded retries & live Ollama |
+| **Total** | **108** | **All tests passing (100%)** |
 
 ---
 
-## 9. Current Limitations & Roadmap
+## 11. Normalization Rules Reference
 
+| Rule | Applied |
+|------|---------||
+| Strip leading/trailing whitespace | ✅ |
+| Collapse internal multiple spaces to one | ✅ |
+| Convert tabs to spaces | ✅ |
+| Normalize CRLF/CR to LF | ✅ |
+| Collapse 3+ blank lines to 1 | ✅ |
+| Strip trailing whitespace per line | ✅ |
+| Remove negation words (`not`, `never`, etc.) | ❌ Never |
+| Change clinical meaning | ❌ Never |
+| Translate or transliterate | ❌ Never |
+| PII / PHI masking | ❌ Phase 7 |
+
+---
+
+## 12. Language Support & Limitations
+
+| Language | Code | Normalization | Segmentation | Word Count |
+|----------|------|---------------|--------------|------------|
+| English | `en` | ✅ Full | ✅ Good (abbreviation-aware) | ✅ Accurate |
+| Hindi | `hi` | ✅ Full | ✅ Good (danda-aware) | ✅ Approximate |
+| Kannada | `kn` | ✅ Full | ⚠️ Period/danda only | ⚠️ Approximation |
+
+- **Word count** for Kannada and other abugida scripts is a whitespace-token approximation.
+- **Language code** is a caller-supplied hint validated against `[en, hi, kn]`; Phase 3 does NOT independently detect the language.
+- **Translation** and **transliteration** are never performed.
+
+---
+
+## 13. Current Limitations & Roadmap
+
+- **Sentence Segmentation**: Heuristic regex approach. Handles common medical abbreviations but may misfire on unusual ones.
+- **Word Count**: Whitespace-based; not linguistically exact for Kannada/Japanese/Chinese.
+- **Language Detection**: Phase 3 trusts the caller's `language` field; independent detection is a future feature.
+- **Speaker Diarization**: Not implemented. Speaker labels are NOT assigned from sentence order.
+- **PII Masking**: Not implemented. Planned for Phase 7.
 - **Audio Length**: Default maximum file size is 25 MB (~25-30 minutes of compressed audio).
-- **Background Noise**: Clinical speech with severe acoustic background noise may require diarization filtering (scheduled for Phase 3).
-- **First-Run Model Download**: Faster Whisper downloads model weights automatically on its first run to the local HuggingFace cache directory (`~/.cache/huggingface/hub`).
-- **Next Phase (Phase 3)**: Transcript segmentation, speaker diarization, and text normalization.
+- **First-Run Model Download**: Faster Whisper downloads model weights automatically on first run.

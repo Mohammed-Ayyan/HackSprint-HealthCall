@@ -34,6 +34,8 @@ class CallIntent(str, Enum):
     EMERGENCY_CONCERN = "Emergency Concern"
     GENERAL_INQUIRY = "General Inquiry"
     FOLLOW_UP_REQUEST = "Follow-up Request"
+    UNKNOWN = "Unknown"
+    UNCERTAIN = "Uncertain"
 
 
 class CallSentiment(str, Enum):
@@ -43,6 +45,7 @@ class CallSentiment(str, Enum):
     CONFUSED = "Confused"
     FRUSTRATED = "Frustrated"
     ANGRY = "Angry"
+    UNCERTAIN = "Uncertain"
     # Frontend alignment aliases
     POSITIVE = "positive"
     CONCERNED = "concerned"
@@ -190,7 +193,162 @@ class TranscriptionResponse(BaseModel):
 
 
 # ============================================================================
-# Future AI Intelligence Response Schemas (Phase 3+ Extensibility)
+# Phase 3: Transcript Processing Engine Schemas
+# ============================================================================
+
+class TranscriptSentence(BaseModel):
+    """A single sentence extracted from a transcript with traceability metadata.
+
+    Offset convention: ``start_char`` and ``end_char`` are byte-level character
+    positions measured against ``normalized_transcript`` (not the original).  They
+    are provided to assist future phases when they need to link evidence quotes back
+    to the processed text.  Do NOT assume they point into the original transcript.
+    """
+
+    index: int = Field(..., description="Zero-based sentence position in the transcript.")
+    text: str = Field(..., description="Sentence text as extracted from the normalized transcript.")
+    start_char: Optional[int] = Field(
+        default=None,
+        description="Start character offset in the normalized_transcript string (inclusive).",
+    )
+    end_char: Optional[int] = Field(
+        default=None,
+        description="End character offset in the normalized_transcript string (exclusive).",
+    )
+
+
+class TranscriptMetadata(BaseModel):
+    """Deterministic, counting-based metadata for a processed transcript.
+
+    Limitations:
+    - ``word_count`` uses whitespace splitting and is only accurate for languages that
+      separate words with spaces (e.g. English, Hindi with spaces).  For scripts such
+      as Kannada, Japanese, or Chinese where words may not be delimited by spaces,
+      ``word_count`` is a whitespace-token approximation and may be null or misleading.
+    - ``character_count`` is the Unicode code-point length of the *normalized* transcript.
+    - ``sentence_count`` reflects the number of segments returned by the segmenter.
+    - ``processing_time_seconds`` measures wall-clock time inside the service only.
+    """
+
+    character_count: int = Field(..., description="Unicode code-point length of normalized_transcript.")
+    word_count: Optional[int] = Field(
+        default=None,
+        description=(
+            "Whitespace-token word count. Approximation only; may be null for "
+            "scripts where whitespace does not reliably delimit words."
+        ),
+    )
+    sentence_count: int = Field(..., description="Number of sentences returned by the segmenter.")
+    is_empty: bool = Field(default=False, description="True when the normalized transcript contains no text.")
+    processing_time_seconds: Optional[float] = Field(
+        default=None,
+        description="Wall-clock seconds spent inside the processing service.",
+    )
+
+
+class TranscriptProcessingResponse(BaseModel):
+    """Structured Phase 3 transcript processing result.
+
+    Contract:
+    - ``original_transcript`` is preserved unchanged for evidence traceability.
+    - ``normalized_transcript`` is the conservative-normalization output used for
+      downstream processing.  It differs from the original only in whitespace.
+    - ``sentences`` are segmented from ``normalized_transcript``.
+    - Sentence offsets (``start_char`` / ``end_char``) reference ``normalized_transcript``.
+    - ``language`` is the caller-supplied language hint validated against supported codes;
+      it is NOT independently detected in Phase 3.
+
+    Not implemented in Phase 3 (planned for later phases):
+    - Intent classification
+    - Summary generation
+    - Sentiment analysis
+    - Priority classification
+    - Action extraction
+    - Staff commitment detection
+    - Semantic evidence verification
+    - Full PII masking
+    - Speaker diarization
+    """
+
+    success: bool = Field(default=True, description="True when processing completed without errors.")
+    language: str = Field(
+        ...,
+        description=(
+            "Caller-supplied and validated language code (en, hi, kn). "
+            "This is a language *hint*, not an independently detected language."
+        ),
+    )
+    original_transcript: str = Field(
+        ...,
+        description="Unmodified input transcript preserved for evidence traceability.",
+    )
+    normalized_transcript: str = Field(
+        ...,
+        description="Conservatively normalized transcript (whitespace only; meaning preserved).",
+    )
+    sentences: List[TranscriptSentence] = Field(
+        default_factory=list,
+        description="Ordered list of sentences segmented from normalized_transcript.",
+    )
+    metadata: TranscriptMetadata = Field(
+        ...,
+        description="Deterministic transcript statistics calculated from actual input.",
+    )
+
+
+# ============================================================================
+# Phase 4: Core AI Intelligence Engine Schemas
+# ============================================================================
+
+class IntentAnalysisResult(BaseModel):
+    """Categorized call intent with supporting evidence quote."""
+    label: str = Field(..., description="Primary categorized intent label.")
+    evidence: Optional[str] = Field(
+        default=None,
+        description="Direct snippet or quote from transcript supporting the classified intent.",
+    )
+
+
+class SentimentAnalysisResult(BaseModel):
+    """Categorized patient sentiment with rationale."""
+    label: str = Field(..., description="Classified patient sentiment label.")
+    explanation: Optional[str] = Field(
+        default=None,
+        description="Concise rationale explaining the sentiment classification.",
+    )
+
+
+class PriorityAnalysisResult(BaseModel):
+    """Categorized operational triage priority with rationale."""
+    level: str = Field(..., description="Operational triage urgency level: CRITICAL, HIGH, MEDIUM, LOW.")
+    reason: str = Field(..., description="Concise rationale explaining the priority level assignment.")
+
+
+class IntelligenceMetadata(BaseModel):
+    """Execution telemetry and safety provenance."""
+    model_name: Optional[str] = Field(default=None, description="Underlying inference model identifier.")
+    processing_time_seconds: Optional[float] = Field(default=None, description="Inference latency in seconds.")
+    emergency_escalated: bool = Field(default=False, description="True if conservative safety rule escalated priority.")
+
+
+class TranscriptAnalysisRequest(TranscriptProcessRequest):
+    """Request payload for Phase 4 transcript intelligence analysis."""
+    pass
+
+
+class TranscriptAnalysisResponse(BaseModel):
+    """Structured Phase 4 AI Intelligence analysis response contract."""
+    success: bool = Field(default=True, description="True when intelligence analysis completed successfully.")
+    language: str = Field(default="en", description="Validated language code of the transcript.")
+    intent: IntentAnalysisResult = Field(..., description="Primary classified intent and evidence.")
+    summary: str = Field(..., description="Factual concise call summary.")
+    sentiment: SentimentAnalysisResult = Field(..., description="Classified patient sentiment and explanation.")
+    priority: PriorityAnalysisResult = Field(..., description="Operational triage urgency level and reason.")
+    metadata: Optional[IntelligenceMetadata] = Field(default=None, description="Execution telemetry and safety metadata.")
+
+
+# ============================================================================
+# Future AI Intelligence Response Schemas (Phase 5+ Extensibility)
 # ============================================================================
 
 class AISummaryResponse(BaseModel):

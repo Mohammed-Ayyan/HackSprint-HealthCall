@@ -49,6 +49,16 @@ const allIntents: { name: CallIntent; icon: React.ReactNode; desc: string }[] = 
     icon: <Siren className="h-4 w-4" />,
     desc: "Acute clinical symptom, 911 EMS dispatch, ER triage",
   },
+  {
+    name: "Follow-up Request",
+    icon: <Calendar className="h-4 w-4" />,
+    desc: "Post-op, test results, or scheduled post-visit consultation",
+  },
+  {
+    name: "General Inquiry",
+    icon: <Target className="h-4 w-4" />,
+    desc: "Hospital directions, visiting hours, or facility questions",
+  },
 ];
 
 export function IntentDetector({

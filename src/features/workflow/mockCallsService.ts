@@ -607,4 +607,14 @@ export const mockCallsService = {
     await new Promise((r) => setTimeout(r, 40));
     return mockCallsList.slice(0, limit);
   },
+
+  upsertCall(call: Call): Call {
+    const idx = mockCallsList.findIndex((c) => c.id === call.id);
+    if (idx >= 0) {
+      mockCallsList[idx] = call;
+    } else {
+      mockCallsList.unshift(call);
+    }
+    return call;
+  },
 };

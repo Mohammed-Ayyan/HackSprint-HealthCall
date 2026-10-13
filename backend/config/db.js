@@ -5,6 +5,14 @@
  */
 
 const mongoose = require("mongoose");
+const dns = require("dns");
+
+// Configure resilient public DNS resolvers to handle SRV records on Windows
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+} catch (dnsErr) {
+  // Ignore in environments where custom DNS servers cannot be set
+}
 
 let isConnected = false;
 

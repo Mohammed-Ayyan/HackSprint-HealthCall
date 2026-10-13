@@ -16,6 +16,8 @@ import {
   CheckCircle,
   Quote,
   Activity,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
 import { AppShell } from "@/shared/components/layout/AppShell";
 import { RoleGuard } from "@/features/platform/auth/RoleGuard";
@@ -32,7 +34,8 @@ import { DepartmentRoutingUI } from "@/features/workflow/components/DepartmentRo
 import { mockCallsService } from "@/features/workflow/mockCallsService";
 import { mockTasksService } from "@/features/workflow/mockTasksService";
 import { mockAuditService } from "@/features/platform/mockAuditService";
-import { Call, TranscriptSegment } from "@/shared/types/call";
+import { apiAiService } from "@/features/ai-intelligence/services/apiAiService";
+import { Call, TranscriptSegment, CallPriority, CallSentiment, CallIntent } from "@/shared/types/call";
 import { AuditEvent } from "@/shared/types/audit";
 import { DepartmentRoutingRule } from "@/shared/types/action";
 import { Badge } from "@/shared/components/ui/Badge";
@@ -64,6 +67,8 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
   const [activeTab, setActiveTab] = useState<"transcript" | "intelligence" | "actions" | "audit">("intelligence");
   const [highlightedTranscriptId, setHighlightedTranscriptId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [aiModelBadge, setAiModelBadge] = useState<string | null>(null);
 
   useEffect(() => {
     loadCallData();
@@ -82,6 +87,80 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
       setRoutingRules(rules);
     }
     setLoading(false);
+  };
+
+  const handleRunAIAnalysis = async () => {
+    if (!call) return;
+    setAnalyzing(true);
+    try {
+      const rawTranscript = call.transcript
+        .map((t) => `${t.speakerName}: ${t.text}`)
+        .join("\n");
+
+      // Phase 3: Sentence Normalization & Segmentation
+      const p3 = await apiAiService.processTranscript(rawTranscript, "en", call.id);
+
+      // Phase 4: Intent, Summary, Sentiment & Priority via Ollama llama3
+      const p4 = await apiAiService.analyzeTranscript(
+        p3.normalized_transcript || rawTranscript,
+        p3.language,
+        call.id
+      );
+
+      const priorityMap: Record<string, CallPriority> = {
+        p1_critical: "critical",
+        critical: "critical",
+        p2_high: "high",
+        high: "high",
+        p3_medium: "medium",
+        medium: "medium",
+        p4_low: "low",
+        low: "low",
+      };
+      const mappedPriority = priorityMap[p4.priority.level?.toLowerCase()] || call.priority;
+
+      const sentimentMap: Record<string, CallSentiment> = {
+        positive: "positive",
+        neutral: "neutral",
+        concerned: "concerned",
+        frustrated: "frustrated",
+        angry: "angry",
+      };
+      const mappedSentiment = sentimentMap[p4.sentiment.label?.toLowerCase()] || call.sentiment;
+
+      const intentMap: Record<string, CallIntent> = {
+        appointment_scheduling: "Appointment Request",
+        medical_inquiry: "Follow-up Request",
+        prescription_refill: "Medicine Refill",
+        billing_and_insurance: "Billing Issue",
+        emergency_or_urgent: "Emergency Concern",
+        complaint_or_feedback: "Complaint",
+        general_information: "General Inquiry",
+      };
+      const mappedIntent =
+        intentMap[p4.intent.label] ||
+        (p4.intent.label as CallIntent) ||
+        call.intent;
+
+      const updatedCall: Call = {
+        ...call,
+        priority: mappedPriority,
+        sentiment: mappedSentiment,
+        intent: mappedIntent,
+        summary: {
+          ...call.summary,
+          overview: p4.summary || call.summary.overview,
+        },
+      };
+
+      setCall(updatedCall);
+      await mockCallsService.upsertCall(updatedCall);
+      setAiModelBadge(p4.metadata?.model_name || "Ollama llama3");
+    } catch (err: any) {
+      alert(`AI Engine Analysis Error: ${err.message || String(err)}`);
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   if (!loading && !call) {
@@ -155,9 +234,35 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-[#607264]">
-              SLA Window: <strong className="text-[#059669]">{call.slaRemainingHours.toFixed(1)} hrs</strong>
+          <div className="flex items-center gap-3">
+            {aiModelBadge && (
+              <Badge variant="emerald" size="sm" dot>
+                Live Analyzed ({aiModelBadge})
+              </Badge>
+            )}
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleRunAIAnalysis}
+              disabled={analyzing}
+              className="border-[#c8e6c9] text-[#1b4332] hover:bg-[#e8f5e9] gap-1.5 text-xs font-semibold"
+            >
+              {analyzing ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#059669]" />
+                  <span>AI Engine Analyzing...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3.5 w-3.5 text-[#059669]" />
+                  <span>Run AI Engine (Phase 4)</span>
+                </>
+              )}
+            </Button>
+
+            <span className="text-xs font-mono text-[#607264] hidden sm:inline">
+              SLA: <strong className="text-[#059669]">{call.slaRemainingHours.toFixed(1)}h</strong>
             </span>
           </div>
         </div>

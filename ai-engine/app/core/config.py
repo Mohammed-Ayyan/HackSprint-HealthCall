@@ -41,6 +41,16 @@ class Settings(BaseSettings):
     ALLOWED_AUDIO_EXTENSIONS: List[str] = [".wav", ".mp3", ".m4a", ".flac", ".ogg"]
     SUPPORTED_AUDIO_LANGUAGES: List[str] = ["en", "hi", "kn"]
 
+    # =========================================================================
+    # Phase 4: Core AI Intelligence Engine Configuration
+    # =========================================================================
+    LLM_PROVIDER: str = "ollama"
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    LLM_MODEL: str = "llama3:latest"
+    LLM_TIMEOUT_SECONDS: float = 60.0
+    LLM_TEMPERATURE: float = 0.0
+    LLM_MAX_RETRIES: int = 1
+
     @property
     def max_upload_size_bytes(self) -> int:
         """Maximum audio upload file size in bytes."""

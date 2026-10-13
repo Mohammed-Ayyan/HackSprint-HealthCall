@@ -173,4 +173,9 @@ export const mockCallService = {
     await new Promise((r) => setTimeout(r, 50));
     return mockLiveCall.actions;
   },
+
+  updateLiveCall(updated: Partial<Call>): Call {
+    Object.assign(mockLiveCall, updated);
+    return mockLiveCall;
+  },
 };

@@ -9,11 +9,15 @@ export type CallSentiment =
 
 export type CallIntent =
   | "Appointment Request"
+  | "Follow-up Request"
   | "Insurance Query"
   | "Complaint"
   | "Billing Issue"
   | "Medicine Refill"
-  | "Emergency Concern";
+  | "Emergency Concern"
+  | "General Inquiry"
+  | "Unknown"
+  | (string & {});
 
 export type CallStatus = "in-progress" | "analyzed" | "triaged" | "archived";
 

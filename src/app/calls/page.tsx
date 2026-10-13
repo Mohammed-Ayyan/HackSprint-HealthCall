@@ -10,10 +10,12 @@ import { Call } from "@/shared/types/call";
 import { StatCard } from "@/shared/components/common/StatCard";
 import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
+import { LiveCallSimulatorModal } from "@/features/ai-intelligence/components/LiveCallSimulatorModal";
 
 export default function CallsPage() {
   const [calls, setCalls] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
 
   useEffect(() => {
     loadCalls();
@@ -53,10 +55,19 @@ export default function CallsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Badge variant="emerald" size="sm" dot>
               Audio Line Active
             </Badge>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsSimulatorOpen(true)}
+              className="gap-1.5 text-xs font-semibold"
+            >
+              <PhoneCall className="h-3.5 w-3.5" />
+              <span>Simulate / Upload Call</span>
+            </Button>
           </div>
         </div>
 
@@ -94,6 +105,14 @@ export default function CallsPage() {
 
         {/* Main Searchable Table */}
         <CallTable calls={calls} />
+
+        <LiveCallSimulatorModal
+          isOpen={isSimulatorOpen}
+          onClose={() => {
+            setIsSimulatorOpen(false);
+            loadCalls();
+          }}
+        />
       </div>
       </RoleGuard>
     </AppShell>
