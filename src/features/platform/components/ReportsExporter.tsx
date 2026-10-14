@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle } from "@/shared/components/ui/Card";
 import { Badge } from "@/shared/components/ui/Badge";
 import { exportToCSV, printOrExportPDF } from "@/shared/utils/export";
 import { mockCallsList } from "@/features/workflow/mockCallsService";
-import { mockActionItems } from "@/features/workflow/mockTasksService";
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
 
 export function ReportsExporter({ className }: { className?: string }) {
   const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
@@ -29,20 +29,25 @@ export function ReportsExporter({ className }: { className?: string }) {
     showNotice("Call Report CSV downloaded successfully");
   };
 
-  const handleExportDepartmentCSV = () => {
-    const rows = mockActionItems.map((a) => ({
-      TaskID: a.id,
-      Task: a.task,
-      Department: a.department,
-      Patient: a.patientName,
-      Priority: a.priority,
-      Deadline: a.deadline,
-      Status: a.status,
-      SLA_Remaining_Hours: a.sla.remainingHours,
-      Escalated: a.isEscalated ? "YES" : "NO",
-    }));
-    exportToCSV("CareOps_Department_Operations_Report", rows);
-    showNotice("Department Operations CSV downloaded successfully");
+  const handleExportDepartmentCSV = async () => {
+    try {
+      const realTasks = await apiTaskService.getTasks();
+      const rows = realTasks.map((a) => ({
+        TaskID: a.id,
+        Task: a.task,
+        Department: a.department,
+        Patient: a.patientName,
+        Priority: a.priority,
+        Deadline: a.deadline,
+        Status: a.status,
+        SLA_Remaining_Hours: a.sla.remainingHours,
+        Escalated: a.isEscalated ? "YES" : "NO",
+      }));
+      exportToCSV("CareOps_Department_Operations_Report", rows);
+      showNotice("Department Operations CSV downloaded successfully");
+    } catch {
+      showNotice("Could not load tasks for export");
+    }
   };
 
   const handleExportPDF = (reportType: string) => {

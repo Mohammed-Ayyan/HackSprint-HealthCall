@@ -18,7 +18,7 @@ router.use(authMiddleware);
 // API 1: CREATE CLAIM
 // Hospital staff only (Patients are blocked)
 router.post(
-  "/claims",
+  ["/", "/claims"],
   requireRole(
     USER_ROLES.ADMIN,
     USER_ROLES.INSURANCE_EMPLOYEE,
@@ -31,7 +31,7 @@ router.post(
 
 // API 2: GET CLAIMS (Role-scoped)
 router.get(
-  "/claims",
+  ["/", "/claims"],
   requireRole(
     USER_ROLES.ADMIN,
     USER_ROLES.INSURANCE_EMPLOYEE,
@@ -45,7 +45,7 @@ router.get(
 
 // API 3: GET SINGLE CLAIM
 router.get(
-  "/claims/:id",
+  ["/:id", "/claims/:id"],
   requireRole(
     USER_ROLES.ADMIN,
     USER_ROLES.INSURANCE_EMPLOYEE,
@@ -60,7 +60,7 @@ router.get(
 // API 4: UPDATE CLAIM STATUS
 // Only ADMIN & INSURANCE_EMPLOYEE can modify adjudication status
 router.patch(
-  "/claims/:id/status",
+  ["/:id/status", "/claims/:id/status"],
   requireRole(USER_ROLES.ADMIN, USER_ROLES.INSURANCE_EMPLOYEE),
   insuranceController.updateClaimStatus
 );
