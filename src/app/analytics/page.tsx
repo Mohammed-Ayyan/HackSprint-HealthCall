@@ -7,7 +7,7 @@ import { RoleGuard } from "@/features/platform/auth/RoleGuard";
 import { AnalyticsCharts } from "@/features/platform/components/AnalyticsCharts";
 import { ReportsExporter } from "@/features/platform/components/ReportsExporter";
 import { StatCard } from "@/shared/components/common/StatCard";
-import { mockAnalyticsService } from "@/features/platform/mockAnalyticsService";
+import { apiAnalyticsService } from "@/features/platform/analytics/apiAnalyticsService";
 import {
   AnalyticsSummary,
   CallVolumePoint,
@@ -30,11 +30,11 @@ export default function AnalyticsPage() {
 
   const loadAnalytics = async () => {
     const [sum, trends, cats, load, res] = await Promise.all([
-      mockAnalyticsService.getSummary(),
-      mockAnalyticsService.getVolumeTrends(),
-      mockAnalyticsService.getIssueCategories(),
-      mockAnalyticsService.getDepartmentWorkload(),
-      mockAnalyticsService.getResolutionTimeMetrics(),
+      apiAnalyticsService.getSummary(),
+      apiAnalyticsService.getVolumeTrends(),
+      apiAnalyticsService.getCategoryDistribution(),
+      apiAnalyticsService.getDepartmentWorkloads(),
+      apiAnalyticsService.getResolutionTimeMetrics(),
     ]);
 
     setSummary(sum);

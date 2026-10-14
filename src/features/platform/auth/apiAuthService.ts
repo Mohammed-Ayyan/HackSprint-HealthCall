@@ -7,7 +7,7 @@
 
 import { User, UserRole } from "@/shared/types/user";
 import { getRoleDashboard } from "./rolePermissions";
-import { AuthResponse, LoginCredentials, MOCK_USERS } from "./authService";
+import { AuthResponse, LoginCredentials } from "./authService";
 import {
   saveSession,
   clearSession,
@@ -130,7 +130,7 @@ export const apiAuthService = {
         role: feRole,
         department: data.user.department || "General Hospital",
         status: "active",
-        avatar: data.user.avatar || MOCK_USERS[feRole]?.avatar || "",
+        avatar: data.user.avatar || "",
         phone: data.user.phone || params.phone || "",
         lastActive: "Just now",
       };
@@ -220,7 +220,7 @@ export const apiAuthService = {
           role: feRole,
           department: data.department || "",
           status: "active",
-          avatar: data.avatar || MOCK_USERS[feRole]?.avatar || "",
+          avatar: data.avatar || "",
           phone: data.phone || "",
           lastActive: "Now",
         };
@@ -256,8 +256,8 @@ export const apiAuthService = {
   },
 
   switchRole(role: UserRole): User {
-    const user = MOCK_USERS[role] || MOCK_USERS.Admin;
-    saveSession(user);
-    return user;
+    const current = getClientSession();
+    if (current) return current;
+    return this.getCurrentUser();
   },
 };

@@ -137,7 +137,7 @@ export function Sidebar({ className, isOpen, onClose }: SidebarProps) {
                   Live Speech Stream
                   <Sparkles className="h-3 w-3 text-[#059669] inline" />
                 </p>
-                <p className="text-[10px] text-[#627267]">Rahul Sharma (03:24)</p>
+                <p className="text-[10px] text-[#627267]">Active Audio Intake</p>
               </div>
             </div>
             <Badge variant="green" size="sm">

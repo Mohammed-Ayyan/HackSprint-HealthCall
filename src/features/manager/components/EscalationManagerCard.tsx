@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AlertTriangle, Clock, CheckCircle2, UserCheck, ArrowUpRight, ShieldAlert, ArrowRight } from "lucide-react";
 import { EscalationCase } from "../types";
 import { managerService } from "../services/managerService";
+import { apiUserService } from "@/features/platform/users/apiUserService";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/Card";
 import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
@@ -17,8 +18,29 @@ export interface EscalationManagerCardProps {
 export function EscalationManagerCard({ initialEscalations }: EscalationManagerCardProps) {
   const [escalations, setEscalations] = useState<EscalationCase[]>(initialEscalations);
   const [selectedEscalation, setSelectedEscalation] = useState<EscalationCase | null>(null);
-  const [newAssignee, setNewAssignee] = useState("Marcus Sterling");
+  const [staffList, setStaffList] = useState<{ label: string; value: string }[]>([]);
+  const [newAssignee, setNewAssignee] = useState("");
   const [newPriority, setNewPriority] = useState<EscalationCase["priority"]>("Urgent");
+
+  useEffect(() => {
+    async function loadStaff() {
+      try {
+        const users = await apiUserService.getUsers();
+        const nonPatients = users.filter((u) => u.role !== "Patient");
+        if (nonPatients.length > 0) {
+          const mapped = nonPatients.map((u) => ({
+            label: `${u.name} (${u.role}${u.department ? ` • ${u.department}` : ""})`,
+            value: u.name,
+          }));
+          setStaffList(mapped);
+          setNewAssignee(mapped[0].value);
+        }
+      } catch (err) {
+        console.warn("Could not load staff list:", err);
+      }
+    }
+    loadStaff();
+  }, []);
 
   const handleResolve = async (id: string) => {
     await managerService.resolveEscalation(id);
@@ -171,13 +193,11 @@ export function EscalationManagerCard({ initialEscalations }: EscalationManagerC
               <Select
                 value={newAssignee}
                 onChange={(e) => setNewAssignee(e.target.value)}
-                options={[
-                  { label: "Marcus Sterling (Insurance Lead)", value: "Marcus Sterling" },
-                  { label: "Sarah Jenkins, RN (Post-Op Triage)", value: "Sarah Jenkins, RN" },
-                  { label: "Clara Oswald (Front Desk Lead)", value: "Clara Oswald" },
-                  { label: "Dr. Rahul (Surgical Director)", value: "Dr. Rahul" },
-                  { label: "James Patel (Pharmacy)", value: "James Patel" },
-                ]}
+                options={
+                  staffList.length > 0
+                    ? staffList
+                    : [{ label: "No personnel available", value: "" }]
+                }
               />
             </div>
 

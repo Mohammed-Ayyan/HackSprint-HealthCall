@@ -1,8 +1,8 @@
 import { User, UserRole } from "@/shared/types/user";
-import { authService, MOCK_USERS } from "./auth/authService";
+import { authService } from "./auth/authService";
 import { apiAuthService } from "./auth/apiAuthService";
 
-export const mockUsersList: User[] = Object.values(MOCK_USERS);
+export const mockUsersList: User[] = [];
 
 /**
  * Enterprise Authentication Service

@@ -267,16 +267,18 @@ export function PatientDirectory({ initialPatients }: PatientDirectoryProps) {
 
             <div className="space-y-2">
               <p className="font-semibold text-[#627267] uppercase tracking-wider text-[11px]">
-                Past Encounters
+                Encounter History
               </p>
-              <div className="bg-[#fcfdfc] p-2.5 rounded-lg border border-[#e2e8df]">
-                <p className="font-medium text-[#142019]">Post-Op Wound Check & Consult</p>
-                <p className="text-[#627267] text-[11px]">Dr. Rahul • Oct 08, 2026</p>
-              </div>
-              <div className="bg-[#fcfdfc] p-2.5 rounded-lg border border-[#e2e8df]">
-                <p className="font-medium text-[#142019]">Inpatient Discharge Summary</p>
-                <p className="text-[#627267] text-[11px]">Surgical Care Team • Oct 05, 2026</p>
-              </div>
+              {selectedPatientForHistory.totalAppointments > 0 ? (
+                <div className="bg-[#fcfdfc] p-2.5 rounded-lg border border-[#e2e8df]">
+                  <p className="font-medium text-[#142019]">Latest Clinical Appointment</p>
+                  <p className="text-[#627267] text-[11px]">{selectedPatientForHistory.lastVisit}</p>
+                </div>
+              ) : (
+                <div className="p-3 bg-[#fcfdfc] rounded-lg border border-dashed border-[#d8e2d6] text-center">
+                  <p className="text-xs text-[#627267]">No historical encounters recorded for this patient.</p>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end pt-2 border-t border-[#edf2ea]">

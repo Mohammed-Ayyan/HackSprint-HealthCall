@@ -28,7 +28,6 @@ interface RoleOption {
   department: string;
   badge: "emerald" | "teal" | "amber" | "default" | "red";
   icon: React.ComponentType<{ className?: string }>;
-  defaultEmail: string;
   destination: string;
 }
 
@@ -39,7 +38,6 @@ const ROLE_OPTIONS: RoleOption[] = [
     department: "Patient Access & Experience",
     badge: "emerald",
     icon: HeartHandshake,
-    defaultEmail: "rahul.sharma@email.com",
     destination: "/patient/dashboard",
   },
   {
@@ -48,7 +46,6 @@ const ROLE_OPTIONS: RoleOption[] = [
     department: "Post-Surgical General & Acute Recovery",
     badge: "teal",
     icon: Stethoscope,
-    defaultEmail: "dr.rahul@metrohealth.eco",
     destination: "/doctor/dashboard",
   },
   {
@@ -57,7 +54,6 @@ const ROLE_OPTIONS: RoleOption[] = [
     department: "Central Intake & Scheduling",
     badge: "default",
     icon: UserCheck,
-    defaultEmail: "clara.o@metrohealth.eco",
     destination: "/reception/dashboard",
   },
   {
@@ -66,7 +62,6 @@ const ROLE_OPTIONS: RoleOption[] = [
     department: "RCM & Carrier Relations",
     badge: "amber",
     icon: FileCheck2,
-    defaultEmail: "marcus.s@metrohealth.eco",
     destination: "/insurance/dashboard",
   },
   {
@@ -75,7 +70,6 @@ const ROLE_OPTIONS: RoleOption[] = [
     department: "Surgical Recovery & Operations",
     badge: "teal",
     icon: Users2,
-    defaultEmail: "eleanor.v@metrohealth.eco",
     destination: "/manager/dashboard",
   },
   {
@@ -84,7 +78,6 @@ const ROLE_OPTIONS: RoleOption[] = [
     department: "Executive Healthcare Governance",
     badge: "emerald",
     icon: ShieldCheck,
-    defaultEmail: "admin@metrohealth.eco",
     destination: "/admin/dashboard",
   },
 ];
@@ -101,10 +94,6 @@ export default function LoginPage() {
 
   const handleRoleChange = (newRole: UserRole) => {
     setRole(newRole);
-    const match = ROLE_OPTIONS.find((r) => r.role === newRole);
-    if (match) {
-      setEmail(match.defaultEmail);
-    }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -123,13 +112,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickPreset = (targetRole: UserRole, userEmail: string) => {
-    setErrorMsg(null);
-    setRole(targetRole);
-    setEmail(userEmail);
-    setPassword("password123");
   };
 
   return (
@@ -190,7 +172,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="dr.rahul@metrohealth.eco"
+              placeholder="e.g. your.email@hospital.org"
               required
             />
 
@@ -215,42 +197,13 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Quick Persona Demo Presets for Hackathon Judges */}
-          <div className="pt-5 border-t border-[#edf2ea] space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-[#627267]">
-                1-Click Role Presets (Interactive Demo)
-              </span>
-              <span className="text-[10px] text-[#059669] font-medium">Instant Login</span>
+          {/* Real Backend Authentication Assurance */}
+          <div className="pt-4 border-t border-[#edf2ea] flex items-center justify-between text-[11px] text-[#627267]">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 text-[#059669]" />
+              <span>Real MongoDB JWT Authentication</span>
             </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              {ROLE_OPTIONS.map((opt) => {
-                const Icon = opt.icon;
-                const isSelected = role === opt.role;
-                return (
-                  <button
-                    key={opt.role}
-                    type="button"
-                    onClick={() => handleQuickPreset(opt.role, opt.defaultEmail)}
-                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                      isSelected
-                        ? "bg-[#e8f3ec] border-[#1b4332] shadow-sm"
-                        : "bg-[#fcfdfc] hover:bg-[#f4f7f3] border-[#e2e8df] text-[#28382e]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <div className="flex items-center gap-1.5">
-                        <Icon className="h-3.5 w-3.5 text-[#1b4332]" />
-                        <span className="font-bold text-[11px] text-[#142019]">{opt.role}</span>
-                      </div>
-                      <span className="text-[9px] font-mono text-[#627267]">{opt.destination.replace('/dashboard', '')}</span>
-                    </div>
-                    <span className="text-[10px] text-[#627267] truncate">{opt.department}</span>
-                  </button>
-                );
-              })}
-            </div>
+            <span className="font-mono text-[#1b4332] font-semibold">Strict RBAC</span>
           </div>
         </Card>
 

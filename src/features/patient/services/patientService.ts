@@ -9,6 +9,7 @@ import { apiPatientService } from "./apiPatientService";
 import { apiAppointmentService } from "@/features/platform/appointments/apiAppointmentService";
 import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
 import { apiInsuranceService } from "@/features/platform/insurance/apiInsuranceService";
+import { authService } from "@/features/platform/auth/authService";
 
 /**
  * Patient Service (Connected directly to MongoDB Backend)
@@ -24,8 +25,8 @@ export const patientService = {
       ]);
 
       if (profile) {
-        let insStatus = (profile.insuranceStatus as any) || "Active & Verified";
-        let insProvider = profile.insuranceProvider || "BlueCross Premier PPO";
+        let insStatus = (profile.insuranceStatus as any) || "Unregistered";
+        let insProvider = profile.insuranceProvider || "Self-Pay / Not Registered";
 
         try {
           const insData = await apiInsuranceService.getPatientInsurance(profile.id);
@@ -42,7 +43,7 @@ export const patientService = {
           mrn: profile.mrn || `MRN-${profile.id.slice(-6).toUpperCase()}`,
           assignedPCP: profile.assignedDoctorName
             ? `${profile.assignedDoctorName} (${profile.department || "Clinical Care"})`
-            : "Assigned Staff Physician",
+            : "Unassigned Attending Physician",
           insuranceStatus: insStatus,
           insuranceProvider: insProvider,
           upcomingAppointmentsCount: liveApts.filter((a) => a.status !== "cancelled").length,
@@ -54,12 +55,13 @@ export const patientService = {
       console.warn("[patientService] Failed to load live profile:", err.message);
     }
 
+    const current = authService.getCurrentUser();
     return {
-      patientName: "Patient Account",
-      mrn: "MRN-PENDING",
-      assignedPCP: "Assigned Staff Physician",
-      insuranceStatus: "Active & Verified",
-      insuranceProvider: "MetroHealth Living System",
+      patientName: current?.name || "Patient Account",
+      mrn: "Pending Registration",
+      assignedPCP: "Unassigned Attending Physician",
+      insuranceStatus: "Action Needed",
+      insuranceProvider: "Self-Pay",
       upcomingAppointmentsCount: 0,
       pendingRequestsCount: 0,
       recentMessagesCount: 0,
