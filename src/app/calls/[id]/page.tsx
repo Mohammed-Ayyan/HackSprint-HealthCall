@@ -35,7 +35,7 @@ import { mockCallsService } from "@/features/workflow/mockCallsService";
 import { mockTasksService } from "@/features/workflow/mockTasksService";
 import { mockAuditService } from "@/features/platform/mockAuditService";
 import { apiAiService } from "@/features/ai-intelligence/services/apiAiService";
-import { Call, TranscriptSegment, CallPriority, CallSentiment, CallIntent } from "@/shared/types/call";
+import { Call, TranscriptSegment, CallPriority, CallSentiment, CallIntent, ActionExtraction } from "@/shared/types/call";
 import { AuditEvent } from "@/shared/types/audit";
 import { DepartmentRoutingRule } from "@/shared/types/action";
 import { Badge } from "@/shared/components/ui/Badge";
@@ -120,9 +120,12 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
       const mappedPriority = priorityMap[p4.priority.level?.toLowerCase()] || call.priority;
 
       const sentimentMap: Record<string, CallSentiment> = {
+        satisfied: "positive",
         positive: "positive",
         neutral: "neutral",
         concerned: "concerned",
+        confused: "concerned",
+        uncertain: "concerned",
         frustrated: "frustrated",
         angry: "angry",
       };
@@ -142,6 +145,18 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
         (p4.intent.label as CallIntent) ||
         call.intent;
 
+      // Phase 5: Grounded Real Action Extraction
+      const extractedActions: ActionExtraction[] = (p4.actions || []).map((act, idx) => ({
+        id: act.id || `act-${call.id}-${idx + 1}`,
+        task: act.task,
+        department: act.department || "Reception",
+        priority: (act.priority?.toLowerCase() as any) || "medium",
+        deadline: act.deadline || "No deadline stated",
+        evidenceQuote: act.evidence_quote || "",
+        suggestedAssignee: act.suggested_assignee || undefined,
+        status: (act.status as any) || "pending",
+      }));
+
       const updatedCall: Call = {
         ...call,
         priority: mappedPriority,
@@ -151,6 +166,7 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
           ...call.summary,
           overview: p4.summary || call.summary.overview,
         },
+        actions: p4.actions !== undefined ? extractedActions : call.actions,
       };
 
       setCall(updatedCall);
@@ -242,6 +258,7 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
             )}
 
             <Button
+              id="btn-run-ai-engine"
               variant="secondary"
               size="sm"
               onClick={handleRunAIAnalysis}
@@ -256,7 +273,7 @@ function CallDetailsContent({ params }: { params: Promise<{ id: string }> }) {
               ) : (
                 <>
                   <Sparkles className="h-3.5 w-3.5 text-[#059669]" />
-                  <span>Run AI Engine (Phase 4)</span>
+                  <span>Run AI Engine (Phases 4–5)</span>
                 </>
               )}
             </Button>

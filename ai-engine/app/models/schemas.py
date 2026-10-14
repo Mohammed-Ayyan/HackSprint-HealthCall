@@ -336,14 +336,30 @@ class TranscriptAnalysisRequest(TranscriptProcessRequest):
     pass
 
 
+class ActionExtractionResponse(BaseModel):
+    """Action item extracted from conversation with grounding evidence."""
+    id: str
+    task: str
+    department: str
+    priority: str
+    deadline: Optional[str] = None
+    evidence_quote: str
+    suggested_assignee: Optional[str] = None
+    status: Optional[str] = "pending"
+
+
 class TranscriptAnalysisResponse(BaseModel):
-    """Structured Phase 4 AI Intelligence analysis response contract."""
+    """Structured Phase 4 & Phase 5 AI Intelligence analysis response contract."""
     success: bool = Field(default=True, description="True when intelligence analysis completed successfully.")
     language: str = Field(default="en", description="Validated language code of the transcript.")
     intent: IntentAnalysisResult = Field(..., description="Primary classified intent and evidence.")
     summary: str = Field(..., description="Factual concise call summary.")
     sentiment: SentimentAnalysisResult = Field(..., description="Classified patient sentiment and explanation.")
     priority: PriorityAnalysisResult = Field(..., description="Operational triage urgency level and reason.")
+    actions: List[ActionExtractionResponse] = Field(
+        default_factory=list,
+        description="Ground-truth actionable tasks extracted from transcript.",
+    )
     metadata: Optional[IntelligenceMetadata] = Field(default=None, description="Execution telemetry and safety metadata.")
 
 
@@ -358,18 +374,6 @@ class AISummaryResponse(BaseModel):
     clinical_flags: List[str] = Field(default_factory=list)
     insurance_pending: bool = False
     confidence_score: float = Field(default=0.0, ge=0.0, le=1.0)
-
-
-class ActionExtractionResponse(BaseModel):
-    """Action item extracted from conversation with grounding evidence."""
-    id: str
-    task: str
-    department: str
-    priority: str
-    deadline: Optional[str] = None
-    evidence_quote: str
-    suggested_assignee: Optional[str] = None
-    status: Optional[str] = "pending"
 
 
 class CommitmentResponse(BaseModel):

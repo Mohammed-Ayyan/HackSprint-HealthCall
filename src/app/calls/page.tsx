@@ -60,6 +60,7 @@ export default function CallsPage() {
               Audio Line Active
             </Badge>
             <Button
+              id="btn-simulate-upload-call"
               variant="primary"
               size="sm"
               onClick={() => setIsSimulatorOpen(true)}

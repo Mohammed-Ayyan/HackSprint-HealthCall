@@ -244,11 +244,17 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                 className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#f4f8f5] transition-colors text-left group cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <img
-                    src={u.avatar}
-                    alt={u.name}
-                    className="h-8 w-8 rounded-lg object-cover border border-[#e2e8df]"
-                  />
+                  {u.avatar ? (
+                    <img
+                      src={u.avatar}
+                      alt={u.name || "User"}
+                      className="h-8 w-8 rounded-lg object-cover border border-[#e2e8df]"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 rounded-lg bg-[#1b4332] text-white flex items-center justify-center font-bold text-xs border border-[#e2e8df]">
+                      {(u.name && u.name.charAt(0).toUpperCase()) || "U"}
+                    </div>
+                  )}
                   <div>
                     <p className="text-xs font-bold text-[#142019] group-hover:text-[#1b4332] transition-colors">
                       {u.name}

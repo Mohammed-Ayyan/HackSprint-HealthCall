@@ -32,7 +32,7 @@ import {
 } from "@/features/ai-intelligence/services/apiAiService";
 import { mockCallService, mockLiveCall } from "@/features/ai-intelligence/mockCallService";
 import { mockCallsService } from "@/features/workflow/mockCallsService";
-import { Call, TranscriptSegment } from "@/shared/types/call";
+import { Call, TranscriptSegment, ActionExtraction } from "@/shared/types/call";
 
 export interface LiveCallSimulatorModalProps {
   isOpen: boolean;
@@ -148,7 +148,10 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
         }
       }
 
-      const rawTranscript = transcriptionResult.transcript;
+      let rawTranscript = transcriptionResult.transcript;
+      if (!rawTranscript || !rawTranscript.trim()) {
+        rawTranscript = "Caller was connected on the live audio line but no audible speech was detected.";
+      }
 
       // Phase 3: Normalization & Sentence Segmentation
       setStatusMessage("Phase 3: Segmenting sentences and calculating deterministic metadata...");
@@ -266,6 +269,18 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
         analysisResult.intent.label ||
         "General Inquiry";
 
+      // Phase 5: Grounded Real Action Extraction
+      const extractedActions: ActionExtraction[] = (analysisResult.actions || []).map((act, idx) => ({
+        id: act.id || `act-live-${idx + 1}`,
+        task: act.task,
+        department: act.department || "Reception",
+        priority: (act.priority?.toLowerCase() as any) || "medium",
+        deadline: act.deadline || "No deadline stated",
+        evidenceQuote: act.evidence_quote || "",
+        suggestedAssignee: act.suggested_assignee || undefined,
+        status: (act.status as any) || "pending",
+      }));
+
       const updatedCall: Call = {
         ...mockLiveCall,
         status: "analyzed",
@@ -287,6 +302,7 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
           confidenceScore: 0.98,
         },
         transcript: transcriptSegments.length > 0 ? transcriptSegments : mockLiveCall.transcript,
+        actions: extractedActions,
       };
 
       mockCallService.updateLiveCall(updatedCall);
@@ -474,6 +490,7 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
             {stage === "idle" && (
               <>
                 <Button
+                  id="btn-simulate-clinical-call"
                   onClick={handleStartSimulatedCall}
                   variant="primary"
                   size="sm"
@@ -484,6 +501,7 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
                 </Button>
 
                 <Button
+                  id="btn-upload-audio"
                   onClick={() => fileInputRef.current?.click()}
                   variant="outline"
                   size="sm"
@@ -494,6 +512,7 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
                 </Button>
 
                 <Button
+                  id="btn-record-mic"
                   onClick={startRecording}
                   variant="outline"
                   size="sm"
@@ -506,7 +525,7 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
             )}
 
             {stage === "recording" && (
-              <Button onClick={stopRecording} variant="danger" size="sm" className="gap-2 cursor-pointer">
+              <Button id="btn-stop-recording" onClick={stopRecording} variant="danger" size="sm" className="gap-2 cursor-pointer">
                 <MicOff className="h-4 w-4" />
                 <span>Stop & Transcribe</span>
               </Button>
@@ -522,7 +541,7 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
             {stage === "analyzed" && (
               <>
                 <Link href={`/calls/${analyzedCallId}`} onClick={onClose}>
-                  <Button variant="primary" size="sm" className="gap-2 cursor-pointer">
+                  <Button id="btn-view-full-dossier" variant="primary" size="sm" className="gap-2 cursor-pointer">
                     <span>View Full Call Dossier</span>
                     <ArrowRight className="h-4 w-4" />
                   </Button>

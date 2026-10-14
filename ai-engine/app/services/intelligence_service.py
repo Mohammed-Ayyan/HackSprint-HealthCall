@@ -24,6 +24,7 @@ import httpx
 
 from app.core.config import settings
 from app.models.schemas import (
+    ActionExtractionResponse,
     CallIntent,
     CallPriority,
     CallSentiment,
@@ -307,6 +308,25 @@ Core Responsibilities:
    - "LOW": General informational queries, routine facility questions, non-urgent information.
    Provide a concise reason explaining the urgency level.
 
+5. Operational Action Item Extraction (Phase 5):
+   Extract actionable operational or clinical follow-up tasks grounded strictly in the transcript.
+   Rules for Action Extraction:
+   - Extract tasks ONLY when supported by explicit dialogue.
+   - For each actionable task, provide:
+     - "task": A concise description of what needs to be done.
+     - "department": Responsible department ("Reception", "Insurance", "Billing", "Pharmacy", "Emergency Triage", "Clinical Team", or "Unknown"). Only assign when explicitly stated or reliably identifiable. If ambiguous or unknown, use "Unknown". Do NOT invent departments.
+     - "priority": Task urgency level: "critical", "high", "medium", or "low".
+     - "deadline": Explicit deadline for completing this task (e.g., "today before 5:00 PM", "within 2 hours").
+       CRITICAL: Only include a deadline if explicitly stated for this task.
+       Do NOT mistake a patient's requested appointment date/time or scheduled appointment date/time for a task deadline.
+       If no explicit task completion deadline is stated, set to null.
+     - "evidence_quote": Direct, verbatim excerpt from the transcript justifying this action.
+     - "suggested_assignee": Specific person or staff role mentioned to perform the task, or null if unmentioned. Do NOT invent names.
+     - "status": "pending"
+   - Do NOT turn every sentence into a task.
+   - If the transcript contains NO actionable tasks (e.g. routine greeting, general information query already answered), return an empty array [] for "actions".
+   - Avoid duplicate actions.
+
 Output Format:
 You must respond ONLY with a valid JSON object matching this schema:
 {
@@ -322,7 +342,18 @@ You must respond ONLY with a valid JSON object matching this schema:
   "priority": {
     "level": "<CRITICAL|HIGH|MEDIUM|LOW>",
     "reason": "<Concise rationale>"
-  }
+  },
+  "actions": [
+    {
+      "task": "<Concise task description>",
+      "department": "<Reception|Insurance|Billing|Pharmacy|Emergency Triage|Clinical Team|Unknown>",
+      "priority": "<critical|high|medium|low>",
+      "deadline": "<Explicit deadline string or null>",
+      "evidence_quote": "<Verbatim transcript excerpt>",
+      "suggested_assignee": "<Person or role name or null>",
+      "status": "pending"
+    }
+  ]
 }
 """
 
@@ -385,7 +416,11 @@ class IntelligenceService:
         raw_json = self._execute_with_retry(prompt=prompt, system=SYSTEM_INSTRUCTION)
 
         # Step 4: Parse & validate model output
-        parsed_data = self._parse_and_validate_output(raw_json=raw_json, original_text=normalized)
+        parsed_data = self._parse_and_validate_output(
+            raw_json=raw_json,
+            original_text=normalized,
+            call_id=call_id,
+        )
 
         # Step 5: Apply conservative safety guardrails
         intent_result, priority_result, escalated = EmergencySafetyChecker.apply_safety_guardrails(
@@ -403,6 +438,7 @@ class IntelligenceService:
             summary=parsed_data["summary"],
             sentiment=parsed_data["sentiment"],
             priority=priority_result,
+            actions=parsed_data.get("actions", []),
             metadata=IntelligenceMetadata(
                 model_name=getattr(self._llm_client, "model_name", "local-llm"),
                 processing_time_seconds=processing_time,
@@ -464,6 +500,7 @@ class IntelligenceService:
         self,
         raw_json: str,
         original_text: str,
+        call_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Validate parsed dictionary against domain rules."""
         data = self._extract_json_dict(raw_json)
@@ -520,12 +557,234 @@ class IntelligenceService:
             reason=reason,
         )
 
+        # 5. Actions validation (Phase 5: Action Extraction Engine)
+        raw_actions = data.get("actions", [])
+        actions_result = self._parse_actions(
+            raw_actions=raw_actions,
+            original_text=original_text,
+            call_id=call_id,
+        )
+
         return {
             "intent": intent_result,
             "summary": summary_text,
             "sentiment": sentiment_result,
             "priority": priority_result,
+            "actions": actions_result,
         }
+
+    def _parse_actions(
+        self,
+        raw_actions: Any,
+        original_text: str,
+        call_id: Optional[str] = None,
+    ) -> List[ActionExtractionResponse]:
+        """Parse, validate, ground, and deduplicate extracted action items (Phase 5)."""
+        if not isinstance(raw_actions, list):
+            return []
+
+        original_lower = original_text.lower()
+        extracted: List[ActionExtractionResponse] = []
+        seen_tasks = set()
+
+        for item in raw_actions:
+            if not isinstance(item, dict):
+                continue
+
+            task = str(item.get("task", "")).strip()
+            if not task or len(task) < 3:
+                continue
+
+            # Deduplication key
+            task_norm = re.sub(r"[^\w\s]", "", task.lower())
+            if task_norm in seen_tasks:
+                continue
+            seen_tasks.add(task_norm)
+
+            # Grounding check for evidence quote
+            evidence_quote = str(item.get("evidence_quote", "")).strip()
+            if not self._is_grounded_in_text(evidence_quote, original_lower):
+                # Unsubstantiated or hallucinated evidence -> drop task
+                continue
+
+            # Department normalization
+            raw_dept = str(item.get("department", "Unknown")).strip()
+            department = self._normalize_department(raw_dept)
+
+            # Priority normalization
+            raw_priority = str(item.get("priority", "medium")).strip().lower()
+            priority = self._normalize_action_priority(raw_priority)
+
+            # Deadline validation (strictly prevents mistaking appointment dates for task deadlines)
+            raw_deadline = item.get("deadline")
+            deadline = self._validate_action_deadline(raw_deadline, original_lower, evidence_quote.lower())
+
+            # Assignee validation (cannot invent assignees absent from transcript)
+            raw_assignee = item.get("suggested_assignee")
+            assignee = self._validate_assignee(raw_assignee, original_lower)
+
+            action_id = f"act-{call_id or 'ext'}-{len(extracted) + 1}"
+
+            extracted.append(
+                ActionExtractionResponse(
+                    id=action_id,
+                    task=task,
+                    department=department,
+                    priority=priority,
+                    deadline=deadline,
+                    evidence_quote=evidence_quote,
+                    suggested_assignee=assignee,
+                    status="pending",
+                )
+            )
+
+        return extracted
+
+    def _is_grounded_in_text(self, quote: str, original_lower: str) -> bool:
+        """Verify that an evidence quote is genuinely grounded in the transcript."""
+        if not quote:
+            return False
+        cleaned = quote.lower().strip('"\' ')
+        if not cleaned:
+            return False
+
+        # Direct substring check
+        if cleaned in original_lower:
+            return True
+
+        # Check with punctuation normalized
+        norm_quote = re.sub(r"[^\w\s]", " ", cleaned)
+        norm_orig = re.sub(r"[^\w\s]", " ", original_lower)
+        if norm_quote.strip() in norm_orig:
+            return True
+
+        # Check ellipses splits (e.g. "phrase one ... phrase two")
+        if "..." in cleaned:
+            parts = [p.strip() for p in cleaned.split("...") if len(p.strip()) > 3]
+            if parts and all(re.sub(r"[^\w\s]", " ", p).strip() in norm_orig for p in parts):
+                return True
+
+        # Word overlap check (at least 70% of words of length > 3 present in transcript)
+        words = [w for w in norm_quote.split() if len(w) > 3]
+        if not words:
+            return False
+        matched_words = [w for w in words if w in norm_orig]
+        return (len(matched_words) / len(words)) >= 0.7
+
+    def _validate_action_deadline(
+        self,
+        raw_deadline: Any,
+        original_lower: str,
+        evidence_lower: str = "",
+    ) -> Optional[str]:
+        """Validate that deadline is explicit, grounded in transcript, and NOT an appointment date.
+
+        Rules:
+        - Must not mistake patient requested appointment dates for task deadlines.
+        - Must not invent dates/times absent from transcript.
+        - If no explicit deadline stated, return None.
+        """
+        if not raw_deadline:
+            return None
+        deadline_str = str(raw_deadline).strip()
+        if not deadline_str or deadline_str.lower() in ("null", "none", "unknown", "n/a", "no deadline", "none stated"):
+            return None
+
+        deadline_lower = deadline_str.lower()
+
+        # Check for appointment date indicators in transcript or evidence
+        # Handles titles like 'Dr.' or 'Mr.' with periods by checking proximity window
+        appointment_date_patterns = [
+            r"\b(?:appointment|consultation|visit|checkup|meeting|slot)\b.{0,120}?" + re.escape(deadline_lower),
+            r"\b(?:book|schedule|request)\b.{0,120}?\b(?:for|on|at)\s+" + re.escape(deadline_lower),
+            r"\b(?:appointment\s+date|date\s+of\s+(?:appointment|visit))\b",
+        ]
+        for pattern in appointment_date_patterns:
+            if re.search(pattern, original_lower, re.DOTALL) or (evidence_lower and re.search(pattern, evidence_lower, re.DOTALL)):
+                return None
+
+        # Check if deadline explicitly mentions appointment
+        if re.search(r"\b(?:appointment|consultation|visit|checkup)\b", deadline_lower):
+            return None
+
+        # Grounding check: ensure key words in the deadline actually exist in the transcript
+        deadline_words = [w for w in re.findall(r"\b[A-Za-z0-9]+\b", deadline_lower) if len(w) > 2]
+        if deadline_words and not any(w in original_lower for w in deadline_words):
+            # Model fabricated a deadline that does not exist in the transcript
+            return None
+
+        return deadline_str
+
+    def _validate_assignee(self, raw_assignee: Any, original_lower: str) -> Optional[str]:
+        """Validate suggested assignee is present in transcript or return None."""
+        if not raw_assignee:
+            return None
+        assignee_str = str(raw_assignee).strip()
+        if not assignee_str or assignee_str.lower() in ("null", "none", "unknown", "n/a", "unassigned", "unspecified"):
+            return None
+
+        # Check if any significant word of the assignee appears in transcript
+        words = [w for w in re.findall(r"\b[A-Za-z]{3,}\b", assignee_str.lower())]
+        if words and any(w in original_lower for w in words):
+            return assignee_str
+
+        # If invented by model and not in transcript
+        return None
+
+    def _normalize_department(self, dept: str) -> str:
+        """Map raw department string to standard CareOps departments or 'Unknown'."""
+        dept_lower = dept.lower().strip()
+        dept_map = {
+            "reception": "Reception",
+            "front desk": "Reception",
+            "scheduling": "Reception",
+            "insurance": "Insurance",
+            "billing": "Billing",
+            "accounts": "Billing",
+            "finance": "Billing",
+            "pharmacy": "Pharmacy",
+            "emergency triage": "Emergency Triage",
+            "emergency": "Emergency Triage",
+            "triage": "Emergency Triage",
+            "clinical team": "Clinical Team",
+            "clinical": "Clinical Team",
+            "nursing": "Clinical Team",
+            "nurse": "Clinical Team",
+            "medical": "Clinical Team",
+            "doctor": "Clinical Team",
+            "surgical": "Clinical Team",
+            "customer support": "Customer Support",
+            "support": "Customer Support",
+        }
+        for key, val in dept_map.items():
+            if key in dept_lower:
+                return val
+        return "Unknown"
+
+    def _normalize_action_priority(self, prio: str) -> str:
+        """Map priority string to standard priority level."""
+        prio_lower = prio.lower().strip()
+        if "crit" in prio_lower:
+            return "critical"
+        if "high" in prio_lower:
+            return "high"
+        if "low" in prio_lower:
+            return "low"
+        return "medium"
+
+    def extract_actions(
+        self,
+        transcript: str,
+        language: str = "en",
+        call_id: Optional[str] = None,
+    ) -> List[ActionExtractionResponse]:
+        """Extract grounded operational action items from a healthcare call transcript (Phase 5)."""
+        normalized = normalize_transcript(transcript)
+        if is_insufficient_or_greeting(normalized):
+            return []
+
+        analysis = self.analyze(transcript=normalized, language=language, call_id=call_id)
+        return analysis.actions
 
     def _normalize_intent_label(self, label: str) -> str:
         """Map raw label to recognized CallIntent or default to Unknown."""
@@ -600,6 +859,7 @@ class IntelligenceService:
                 level=CallPriority.LOW.value,
                 reason="Call transcript lacks substantive clinical or administrative request.",
             ),
+            actions=[],
             metadata=IntelligenceMetadata(
                 model_name=getattr(self._llm_client, "model_name", "local-llm"),
                 processing_time_seconds=round(processing_time, 3),

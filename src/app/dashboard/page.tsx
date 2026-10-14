@@ -53,34 +53,43 @@ export default function DashboardPage() {
   const [resolutionMetrics, setResolutionMetrics] = useState<ResolutionTimeMetric[]>([]);
 
   useEffect(() => {
-    loadDashboardData();
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const [call, recent, escalated, sum, trends, cats, load, res] = await Promise.all([
+          mockCallService.getLiveCall().catch(() => null),
+          mockCallsService.getRecentCalls(5).catch(() => []),
+          apiTaskService
+            .getTasks()
+            .then((tasks) => (tasks || []).filter((t) => t.isEscalated || t.sla?.isBreached))
+            .catch(() => []),
+          apiAnalyticsService.getSummary().catch(() => null),
+          apiAnalyticsService.getVolumeTrends().catch(() => []),
+          apiAnalyticsService.getCategoryDistribution().catch(() => []),
+          apiAnalyticsService.getDepartmentWorkloads().catch(() => []),
+          apiAnalyticsService.getResolutionTimeMetrics().catch(() => []),
+        ]);
+
+        if (isMounted) {
+          setLiveCall(call);
+          setRecentCalls(recent || []);
+          setEscalatedTasks(escalated || []);
+          setSummary(sum);
+          setVolumeTrends(trends || []);
+          setCategories(cats || []);
+          setWorkloads(load || []);
+          setResolutionMetrics(res || []);
+        }
+      } catch (err) {
+        console.error("[Dashboard] Failed to load data:", err);
+      }
+    };
+
+    load();
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  const loadDashboardData = async () => {
-    const [call, recent, escalated, sum, trends, cats, load, res] = await Promise.all([
-      mockCallService.getLiveCall(),
-      mockCallsService.getRecentCalls(5),
-      apiTaskService
-        .getTasks()
-        .then((tasks) => tasks.filter((t) => t.isEscalated || t.sla?.isBreached))
-        .catch(() => []),
-      apiAnalyticsService.getSummary(),
-      apiAnalyticsService.getVolumeTrends(),
-      apiAnalyticsService.getCategoryDistribution(),
-      apiAnalyticsService.getDepartmentWorkloads(),
-      apiAnalyticsService.getResolutionTimeMetrics(),
-    ]);
-
-    setLiveCall(call);
-    setRecentCalls(recent);
-    setEscalatedTasks(escalated);
-    setSummary(sum);
-    setVolumeTrends(trends);
-    setCategories(cats);
-    setWorkloads(load);
-    setResolutionMetrics(res);
-  };
-
   const portalShortcuts = [
     { name: "Patient Portal", href: "/patient/dashboard", icon: HeartPulse, count: "Active" },
     { name: "Doctor Portal", href: "/doctor/dashboard", icon: Stethoscope, count: "8 appts" },
@@ -158,7 +167,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
               title="Patient Wellness Flow (Calls)"
-              value={summary.totalCalls.toLocaleString()}
+              value={(summary.totalCalls ?? 0).toLocaleString()}
               changePercent={summary.callsChangePercent}
               subtitle="vs yesterday"
               icon={<PhoneCall className="h-5 w-5" />}
@@ -166,7 +175,7 @@ export default function DashboardPage() {
             />
             <StatCard
               title="Fulfilled Commitments"
-              value={summary.completedTasks.toLocaleString()}
+              value={(summary.completedTasks ?? 0).toLocaleString()}
               changePercent={summary.tasksChangePercent}
               subtitle="autonomous dispatch"
               icon={<CheckCircle2 className="h-5 w-5" />}
@@ -174,14 +183,14 @@ export default function DashboardPage() {
             />
             <StatCard
               title="Active Clinical Flow Queue"
-              value={summary.pendingActions}
+              value={summary.pendingActions ?? 0}
               subtitle="across 5 hospital divisions"
               icon={<Clock className="h-5 w-5" />}
               variant="amber"
             />
             <StatCard
               title="Urgent Triage Incidents"
-              value={summary.criticalCases}
+              value={summary.criticalCases ?? 0}
               changePercent={summary.criticalChangePercent}
               subtitle="immediate attention"
               icon={<Activity className="h-5 w-5" />}
@@ -220,41 +229,49 @@ export default function DashboardPage() {
             </div>
 
             <div className="rounded-2xl border border-[#e2e8e0] bg-white divide-y divide-[#edf2ec] shadow-sm overflow-hidden">
-              {recentCalls.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/calls/${c.id}`}
-                  className="p-3.5 flex items-center justify-between hover:bg-[#f7f9f6] transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332] font-mono text-xs font-bold">
-                      {c.callNumber.slice(-4)}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#142019] group-hover:text-[#059669] transition-colors">
-                          {c.patient.name}
-                        </span>
-                        <span className="text-[10px] text-[#607264] font-mono">{c.patient.mrn}</span>
-                        <Badge
-                          variant={c.priority === "critical" ? "red" : c.priority === "high" ? "amber" : "teal"}
-                          size="sm"
-                        >
-                          {c.priority}
-                        </Badge>
+              {recentCalls.length === 0 ? (
+                <div className="p-6 text-center text-xs text-[#607264]">
+                  No recent patient telephony records available
+                </div>
+              ) : (
+                recentCalls.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={`/calls/${c.id}`}
+                    className="p-3.5 flex items-center justify-between hover:bg-[#f7f9f6] transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-xl bg-[#e8f5e9] border border-[#c8e6c9] flex items-center justify-center text-[#1b4332] font-mono text-xs font-bold">
+                        {c.callNumber ? c.callNumber.slice(-4) : "CALL"}
                       </div>
-                      <p className="text-[11px] text-[#4a5f52] mt-0.5 max-w-lg truncate">
-                        {c.intent} • {c.summary.overview}
-                      </p>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#142019] group-hover:text-[#059669] transition-colors">
+                            {c.patient?.name || "Patient"}
+                          </span>
+                          <span className="text-[10px] text-[#607264] font-mono">
+                            {c.patient?.mrn || "N/A"}
+                          </span>
+                          <Badge
+                            variant={c.priority === "critical" ? "red" : c.priority === "high" ? "amber" : "teal"}
+                            size="sm"
+                          >
+                            {c.priority || "routine"}
+                          </Badge>
+                        </div>
+                        <p className="text-[11px] text-[#4a5f52] mt-0.5 max-w-lg truncate">
+                          {c.intent || "General"} • {c.summary?.overview || "No overview available."}
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-3 text-xs font-mono text-[#607264]">
-                    <span>{c.duration}</span>
-                    <ArrowRight className="h-4 w-4 text-[#8fa394] group-hover:text-[#059669] transition-colors" />
-                  </div>
-                </Link>
-              ))}
+                    <div className="flex items-center gap-3 text-xs font-mono text-[#607264]">
+                      <span>{c.duration || "00:00"}</span>
+                      <ArrowRight className="h-4 w-4 text-[#8fa394] group-hover:text-[#059669] transition-colors" />
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
 

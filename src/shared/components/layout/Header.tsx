@@ -38,7 +38,11 @@ export function Header({
   const { user, role, logout, isHydrated } = useAuth();
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(mockNotificationsService.getUnreadCount());
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  React.useEffect(() => {
+    setUnreadCount(mockNotificationsService.getUnreadCount());
+  }, []);
 
   const handleLogout = async () => {
     setIsRoleMenuOpen(false);
@@ -77,6 +81,7 @@ export function Header({
       <div className="flex items-center gap-3">
         {/* Simulate Live Inbound Call Button */}
         <Button
+          id="btn-header-simulate-call"
           onClick={onOpenSimulator}
           variant="primary"
           size="sm"
@@ -126,20 +131,28 @@ export function Header({
               </>
             ) : (
               <>
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="h-7 w-7 rounded-lg object-cover border border-[#d8e2d6] group-hover:border-[#059669] transition-colors"
-                />
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name || "User"}
+                    className="h-7 w-7 rounded-lg object-cover border border-[#d8e2d6] group-hover:border-[#059669] transition-colors"
+                  />
+                ) : (
+                  <div className="h-7 w-7 rounded-lg bg-[#1b4332] text-white flex items-center justify-center font-bold text-xs border border-[#d8e2d6] group-hover:border-[#059669] transition-colors">
+                    {(user?.name && user.name.charAt(0).toUpperCase()) || "U"}
+                  </div>
+                )}
                 <div className="text-left hidden md:block">
                   <p className="text-xs font-semibold text-[#142019] leading-tight">
-                    {user.name}
+                    {user?.name || "User"}
                   </p>
                   <div className="flex items-center gap-1">
                     <span className="text-[10px] text-[#059669] font-semibold">
-                      {user.role}
+                      {user?.role || "Patient"}
                     </span>
-                    <span className="text-[10px] text-[#7d8f81]">• {user.department}</span>
+                    {user?.department && (
+                      <span className="text-[10px] text-[#7d8f81]">• {user.department}</span>
+                    )}
                   </div>
                 </div>
               </>
@@ -155,16 +168,16 @@ export function Header({
                   Verified Database Session
                 </p>
                 <p className="text-xs font-bold text-[#142019] mt-0.5">
-                  {user.name}
+                  {user?.name || "Guest User"}
                 </p>
                 <p className="text-[11px] text-[#627267] truncate">
-                  {user.email}
+                  {user?.email || "No email"}
                 </p>
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#e8f5e9] text-[#1b4332] font-semibold border border-[#c8e6c9]">
-                    {user.role}
+                    {user?.role || "Patient"}
                   </span>
-                  {user.department && (
+                  {user?.department && (
                     <span className="text-[10px] text-[#627267] truncate">• {user.department}</span>
                   )}
                 </div>
@@ -172,7 +185,7 @@ export function Header({
 
               <div className="py-1 space-y-0.5">
                 <Link
-                  href={getRoleDashboard(role)}
+                  href={getRoleDashboard(role || user?.role || "Patient")}
                   onClick={() => setIsRoleMenuOpen(false)}
                   className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#334139] hover:text-[#142019] hover:bg-[#edf5ee] transition-colors group"
                 >

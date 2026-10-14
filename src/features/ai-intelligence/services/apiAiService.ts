@@ -77,6 +77,17 @@ export interface AnalysisMetadata {
   emergency_escalated?: boolean;
 }
 
+export interface ActionExtractionResponse {
+  id: string;
+  task: string;
+  department: string;
+  priority: string;
+  deadline?: string | null;
+  evidence_quote: string;
+  suggested_assignee?: string | null;
+  status?: string;
+}
+
 export interface TranscriptAnalysisResponse {
   success: boolean;
   language: string;
@@ -84,6 +95,7 @@ export interface TranscriptAnalysisResponse {
   summary: string;
   sentiment: SentimentResult;
   priority: PriorityResult;
+  actions?: ActionExtractionResponse[];
   metadata?: AnalysisMetadata;
 }
 
@@ -177,7 +189,15 @@ export const apiAiService = {
   },
 
   /**
-   * End-to-end pipeline: Audio -> Transcription (P2) -> Segmentation (P3) -> AI Analysis (P4).
+   * Phase 5: Action extraction grounded in dialogue evidence.
+   */
+  async extractActions(transcript: string, language: string = "en", callId?: string): Promise<ActionExtractionResponse[]> {
+    const analysis = await this.analyzeTranscript(transcript, language, callId);
+    return analysis.actions || [];
+  },
+
+  /**
+   * End-to-end pipeline: Audio -> Transcription (P2) -> Segmentation (P3) -> AI Analysis (P4/P5).
    */
   async processFullCallPipeline(file: File | Blob, language: string = "en"): Promise<FullPipelineResult> {
     // 1. Phase 2: Transcribe

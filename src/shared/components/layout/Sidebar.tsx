@@ -63,7 +63,7 @@ export function Sidebar({ className, isOpen, onClose }: SidebarProps) {
     if (onClose) onClose();
   };
 
-  const userDashboardUrl = isHydrated ? getRoleDashboard(user.role) : "";
+  const userDashboardUrl = isHydrated ? getRoleDashboard(user?.role || "Patient") : "";
 
   return (
     <>
