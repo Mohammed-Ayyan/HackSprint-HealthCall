@@ -83,6 +83,14 @@ export const doctorService = {
 
       const queue: DoctorQueuePatient[] = [];
 
+      const calculateAge = (dob?: string) => {
+        if (!dob) return undefined;
+        const b = new Date(dob);
+        if (isNaN(b.getTime())) return undefined;
+        const diff = Date.now() - b.getTime();
+        return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+      };
+
       // 1. Convert live database appointments into patient queue
       if (Array.isArray(apts)) {
         apts.forEach((a) => {
@@ -90,13 +98,13 @@ export const doctorService = {
             id: a.id,
             mrn: a.mrn || "MRN-PENDING",
             name: a.patientName,
-            age: 38,
+            age: 0,
             gender: "Patient Record",
-            appointmentTime: a.time,
-            issue: `${a.type} • ${a.instructions || "Scheduled consultation"}`,
+            appointmentTime: a.time || "Scheduled Slot",
+            issue: `${a.type || "Consultation"} • ${a.instructions || "Scheduled visit"}`,
             priority: a.status === "confirmed" ? "medium" : "routine",
             status: a.status === "confirmed" ? "Checked In" : "Waiting Room",
-            roomNumber: a.location || "Pavilion 3",
+            roomNumber: a.location || "Consultation Suite",
             aiBrief: {
               summary: `Patient booked ${a.type || "consultation"} for ${a.date} at ${a.time}.`,
               previousConversation: a.notes || `Scheduled appointment for ${a.date}.`,
@@ -114,20 +122,21 @@ export const doctorService = {
       if (Array.isArray(assigned)) {
         assigned.forEach((p) => {
           if (!queue.some((q) => q.name.toLowerCase() === p.name.toLowerCase())) {
+            const computedAge = calculateAge(p.dateOfBirth);
             queue.push({
               id: p.id || p._id,
-              mrn: p.mrn || "MRN-884920",
+              mrn: p.mrn || `MRN-${(p.id || p._id || "").slice(-6).toUpperCase()}`,
               name: p.name,
-              age: p.age || 42,
+              age: computedAge ?? 0,
               gender: p.gender || "Patient",
-              appointmentTime: "10:30 AM",
-              issue: p.medicalSummary || "Post-Surgical Follow-up & Evaluation",
+              appointmentTime: "Clinical Schedule",
+              issue: p.medicalSummary || "Clinical Follow-up & Evaluation",
               priority: "urgent",
               status: "Checked In",
-              roomNumber: "Room 412",
+              roomNumber: p.department || "Clinical Care Unit",
               aiBrief: {
                 summary: `Assigned clinical patient ${p.name}.`,
-                previousConversation: p.medicalSummary || "Post-discharge evaluation.",
+                previousConversation: p.medicalSummary || "Clinical record registered.",
                 pendingIssue: "Clinical review required.",
                 requiredAction: "Review vitals and evaluate recovery trajectory.",
                 keyVitalsAlert: "Vitals under observation",

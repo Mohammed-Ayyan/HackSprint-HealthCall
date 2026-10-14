@@ -178,7 +178,7 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
           const isAgent = idx === 0 && transcriptionResult.segments.length > 1;
           displayLines.push({
             speaker: isAgent ? "agent" : "patient",
-            speakerName: isAgent ? "AI Voice Agent" : "Rahul Sharma (Patient)",
+            speakerName: isAgent ? "AI Voice Agent" : "Patient (Inbound Caller)",
             text: seg.text,
             timestamp: `00:${Math.floor(seg.start).toString().padStart(2, "0")}`,
           });
@@ -186,7 +186,7 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
       } else {
         displayLines.push({
           speaker: "patient",
-          speakerName: "Rahul Sharma (Patient)",
+          speakerName: "Patient (Inbound Caller)",
           text: processingResult.normalized_transcript,
           timestamp: "00:04",
         });
@@ -424,8 +424,8 @@ export function LiveCallSimulatorModal({ isOpen, onClose }: LiveCallSimulatorMod
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-[#142019]">Rahul Sharma</span>
-                <span className="text-xs text-[#607264] font-mono">(48M, MRN-884920)</span>
+                <span className="text-sm font-bold text-[#142019]">Inbound Caller Intake</span>
+                <span className="text-xs text-[#607264] font-mono">(Live Triage Audio)</span>
                 <Badge
                   variant={
                     stage === "live" || stage === "recording"

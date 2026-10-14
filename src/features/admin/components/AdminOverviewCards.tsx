@@ -21,10 +21,10 @@ export interface AdminOverviewCardsProps {
 export function AdminOverviewCards({ overview }: AdminOverviewCardsProps) {
   const totalUsers = overview.totalUsers ?? overview.activeStaffCount;
   const totalPatients = overview.totalPatients ?? overview.patientsHandled;
-  const activeDoctors = overview.activeDoctors ?? 1;
+  const activeDoctors = overview.activeDoctors ?? 0;
   const pendingTasks = overview.pendingTasks ?? 0;
   const claims = overview.insuranceClaims;
-  const totalClaims = claims ? claims.total : 3;
+  const totalClaims = claims ? claims.total : 0;
 
   return (
     <div className="space-y-6">

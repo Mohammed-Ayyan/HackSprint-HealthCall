@@ -42,13 +42,13 @@ export function AppointmentManager({
   const [loadingDoctors, setLoadingDoctors] = useState(false);
 
   // Form states
-  const [doctorName, setDoctorName] = useState("Dr. Rahul");
-  const [preferredDate, setPreferredDate] = useState("18 October");
-  const [preferredTime, setPreferredTime] = useState("11:00 AM");
+  const [doctorName, setDoctorName] = useState("");
+  const [preferredDate, setPreferredDate] = useState("");
+  const [preferredTime, setPreferredTime] = useState("");
   const [consultType, setConsultType] = useState<PatientAppointment["type"]>("In-Person Consultation");
 
-  const [rescheduleDate, setRescheduleDate] = useState("19 October");
-  const [rescheduleTime, setRescheduleTime] = useState("03:00 PM");
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleTime, setRescheduleTime] = useState("");
 
   useEffect(() => {
     setAppointments(initialAppointments);

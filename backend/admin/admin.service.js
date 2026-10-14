@@ -98,8 +98,8 @@ class AdminService {
       status: { $in: ["COMPLETED", "RESOLVED", "completed"] },
     });
     const totalAllTasks = totalFinishedTasks + pendingTasksCount;
-    const taskCompletionRate = totalAllTasks > 0 ? (totalFinishedTasks / totalAllTasks) * 100 : 96.5;
-    const overallDepartmentEfficiency = Number(Math.max(90, Math.min(99.8, taskCompletionRate)).toFixed(1));
+    const taskCompletionRate = totalAllTasks > 0 ? Number(((totalFinishedTasks / totalAllTasks) * 100).toFixed(1)) : 100.0;
+    const overallDepartmentEfficiency = taskCompletionRate;
 
     return {
       // Direct prompt required fields

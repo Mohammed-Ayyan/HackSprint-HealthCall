@@ -28,8 +28,8 @@ import { AnalyticsCharts } from "@/features/platform/components/AnalyticsCharts"
 import { ReportsExporter } from "@/features/platform/components/ReportsExporter";
 import { mockCallService } from "@/features/ai-intelligence/mockCallService";
 import { mockCallsService } from "@/features/workflow/mockCallsService";
-import { mockTasksService } from "@/features/workflow/mockTasksService";
-import { mockAnalyticsService } from "@/features/platform/mockAnalyticsService";
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
+import { apiAnalyticsService } from "@/features/platform/analytics/apiAnalyticsService";
 import { Call } from "@/shared/types/call";
 import { ActionItem } from "@/shared/types/action";
 import {
@@ -60,12 +60,15 @@ export default function DashboardPage() {
     const [call, recent, escalated, sum, trends, cats, load, res] = await Promise.all([
       mockCallService.getLiveCall(),
       mockCallsService.getRecentCalls(5),
-      mockTasksService.getOverdueAndEscalated(),
-      mockAnalyticsService.getSummary(),
-      mockAnalyticsService.getVolumeTrends(),
-      mockAnalyticsService.getIssueCategories(),
-      mockAnalyticsService.getDepartmentWorkload(),
-      mockAnalyticsService.getResolutionTimeMetrics(),
+      apiTaskService
+        .getTasks()
+        .then((tasks) => tasks.filter((t) => t.isEscalated || t.sla?.isBreached))
+        .catch(() => []),
+      apiAnalyticsService.getSummary(),
+      apiAnalyticsService.getVolumeTrends(),
+      apiAnalyticsService.getCategoryDistribution(),
+      apiAnalyticsService.getDepartmentWorkloads(),
+      apiAnalyticsService.getResolutionTimeMetrics(),
     ]);
 
     setLiveCall(call);

@@ -9,6 +9,7 @@ import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
 import { Modal } from "@/shared/components/ui/Modal";
 import { Input, Select } from "@/shared/components/ui/Input";
+import { authService } from "@/features/platform/auth/authService";
 
 export interface FollowUpManagerProps {
   initialFollowUps: DoctorFollowUp[];
@@ -18,13 +19,15 @@ export function FollowUpManager({ initialFollowUps }: FollowUpManagerProps) {
   const [followUps, setFollowUps] = useState<DoctorFollowUp[]>(initialFollowUps);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+  const currentUser = authService.getCurrentUser();
+
   // Form states
-  const [patientName, setPatientName] = useState("Rahul Sharma");
-  const [scheduledDate, setScheduledDate] = useState("18 October 2026");
-  const [protocol, setProtocol] = useState("Surgical Suture & Lab Recheck");
-  const [notes, setNotes] = useState("Monitor WBC differential and wound incision exudate.");
-  const [assignedTo, setAssignedTo] = useState("Nurse Triage Unit 2");
-  const [priority, setPriority] = useState<DoctorFollowUp["priority"]>("high");
+  const [patientName, setPatientName] = useState("");
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [protocol, setProtocol] = useState("");
+  const [notes, setNotes] = useState("");
+  const [assignedTo, setAssignedTo] = useState(currentUser?.name || "Attending Clinician");
+  const [priority, setPriority] = useState<DoctorFollowUp["priority"]>("medium");
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +204,7 @@ export function FollowUpManager({ initialFollowUps }: FollowUpManagerProps) {
               value={assignedTo}
               onChange={(e) => setAssignedTo(e.target.value)}
               options={[
-                { label: "Dr. Rahul (Self)", value: "Dr. Rahul" },
+                { label: `${currentUser?.name || "Attending Clinician"} (Self)`, value: currentUser?.name || "Attending Clinician" },
                 { label: "Nurse Triage Unit 2", value: "Nurse Triage Unit 2" },
                 { label: "Post-Op Recovery Clinic", value: "Post-Op Recovery Clinic" },
                 { label: "Care Coordination Desk", value: "Care Coordination Desk" },

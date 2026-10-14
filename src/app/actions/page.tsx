@@ -16,7 +16,8 @@ import { KanbanBoard } from "@/features/workflow/components/KanbanBoard";
 import { SLATrackerCard } from "@/features/workflow/components/SLATrackerCard";
 import { DepartmentRoutingUI } from "@/features/workflow/components/DepartmentRoutingUI";
 import { EscalationBanner } from "@/features/workflow/components/EscalationBanner";
-import { mockTasksService } from "@/features/workflow/mockTasksService";
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
+import { apiDepartmentService } from "@/features/platform/departments/apiDepartmentService";
 import { apiUserService } from "@/features/platform/users/apiUserService";
 import { ActionItem, DepartmentRoutingRule, TaskStatus } from "@/shared/types/action";
 import { User } from "@/shared/types/user";
@@ -38,15 +39,28 @@ export default function ActionsPage() {
 
   const loadActionData = async () => {
     setLoading(true);
-    const [actionList, rules, staffList] = await Promise.all([
-      mockTasksService.getTasks(),
-      mockTasksService.getRoutingRules(),
-      apiUserService.getUsers(),
-    ]);
-    setTasks(actionList);
-    setRoutingRules(rules);
-    setUsers(staffList);
-    setLoading(false);
+    try {
+      const [actionList, staffList, depts] = await Promise.all([
+        apiTaskService.getTasks(),
+        apiUserService.getUsers(),
+        apiDepartmentService.getDepartments().catch(() => []),
+      ]);
+      setTasks(actionList);
+      setUsers(staffList);
+
+      const dynamicRules: DepartmentRoutingRule[] = (depts || []).map((d) => ({
+        intent: `${d.name} Clinical & Operations Dispatch`,
+        targetDepartment: (d.name as any) || "Clinical",
+        defaultPriority: "medium",
+        slaTargetHours: 24,
+        autoAssignee: d.leadName || "Department Queue",
+      }));
+      setRoutingRules(dynamicRules);
+    } catch (e: any) {
+      console.warn("Error loading actions data:", e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOpenAssignModal = (task: ActionItem) => {
@@ -56,26 +70,27 @@ export default function ActionsPage() {
 
   const handleAssignUser = async (user: User) => {
     if (!activeTaskForAssign) return;
-    const updated = await mockTasksService.assignTask(activeTaskForAssign.id, {
-      id: user.id,
-      name: user.name,
-      avatar: user.avatar,
-      role: user.role,
-    });
-    if (updated) {
-      setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+    try {
+      const updated = await apiTaskService.assignTask(activeTaskForAssign.id, user.id);
+      if (updated) {
+        setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+      }
+    } catch (err: any) {
+      console.warn("Failed to assign task:", err.message);
     }
     setIsAssignModalOpen(false);
     setActiveTaskForAssign(null);
   };
 
   const handleEscalateTask = async (task: ActionItem) => {
-    const updated = await mockTasksService.escalateTask(
-      task.id,
-      "Escalated by supervisor for urgent clinical resolution."
-    );
-    if (updated) {
-      setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+    try {
+      const updated = await apiTaskService.updateTaskStatus(task.id, "IN_PROGRESS");
+      if (updated) {
+        updated.isEscalated = true;
+        setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+      }
+    } catch (err: any) {
+      console.warn("Failed to escalate task:", err.message);
     }
   };
 

@@ -28,7 +28,7 @@ function mapTaskToReceptionCallAction(t: any): ReceptionCallAction {
     id: t.id,
     callId: t.callId || "call-live-inbound",
     callerName: t.patientName || "Walk-In / Caller",
-    callerPhone: "+1 (555) 019-2831",
+    callerPhone: t.patientPhone || "Registered Patient Phone",
     taskTitle: t.task,
     priority: prio,
     deadline: t.deadline || "Today",
@@ -173,19 +173,28 @@ export const receptionService = {
 
   async getPatientDirectory(): Promise<DirectoryPatient[]> {
     try {
-      const apiPatients = await apiPatientService.getPatients();
+      const [apiPatients, liveApts] = await Promise.all([
+        apiPatientService.getPatients(),
+        apiAppointmentService.getAppointments().catch(() => []),
+      ]);
       if (apiPatients) {
-        return apiPatients.map((p) => ({
-          id: p.id,
-          mrn: p.mrn,
-          name: p.name,
-          contact: p.phone,
-          email: p.email,
-          dob: p.dateOfBirth || "1990-01-01",
-          insuranceProvider: p.insuranceProvider || "MetroHealth Care Plan",
-          lastVisit: "Recent Consultation",
-          totalAppointments: 1,
-        }));
+        return apiPatients.map((p) => {
+          const patientApts = liveApts.filter(
+            (a) => a.mrn === p.mrn || a.patientName === p.name
+          );
+          const lastApt = patientApts[0];
+          return {
+            id: p.id,
+            mrn: p.mrn,
+            name: p.name,
+            contact: p.phone,
+            email: p.email,
+            dob: p.dateOfBirth || "Not Specified",
+            insuranceProvider: p.insuranceProvider || "Self-Pay / Not Registered",
+            lastVisit: lastApt ? `${lastApt.date} (${lastApt.doctorName})` : "Registered",
+            totalAppointments: patientApts.length,
+          };
+        });
       }
     } catch (err: any) {
       console.error("[receptionService] Failed to fetch patient directory from backend:", err.message);
@@ -212,7 +221,7 @@ export const receptionService = {
       dob: created.dateOfBirth || data.dob,
       insuranceProvider: created.insuranceProvider || data.insuranceProvider,
       lastVisit: data.lastVisit || "Today (Intake)",
-      totalAppointments: 1,
+      totalAppointments: 0,
     };
   },
 
