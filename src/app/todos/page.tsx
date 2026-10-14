@@ -1,10 +1,10 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 
-export default async function Page() {
+async function TodosList() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-
   const { data: todos } = await supabase.from("todos").select();
 
   return (
@@ -16,3 +16,10 @@ export default async function Page() {
   );
 }
 
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="p-8 text-sm text-[#627267]">Loading todos...</div>}>
+      <TodosList />
+    </Suspense>
+  );
+}
