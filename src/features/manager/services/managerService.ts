@@ -2,6 +2,7 @@ import { ManagerOverviewData, EmployeeWorkload, EscalationCase } from "../types"
 import { apiUserService } from "@/features/platform/users/apiUserService";
 import { apiAppointmentService } from "@/features/platform/appointments/apiAppointmentService";
 import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
+import { apiAnalyticsService } from "@/features/platform/analytics/apiAnalyticsService";
 
 /**
  * Manager Service (Connected to live database users, appointments, and task engine)
@@ -9,24 +10,25 @@ import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
 export const managerService = {
   async getOverview(): Promise<ManagerOverviewData> {
     try {
-      const [users, tasks] = await Promise.all([
+      const [users, tasks, analytics] = await Promise.all([
         apiUserService.getUsers().catch(() => []),
         apiTaskService.getTasks().catch(() => []),
+        apiAnalyticsService.getTaskAnalytics().catch(() => null),
       ]);
 
       const staff = users.filter((u) => u.role !== "Patient");
-      const activeTasks = tasks.filter((t) => t.status !== "completed");
-      const completedTasks = tasks.filter((t) => t.status === "completed");
+      const activeTasksCount = analytics ? analytics.pendingTasks : tasks.filter((t) => t.status !== "completed").length;
+      const completedTasksCount = analytics ? analytics.completedTasks : tasks.filter((t) => t.status === "completed").length;
       const overdueTasks = tasks.filter((t) => t.sla?.isBreached);
 
       return {
         managerName: "Operations Command",
         departmentName: "Surgical Recovery & Care Operations",
         totalEmployeesCount: staff.length,
-        activeTasksCount: activeTasks.length,
-        completedTasksCount: completedTasks.length,
+        activeTasksCount,
+        completedTasksCount,
         overdueTasksCount: overdueTasks.length,
-        avgResolutionHours: activeTasks.length > 0 ? 1.5 : 0,
+        avgResolutionHours: activeTasksCount > 0 ? 1.5 : 0,
         departmentVitalityScore: staff.length > 0 ? 98 : 0,
       };
     } catch {
