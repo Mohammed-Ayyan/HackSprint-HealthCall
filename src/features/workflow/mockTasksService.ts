@@ -316,35 +316,13 @@ export const mockTasksService = {
   }): Promise<ActionItem[]> {
     try {
       const realTasks = await apiTaskService.getTasks(filters as any);
-      if (realTasks && realTasks.length > 0) {
+      if (Array.isArray(realTasks)) {
         return realTasks;
       }
     } catch (e: any) {
-      console.warn("[mockTasksService] Live tasks unavailable, using fallback:", e.message);
+      console.warn("[mockTasksService] Live tasks query failed:", e.message);
     }
-
-    let items = [...mockActionItems];
-
-    if (filters?.status) {
-      items = items.filter((i) => i.status === filters.status);
-    }
-    if (filters?.department) {
-      items = items.filter((i) => i.department === filters.department);
-    }
-    if (filters?.priority) {
-      items = items.filter((i) => i.priority === filters.priority);
-    }
-    if (filters?.search) {
-      const q = filters.search.toLowerCase();
-      items = items.filter(
-        (i) =>
-          i.task.toLowerCase().includes(q) ||
-          i.patientName.toLowerCase().includes(q) ||
-          i.department.toLowerCase().includes(q)
-      );
-    }
-
-    return items;
+    return [];
   },
 
   async updateTaskStatus(taskId: string, newStatus: TaskStatus): Promise<ActionItem | null> {
@@ -354,12 +332,7 @@ export const mockTasksService = {
     } catch (e: any) {
       console.warn("[mockTasksService] Live status update failed:", e.message);
     }
-
-    const task = mockActionItems.find((i) => i.id === taskId);
-    if (!task) return null;
-    task.status = newStatus;
-    task.updatedAt = new Date().toISOString();
-    return { ...task };
+    return null;
   },
 
   async assignTask(
@@ -372,15 +345,7 @@ export const mockTasksService = {
     } catch (e: any) {
       console.warn("[mockTasksService] Live assignment failed:", e.message);
     }
-
-    const task = mockActionItems.find((i) => i.id === taskId);
-    if (!task) return null;
-    task.assignedTo = user;
-    if (task.status === "pending") {
-      task.status = "assigned";
-    }
-    task.updatedAt = new Date().toISOString();
-    return { ...task };
+    return null;
   },
 
   async escalateTask(taskId: string, reason: string): Promise<ActionItem | null> {
@@ -395,15 +360,7 @@ export const mockTasksService = {
     } catch (e: any) {
       console.warn("[mockTasksService] Live escalate failed:", e.message);
     }
-
-    const task = mockActionItems.find((i) => i.id === taskId);
-    if (!task) return null;
-    task.isEscalated = true;
-    task.escalatedTo = "Operations Executive / Manager";
-    task.escalationReason = reason;
-    task.priority = "critical";
-    task.updatedAt = new Date().toISOString();
-    return { ...task };
+    return null;
   },
 
   async getRoutingRules(): Promise<DepartmentRoutingRule[]> {
@@ -413,9 +370,9 @@ export const mockTasksService = {
   async getOverdueAndEscalated(): Promise<ActionItem[]> {
     try {
       const allTasks = await this.getTasks();
-      return allTasks.filter((i) => i.isEscalated || i.sla.isBreached || i.sla.isWarning);
+      return allTasks.filter((i) => i.isEscalated || i.sla?.isBreached || i.sla?.isWarning);
     } catch {
-      return mockActionItems.filter((i) => i.isEscalated || i.sla.isBreached || i.sla.isWarning);
+      return [];
     }
   },
 };

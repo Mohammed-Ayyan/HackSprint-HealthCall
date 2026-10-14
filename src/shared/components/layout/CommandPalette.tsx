@@ -16,10 +16,12 @@ import {
 } from "lucide-react";
 import { Modal } from "@/shared/components/ui/Modal";
 import { mockCallsList } from "@/features/workflow/mockCallsService";
-import { mockActionItems } from "@/features/workflow/mockTasksService";
+import { apiTaskService } from "@/features/platform/tasks/apiTaskService";
+import { ActionItem } from "@/shared/types/action";
 import { apiUserService } from "@/features/platform/users/apiUserService";
 import { User as UserType } from "@/shared/types/user";
-import { mockInsuranceClaims } from "@/features/insurance/services/insuranceService";
+import { apiInsuranceService } from "@/features/platform/insurance/apiInsuranceService";
+import { InsuranceClaim } from "@/features/insurance/types";
 import { Badge } from "@/shared/components/ui/Badge";
 import { cn } from "@/shared/utils/cn";
 
@@ -32,10 +34,14 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<UserType[]>([]);
+  const [actions, setActions] = useState<ActionItem[]>([]);
+  const [claims, setClaims] = useState<InsuranceClaim[]>([]);
 
   React.useEffect(() => {
     if (isOpen) {
       apiUserService.getUsers().then((u) => setUsers(u || [])).catch(() => {});
+      apiTaskService.getTasks().then((t) => setActions(t || [])).catch(() => {});
+      apiInsuranceService.getClaims().then((c) => setClaims(c || [])).catch(() => {});
     }
   }, [isOpen]);
 
@@ -57,22 +63,22 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     : mockCallsList.slice(0, 2);
 
   const filteredActions = q
-    ? mockActionItems.filter(
+    ? actions.filter(
         (a) =>
           a.task.toLowerCase().includes(q) ||
           a.patientName.toLowerCase().includes(q) ||
           a.department.toLowerCase().includes(q)
       )
-    : mockActionItems.slice(0, 2);
+    : actions.slice(0, 2);
 
   const filteredClaims = q
-    ? mockInsuranceClaims.filter(
+    ? claims.filter(
         (c) =>
           c.claimId.toLowerCase().includes(q) ||
           c.patientName.toLowerCase().includes(q) ||
           c.payerName.toLowerCase().includes(q)
       )
-    : mockInsuranceClaims.slice(0, 2);
+    : claims.slice(0, 2);
 
   const filteredUsers = q
     ? users.filter(

@@ -226,7 +226,23 @@ async function getPatientById({ patientId, requester }) {
       throw error;
     }
   } else if (requester.role === USER_ROLES.DOCTOR) {
+    let hasAppointment = false;
+    try {
+      const Appointment = require("../models/Appointment");
+      if (requester.name) {
+        hasAppointment = await Appointment.exists({
+          $or: [
+            { doctorName: new RegExp(requester.name, "i"), patientId: patient._id },
+            { doctorName: new RegExp(requester.name, "i"), patientName: new RegExp(patient.name, "i") },
+          ],
+        });
+      }
+    } catch {
+      // ignore
+    }
+
     const isAssigned =
+      hasAppointment ||
       (patient.assignedDoctorId && patient.assignedDoctorId.toString() === requester.id) ||
       (patient.assignedDoctorName &&
         requester.name &&
